@@ -8,6 +8,7 @@
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#2575fc">
+	<meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ربات CST">
@@ -593,6 +594,49 @@ function createInstallButton() {
     installButton.addEventListener('click', installPWA);
     document.body.appendChild(installButton);
 }
+
+
+
+// اضافه کردن به کد PWA موجود
+function shouldShowInstallPrompt() {
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    
+    if (isIOS) {
+        // در iOS باید راهنمایی کنیم
+        showIOSInstallGuide();
+        return false;
+    }
+    return true;
+}
+
+function showIOSInstallGuide() {
+    const iosGuide = document.createElement('div');
+    iosGuide.innerHTML = `
+        <div style="position: fixed; bottom: 20px; left: 20px; right: 20px; background: #333; color: white; padding: 15px; border-radius: 10px; z-index: 1000;">
+            <p>📱 برای نصب: منوی Share → Add to Home Screen</p>
+            <button onclick="this.parentElement.style.display='none'" style="background: #6a11cb; color: white; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 10px;">متوجه شدم</button>
+        </div>
+    `;
+    document.body.appendChild(iosGuide);
+}
+
+// آپدیت رویداد beforeinstallprompt
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('🔔 قابلیت نصب فعال شد');
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    if (shouldShowInstallPrompt()) {
+        createInstallButton();
+        if (installButton) {
+            installButton.style.display = 'block';
+        }
+    }
+});
+
+
+		
 
 // رویداد پیشنهاد نصب
 window.addEventListener('beforeinstallprompt', (e) => {
