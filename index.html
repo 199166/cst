@@ -718,7 +718,46 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-		
+	// تشخیص قابلیت‌های PWA
+function checkPWASupport() {
+    const supports = {
+        serviceWorker: 'serviceWorker' in navigator,
+        manifest: !!document.querySelector('link[rel="manifest"]'),
+        beforeInstallPrompt: 'onbeforeinstallprompt' in window,
+        standalone: window.matchMedia('(display-mode: standalone)').matches
+    };
+    
+    console.log('📱 قابلیت‌های PWA:', supports);
+    
+    if (!supports.serviceWorker) {
+        showMessage('❌ مرورگر شما از PWA پشتیبانی نمی‌کند');
+    }
+    
+    if (!supports.beforeInstallPrompt) {
+        showManualInstallGuide();
+    }
+    
+    return supports;
+}
+
+// راهنمای نصب دستی
+function showManualInstallGuide() {
+    const guide = document.createElement('div');
+    guide.innerHTML = `
+        <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); color: white; padding: 20px; border-radius: 10px; z-index: 10000; text-align: center; max-width: 300px;">
+            <h3>📱 راهنمای نصب</h3>
+            <p>برای نصب اپ:</p>
+            <p>1. منوی مرورگر (⋯) را باز کنید</p>
+            <p>2. "Add to Home screen" را انتخاب کنید</p>
+            <p>3. "Add" را بزنید</p>
+            <button onclick="this.parentElement.parentElement.remove()" style="background: #6a11cb; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 10px; cursor: pointer;">متوجه شدم</button>
+        </div>
+    `;
+    document.body.appendChild(guide);
+}
+
+// اجرای چک
+window.addEventListener('load', checkPWASupport);	
 
 		
     </script>
