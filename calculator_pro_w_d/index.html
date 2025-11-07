@@ -634,6 +634,31 @@
         font-size: 0.95rem;
       }
     }
+
+/* استایل برای آیکون دکمه تاگل */
+#toggle_icon {
+  transition: all 0.3s ease;
+  font-weight: bold;
+  display: inline-block;
+}
+
+/* افکت hover برای دکمه تاگل */
+#toggle_history_btn:hover #toggle_icon {
+  transform: scale(1.2);
+}
+
+/* استایل برای حالت باز بودن */
+#toggle_history_btn.open {
+  background: #374151 !important;
+  border-color: #6b7280 !important;
+}
+
+/* استایل برای حالت بسته بودن */
+#toggle_history_btn.closed {
+  background: #475569 !important;
+  border-color: #64748b !important;
+}
+  
 </style>
 </head>
 <body>
@@ -1226,6 +1251,66 @@ function pruneOldEntries(){
 
 // مدیریت وضعیت باکس‌ها بر اساس دستگاه - فقط هنگام لود صفحه
 initializeBoxStates();
+
+
+
+
+
+// ---------- DOM refs ----------
+const $ = id => document.getElementById(id);
+const pairSelect = $('pair_select');
+const historyPairFilter = $('history_pair_filter');
+// ... بقیه متغیرها
+
+const toggleHistoryBtn = $('toggle_history_btn');
+const historyPanel = $('history_panel');
+// ... بقیه متغیرها
+
+// ---------- تابع جدید برای مدیریت دکمه تاگل ----------
+function updateToggleButton(isOpen) {
+  const toggleIcon = document.getElementById('toggle_icon');
+  const toggleText = document.getElementById('toggle_text');
+  const toggleBtn = document.getElementById('toggle_history_btn');
+  
+  if (isOpen) {
+    toggleIcon.textContent = '📁';
+    toggleIcon.style.transform = 'rotate(0deg) scale(1.1)';
+    toggleText.textContent = 'بستن ذخیره‌ها';
+    toggleBtn.classList.remove('closed');
+    toggleBtn.classList.add('open');
+  } else {
+    toggleIcon.textContent = '📂';
+    toggleIcon.style.transform = 'rotate(0deg) scale(1)';
+    toggleText.textContent = 'نمایش ذخیره‌ها';
+    toggleBtn.classList.remove('open');
+    toggleBtn.classList.add('closed');
+  }
+}
+
+// ---------- event listeners ----------
+if(calculateButton) calculateButton.addEventListener('click', ()=>{
+  // ... کدهای موجود
+});
+
+// ---------- مدیریت تاریخچه ----------
+if(toggleHistoryBtn) toggleHistoryBtn.addEventListener('click', ()=>{
+  const isCurrentlyHidden = historyPanel.classList.contains('hidden');
+  
+  if(isCurrentlyHidden){
+    historyPanel.classList.remove('hidden'); 
+    updateToggleButton(true); // اینجا فراخوانی شود
+    const today = new Date().toISOString().split('T')[0];
+    if(historyDate) historyDate.value = today;
+    renderHistory();
+  } else { 
+    historyPanel.classList.add('hidden'); 
+    updateToggleButton(false); // اینجا فراخوانی شود
+  }
+});
+
+
+
+
 
   
 // ---------- event listeners ----------
@@ -1866,25 +1951,7 @@ if(toggleHistoryBtn) toggleHistoryBtn.addEventListener('click', ()=>{
 });
 
 
-function updateToggleButton(isOpen) {
-  const toggleIcon = document.getElementById('toggle_icon');
-  const toggleText = document.getElementById('toggle_text');
-  const toggleBtn = document.getElementById('toggle_history_btn');
-  
-  if (isOpen) {
-    toggleIcon.textContent = '📁';
-    toggleIcon.style.transform = 'rotate(0deg) scale(1.1)';
-    toggleText.textContent = 'بستن ذخیره‌ها';
-    toggleBtn.classList.remove('closed');
-    toggleBtn.classList.add('open');
-  } else {
-    toggleIcon.textContent = '📂';
-    toggleIcon.style.transform = 'rotate(0deg) scale(1)';
-    toggleText.textContent = 'نمایش ذخیره‌ها';
-    toggleBtn.classList.remove('open');
-    toggleBtn.classList.add('closed');
-  }
-}
+
 
 
   
