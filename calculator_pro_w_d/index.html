@@ -170,7 +170,10 @@
 
     <aside class="card">
       <div id="hdr_pairs" class="section-header">
-        <div class="title-click"><span class="section-title">مدیریت جفت‌ارز - برنامه اول</span> <span class="muted">🔽</span></div>
+<div class="title-click">
+    <span class="hamburger-icon">≡</span>
+    <span class="section-title">مدیریت جفت‌ارز - برنامه اول</span>
+</div>
       </div>
       <div id="box_pairs" class="mt-3">
         <div class="mb-4 p-3 rounded bg-[var(--input-bg)] border border-white/10">
@@ -251,7 +254,12 @@
 
     <main class="card">
       <div id="hdr_calc" class="section-header">
-        <div class="title-click"><span class="section-title">ماشین حساب فرمول‌ها — برنامه اول</span> <span class="muted">🔽</span></div>
+
+        <div class="title-click">
+    <span class="hamburger-icon">≡</span>
+    <span class="section-title">ماشین حساب فرمول‌ها — برنامه اول</span>
+</div>
+
       </div>
 
       <div id="box_calc" class="mt-3">
@@ -325,7 +333,11 @@
 
     <section class="card">
       <div id="hdr_history" class="section-header">
-        <div class="title-click"><span class="section-title">تاریخچه - برنامه اول</span> <span class="muted">🔽</span></div>
+
+                <div class="title-click">
+    <span class="hamburger-icon">≡</span>
+    <span class="section-title">تاریخچه - برنامه اول</span>
+</div>
       </div>
 
       <div id="box_history" class="mt-3">
@@ -971,7 +983,7 @@ function renderCategorySection(categoryId, categoryName, pairs){
   section.innerHTML = `
     <div class="category-header flex justify-between items-center" data-category="${categoryId || ''}">
       <div class="font-semibold text-sm">${categoryName} (${pairs.length})</div>
-      <div class="muted text-xs">🔽</div>
+
     </div>
     <div class="category-content">
       <ul class="space-y-2 pairs-list-${categoryId || 'uncategorized'}"></ul>
