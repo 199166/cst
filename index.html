@@ -543,112 +543,95 @@
             console.log('کد فعلی (آپدیت):', generateTOTP());
         }, 10000);
 
-        // ==================== PWA FUNCTIONALITY ====================
+        // ==================== PWA INSTALL ====================
+let deferredPrompt;
+const installButton = document.createElement('button');
+
+// ایجاد دکمه نصب
+function createInstallButton() {
+    installButton.innerHTML = '📱 نصب اپلیکیشن';
+    installButton.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        z-index: 1000;
+        transition: all 0.3s ease;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    `;
+    
+    installButton.addEventListener('click', installPWA);
+    document.body.appendChild(installButton);
+    installButton.style.display = 'none';
+}
+
+// رویداد پیشنهاد نصب
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('قابلیت نصب فعال شد');
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    createInstallButton();
+    installButton.style.display = 'block';
+});
+
+// تابع نصب
+function installPWA() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
         
-        // مدیریت PWA - قابلیت نصب
-        let deferredPrompt;
-        const installButton = document.createElement('button');
-
-        // ایجاد دکمه نصب
-        function createInstallButton() {
-            installButton.innerHTML = '📱 نصب اپلیکیشن';
-            installButton.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 20px;
-                padding: 12px 20px;
-                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-                color: white;
-                border: none;
-                border-radius: 25px;
-                font-size: 14px;
-                font-weight: bold;
-                cursor: pointer;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-                z-index: 1000;
-                transition: all 0.3s ease;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            `;
-            
-            installButton.addEventListener('mouseenter', () => {
-                installButton.style.transform = 'translateY(-2px)';
-                installButton.style.boxShadow = '0 6px 20px rgba(0,0,0,0.4)';
-            });
-            
-            installButton.addEventListener('mouseleave', () => {
-                installButton.style.transform = 'translateY(0)';
-                installButton.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3)';
-            });
-            
-            installButton.addEventListener('click', installPWA);
-            document.body.appendChild(installButton);
-            installButton.style.display = 'none';
-        }
-
-        // رویداد پیشنهاد نصب
-        window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('قابلیت نصب فعال شد');
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // نمایش دکمه نصب
-            if (!document.querySelector('.install-btn')) {
-                createInstallButton();
-                installButton.style.display = 'block';
-                
-                // مخفی کردن خودکار پس از 10 ثانیه
-                setTimeout(() => {
-                    if (installButton.style.display !== 'none') {
-                        installButton.style.display = 'none';
-                    }
-                }, 10000);
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('کاربر نصب را پذیرفت');
+                installButton.style.display = 'none';
             }
-        });
-
-        // تابع نصب
-        function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('کاربر نصب را پذیرفت');
-                        installButton.style.display = 'none';
-                    } else {
-                        console.log('کاربر از نصب صرف نظر کرد');
-                    }
-                    deferredPrompt = null;
-                });
-            }
-        }
-
-        // بررسی اگر اپلیکیشن نصب شده
-        window.addEventListener('appinstalled', (evt) => {
-            console.log('اپلیکیشن با موفقیت نصب شد');
-            installButton.style.display = 'none';
             deferredPrompt = null;
         });
+    }
+}
 
+// بررسی اگر اپلیکیشن نصب شده
+window.addEventListener('appinstalled', (evt) => {
+    console.log('اپلیکیشن با موفقیت نصب شد');
+    installButton.style.display = 'none';
+    deferredPrompt = null;
+});
 
 // ثبت Service Worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js');
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/cst/sw.js')
+            .then(function(registration) {
+                console.log('ServiceWorker ثبت شد: ', registration.scope);
+            })
+            .catch(function(error) {
+                console.log('خطا در ثبت ServiceWorker: ', error);
+            });
+    });
 }
 
-        // تشخیص حالت نمایش
-        function detectDisplayMode() {
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                console.log('در حالت standalone اجرا می‌شود');
-                document.body.classList.add('standalone');
-            } else if (window.matchMedia('(display-mode: fullscreen)').matches) {
-                console.log('در حالت fullscreen اجرا می‌شود');
-            } else {
-                console.log('در مرورگر اجرا می‌شود');
-            }
-        }
+// تشخیص حالت نمایش
+function detectDisplayMode() {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('در حالت standalone اجرا می‌شود');
+        document.body.classList.add('standalone');
+    } else if (window.matchMedia('(display-mode: fullscreen)').matches) {
+        console.log('در حالت fullscreen اجرا می‌شود');
+    } else {
+        console.log('در مرورگر اجرا می‌شود');
+    }
+}
 
-        // اجرا پس از لود صفحه
-        window.addEventListener('load', detectDisplayMode);
+// اجرا پس از لود صفحه
+window.addEventListener('load', detectDisplayMode);
     </script>
 </body>
 </html>
