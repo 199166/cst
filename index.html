@@ -318,16 +318,45 @@
         }
 
 
+/* اضافه کردن به بخش استایل */
 .pwa-install-btn {
-    display: none; /* پیش‌فرض مخفی */
+    position: fixed;
+    bottom: 25px;
+    left: 25px;
+    padding: 16px 28px;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    font-family: 'Vazirmatn', 'Segoe UI', sans-serif;
+    min-width: 180px;
+    min-height: 55px;
+    display: none;
 }
 
 .pwa-install-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
 }
 
-
+/* برای موبایل استایل جدا */
+@media (max-width: 768px) {
+    .pwa-install-btn {
+        padding: 14px 22px;
+        font-size: 15px;
+        min-width: 160px;
+        min-height: 50px;
+        bottom: 20px;
+        left: 20px;
+    }
+}
 		
     </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -580,10 +609,10 @@
 
 
 
-
 // ==================== PWA INSTALL ====================
 let deferredPrompt;
 let installButton = null;
+let installPromptTimeout;
 
 // ایجاد دکمه نصب
 function createInstallButton() {
@@ -591,71 +620,54 @@ function createInstallButton() {
     
     installButton = document.createElement('button');
     installButton.className = 'pwa-install-btn';
-    installButton.innerHTML = '📱 نصب اپلیکیشن';
-    installButton.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        padding: 12px 20px;
-        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-        color: white;
-        border: none;
-        border-radius: 25px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        z-index: 1000;
-        transition: all 0.3s ease;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    `;
+    installButton.innerHTML = '📱 نصب برنامه';
+    installButton.style.display = 'none';
+    
+    // اضافه کردن افکت‌ها
+    installButton.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-3px)';
+        this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.4)';
+    });
+    
+    installButton.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+    });
     
     installButton.addEventListener('click', installPWA);
     document.body.appendChild(installButton);
 }
 
-
-
-// اضافه کردن به کد PWA موجود
-function shouldShowInstallPrompt() {
-    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    
-    if (isIOS) {
-        // در iOS باید راهنمایی کنیم
-        showIOSInstallGuide();
-        return false;
-    }
-    return true;
-}
-
-function showIOSInstallGuide() {
-    const iosGuide = document.createElement('div');
-    iosGuide.innerHTML = `
-        <div style="position: fixed; bottom: 20px; left: 20px; right: 20px; background: #333; color: white; padding: 15px; border-radius: 10px; z-index: 1000;">
-            <p>📱 برای نصب: منوی Share → Add to Home Screen</p>
-            <button onclick="this.parentElement.style.display='none'" style="background: #6a11cb; color: white; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 10px;">متوجه شدم</button>
-        </div>
-    `;
-    document.body.appendChild(iosGuide);
-}
-
-// آپدیت رویداد beforeinstallprompt
-window.addEventListener('beforeinstallprompt', (e) => {
-    console.log('🔔 قابلیت نصب فعال شد');
-    e.preventDefault();
-    deferredPrompt = e;
-    
-    if (shouldShowInstallPrompt()) {
+// نمایش دکمه
+function showInstallButton() {
+    if (!installButton) {
         createInstallButton();
-        if (installButton) {
-            installButton.style.display = 'block';
-        }
     }
-});
+    installButton.style.display = 'block';
+    
+    // پاک کردن تایموت قبلی
+    if (installPromptTimeout) {
+        clearTimeout(installPromptTimeout);
+    }
+    
+    // تنظیم تایموت جدید برای ۲ دقیقه (120 ثانیه)
+    installPromptTimeout = setTimeout(() => {
+        if (installButton && installButton.style.display !== 'none') {
+            installButton.style.display = 'none';
+            console.log('⏰ دکمه نصب به صورت خودکار مخفی شد');
+        }
+    }, 120000); // 120 ثانیه = 2 دقیقه
+}
 
-
-		
+// مخفی کردن دکمه
+function hideInstallButton() {
+    if (installButton) {
+        installButton.style.display = 'none';
+    }
+    if (installPromptTimeout) {
+        clearTimeout(installPromptTimeout);
+    }
+}
 
 // رویداد پیشنهاد نصب
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -663,18 +675,15 @@ window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     
-    // ایجاد و نمایش دکمه
-    createInstallButton();
-    if (installButton) {
-        installButton.style.display = 'block';
-    }
+    // نمایش دکمه
+    showInstallButton();
     
-    // مخفی کردن خودکار پس از ۲۰ ثانیه
+    // همچنین بعد از ۱۰ ثانیه دوباره چک کن (برای موارد خاص)
     setTimeout(() => {
-        if (installButton && installButton.style.display !== 'none') {
-            installButton.style.display = 'none';
+        if (deferredPrompt && installButton && installButton.style.display === 'none') {
+            showInstallButton();
         }
-    }, 20000);
+    }, 10000);
 });
 
 // تابع نصب
@@ -685,11 +694,13 @@ function installPWA() {
         deferredPrompt.userChoice.then((choiceResult) => {
             if (choiceResult.outcome === 'accepted') {
                 console.log('✅ کاربر نصب را پذیرفت');
-                if (installButton) {
-                    installButton.style.display = 'none';
-                }
+                hideInstallButton();
             } else {
                 console.log('❌ کاربر از نصب صرف نظر کرد');
+                // بعد از رد نصب، ۱۰ ثانیه دیگه نمایش بده
+                setTimeout(() => {
+                    showInstallButton();
+                }, 10000);
             }
             deferredPrompt = null;
         });
@@ -699,86 +710,41 @@ function installPWA() {
 // بررسی اگر اپلیکیشن نصب شده
 window.addEventListener('appinstalled', (evt) => {
     console.log('🎉 اپلیکیشن با موفقیت نصب شد');
-    if (installButton) {
-        installButton.style.display = 'none';
-    }
+    hideInstallButton();
     deferredPrompt = null;
 });
 
-// ثبت Service Worker با fallback
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/cst/sw.js')
-        .then(reg => console.log('✅ SW ثبت شد'))
-        .catch(err => console.log('❌ خطای SW:', err));
-} else {
-    console.log('⚠️ مرورگر از Service Worker پشتیبانی نمی‌کند');
-}
-
-
-
-
-
-		
-
-// تشخیص شیائومی و نمایش راهنمای ویژه
-function detectXiaomiAndShowGuide() {
-    const isXiaomi = /xiaomi|redmi|poco|mi\s/i.test(navigator.userAgent.toLowerCase());
-    const isChrome = /chrome/i.test(navigator.userAgent);
-    
-    if (isXiaomi && isChrome) {
-        console.log('📱 دستگاه شیائومی با کروم تشخیص داده شد');
-        
-        // نمایش راهنمای ویژه پس از 5 ثانیه
-        setTimeout(() => {
-            showXiaomiPWAGuide();
-        }, 5000);
+// نمایش دکمه وقتی کاربر اسکرول می‌کنه (تعامل داره)
+let userInteracted = false;
+window.addEventListener('scroll', function() {
+    if (!userInteracted && deferredPrompt && installButton && installButton.style.display === 'none') {
+        userInteracted = true;
+        showInstallButton();
     }
+});
+
+window.addEventListener('click', function() {
+    if (!userInteracted && deferredPrompt && installButton && installButton.style.display === 'none') {
+        userInteracted = true;
+        showInstallButton();
+    }
+});
+
+// ثبت Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/cst/sw.js')
+            .then(function(registration) {
+                console.log('✅ ServiceWorker ثبت شد: ', registration.scope);
+            })
+            .catch(function(error) {
+                console.log('❌ خطا در ثبت ServiceWorker: ', error);
+            });
+    });
 }
 
-function showXiaomiPWAGuide() {
-    const guide = document.createElement('div');
-    guide.id = 'xiaomi-pwa-guide';
-    guide.innerHTML = `
-        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; justify-content: center; align-items: center; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); color: white; padding: 30px; border-radius: 20px; max-width: 400px; text-align: center; border: 2px solid rgba(255,255,255,0.3);">
-                <h3 style="margin-bottom: 20px; font-size: 1.3em;">📱 مشکل نصب در شیائومی</h3>
-                
-                <div style="text-align: right; direction: rtl; line-height: 2; margin-bottom: 25px;">
-                    <p><strong>راه حل 1:</strong> از Firefox استفاده کنید</p>
-                    <p><strong>راه حل 2:</strong> تنظیمات باتری رو تغییر بدید</p>
-                    <p><strong>راه حل 3:</strong> مرورگر پیش‌فرض شیائومی رو امتحان کنید</p>
-                </div>
-                
-                <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button onclick="installFirefoxGuide()" style="background: white; color: #6a11cb; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; flex: 1;">Firefox نصب کنید</button>
-                    <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid white; padding: 12px 20px; border-radius: 25px; cursor: pointer; flex: 1;">بستن</button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(guide);
-}
 
-function installFirefoxGuide() {
-    document.getElementById('xiaomi-pwa-guide').innerHTML = `
-        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; justify-content: center; align-items: center; padding: 20px;">
-            <div style="background: #00539F; color: white; padding: 30px; border-radius: 20px; max-width: 400px; text-align: center;">
-                <h3 style="margin-bottom: 20px;">🦊 نصب Firefox</h3>
-                <div style="text-align: right; direction: rtl; line-height: 2; margin-bottom: 25px;">
-                    <p>1. به Play Store برید</p>
-                    <p>2. "Firefox" رو جستجو کنید</p>
-                    <p>3. نصب کنید و این سایت رو باز کنید</p>
-                    <p>4. منو → "Install"</p>
-                </div>
-                <button onclick="window.open('https://play.google.com/store/apps/details?id=org.mozilla.firefox', '_blank')" style="background: #FF9500; color: white; border: none; padding: 15px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; width: 100%;">برو به Play Store</button>
-                <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: transparent; color: white; border: 1px solid white; padding: 12px 25px; border-radius: 25px; cursor: pointer; margin-top: 15px; width: 100%;">بستن</button>
-            </div>
-        </div>
-    `;
-}
 
-// اجرای تشخیص
-window.addEventListener('load', detectXiaomiAndShowGuide);
 		
     </script>
 </body>
