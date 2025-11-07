@@ -93,6 +93,7 @@
             margin-bottom: 20px;
             flex-wrap: wrap;
             position: relative;
+            min-height: 60px; /* ارتفاع ثابت برای هدر */
         }
 
         h1, h2, h3 {
@@ -111,6 +112,7 @@
             left: 10px;
             top: 50%;
             transform: translateY(-50%);
+            z-index: 101; /* بالاتر از منوی همبرگری */
         }
 
         .theme-toggle:hover {
@@ -177,7 +179,7 @@
             display: block;
         }
 
-        /* منوی همبرگری برای موبایل - بهبود یافته */
+        /* منوی همبرگری برای موبایل - کاملاً اصلاح شده */
         .mobile-menu-toggle {
             display: none;
             background: none;
@@ -185,16 +187,32 @@
             font-size: 28px;
             cursor: pointer;
             color: var(--text-color);
-            padding: 8px 12px;
+            padding: 5px; /* کاهش padding */
             position: absolute;
-            right: 10px;
+            right: 5px; /* فاصله کمتر از راست */
             top: 50%;
             transform: translateY(-50%);
-            background-color: var(--menu-bg);
-            border-radius: 5px;
-            border: 1px solid var(--menu-border);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            /* حذف کامل background, border, box-shadow */
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0;
             z-index: 100;
+            transition: color 0.3s ease;
+        }
+
+        .mobile-menu-toggle:hover {
+            background-color: transparent !important;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .mobile-menu-toggle:active {
+            background-color: transparent !important;
+        }
+
+        .mobile-menu-toggle:focus {
+            outline: none;
+            background-color: transparent !important;
         }
 
         .mobile-tabs {
@@ -869,8 +887,9 @@
             .header {
                 flex-direction: row;
                 align-items: center;
-                padding-left: 50px;
-                padding-right: 50px;
+                padding-left: 45px; /* کاهش فاصله برای دکمه تاریک/روشن */
+                padding-right: 45px; /* کاهش فاصله برای منوی همبرگری */
+                min-height: 50px; /* ارتفاع کمتر در موبایل */
             }
             
             .input-row {
@@ -913,10 +932,12 @@
             }
             
             h1 {
-                font-size: 20px;
+                font-size: 18px; /* کاهش سایز فونت برای موبایل */
                 text-align: center;
                 flex: 1;
-                margin: 0 10px;
+                margin: 0 5px;
+                padding: 0 10px;
+                line-height: 1.2;
             }
 
             .tabs {
@@ -925,6 +946,8 @@
             
             .mobile-menu-toggle {
                 display: block;
+                right: 0; /* چسباندن به لبه */
+                padding: 8px 10px; /* padding متعادل */
             }
             
             .mobile-tabs {
@@ -999,6 +1022,12 @@
             .desktop-input-order {
                 display: none;
             }
+
+            /* تنظیم موقعیت دکمه تاریک/روشن در موبایل */
+            .theme-toggle {
+                left: 0; /* چسباندن به لبه */
+                padding: 8px 10px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1020,12 +1049,15 @@
             }
             
             .header {
-                padding-left: 45px;
-                padding-right: 45px;
+                padding-left: 40px;
+                padding-right: 40px;
+                min-height: 45px;
             }
             
             h1 {
-                font-size: 18px;
+                font-size: 16px; /* کاهش بیشتر سایز فونت */
+                margin: 0 2px;
+                padding: 0 5px;
             }
             
             /* بهبود بیشتر برای موبایل‌های کوچک */
@@ -1047,6 +1079,16 @@
                 padding: 1px 2px;
                 font-size: 8px;
                 min-width: 18px;
+            }
+
+            .mobile-menu-toggle {
+                font-size: 24px; /* کاهش سایز آیکون */
+                padding: 6px 8px;
+            }
+
+            .theme-toggle {
+                font-size: 20px; /* کاهش سایز آیکون */
+                padding: 6px 8px;
             }
         }
 
