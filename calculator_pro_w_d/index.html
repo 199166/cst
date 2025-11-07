@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>calculator pro w/d - برنامه اول</title>
   <script src="https://cdn.tailwindcss.com"></script>
- <style>
+<style>
     :root{
       --bg:#1e293b;
       --card:#334155;
@@ -259,6 +259,44 @@
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     
+    /* استایل مخصوص برای دکمه‌های داخل فهرست جفت‌ارزها */
+    #categories_container .small-btn {
+      padding: 0.2rem 0.4rem !important;
+      font-size: 0.7rem !important;
+      min-height: 24px !important;
+      border-width: 1px !important;
+      white-space: nowrap;
+    }
+    
+    /* استایل برای selectهای داخل فهرست جفت‌ارزها */
+    #categories_container select.small-btn {
+      padding: 0.15rem 0.3rem !important;
+      font-size: 0.65rem !important;
+      min-height: 22px !important;
+      max-width: 120px;
+    }
+    
+    /* استایل برای دکمه‌های عمل در لیست جفت‌ارزها */
+    #categories_container button.small-btn {
+      min-width: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* استایل برای آیتم‌های لیست جفت‌ارزها */
+    #categories_container li {
+      padding: 0.4rem 0.5rem !important;
+      gap: 0.3rem !important;
+    }
+    
+    /* استایل برای container دکمه‌ها در هر آیتم */
+    #categories_container .flex.gap-1 {
+      flex-wrap: nowrap !important;
+      gap: 0.2rem !important;
+      min-width: fit-content;
+    }
+    
     .thin-scroll::-webkit-scrollbar{ 
       width:8px; 
       height:8px; 
@@ -487,6 +525,11 @@
       border-radius: 8px;
       padding: 10px;
       margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+    
+    .comparison-group:hover {
+      border-color: rgba(255,255,255,0.2);
     }
 
     .signature {
@@ -516,6 +559,45 @@
         border-width: 2px;
       }
       
+      /* استایل مخصوص موبایل برای دکمه‌های فهرست جفت‌ارزها */
+      #categories_container .small-btn {
+        padding: 0.15rem 0.3rem !important;
+        font-size: 0.65rem !important;
+        min-height: 22px !important;
+      }
+      
+      #categories_container select.small-btn {
+        padding: 0.1rem 0.25rem !important;
+        font-size: 0.6rem !important;
+        min-height: 20px !important;
+        max-width: 100px;
+      }
+      
+      #categories_container button.small-btn {
+        min-width: 24px;
+      }
+      
+      #categories_container li {
+        padding: 0.3rem 0.4rem !important;
+        gap: 0.2rem !important;
+        flex-wrap: wrap;
+      }
+      
+      #categories_container .flex.gap-1 {
+        gap: 0.15rem !important;
+        order: 2;
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 0.3rem;
+        padding-top: 0.3rem;
+        border-top: 1px solid rgba(255,255,255,0.1);
+      }
+      
+      #categories_container .flex-1 {
+        order: 1;
+        width: 100%;
+      }
+      
       .signature {
         font-size: 14px;
         padding: 15px;
@@ -534,6 +616,11 @@
         display: flex;
         align-items: center;
       }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
     }
 
     @media only screen and (max-width: 480px) {
@@ -545,11 +632,6 @@
       .small-btn {
         padding: 0.875rem 1rem;
         font-size: 0.95rem;
-      }
-      
-      .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 6px;
       }
     }
 </style>
@@ -735,11 +817,13 @@
           <div class="muted">کل: <span id="entries_count">0</span></div>
         </div>
 
-        <div class="flex gap-2 mb-3">
-          <span class="hamburger-icon">≡</span>
-          <button id="toggle_history_btn" class="small-btn flex-1 bg-slate-600 hover:bg-slate-700">نمایش ذخیره‌ها</button>
-          <button id="quick_prune" class="small-btn bg-rose-600 hover:bg-rose-700 hidden">پاک ۳۰ روزه</button>
-        </div>
+<div class="flex gap-2 mb-3">
+  <button id="toggle_history_btn" class="small-btn flex-1 bg-slate-600 hover:bg-slate-700 flex items-center justify-center gap-2 transition-all duration-300">
+    <span id="toggle_icon" class="text-lg transition-all duration-300 transform">📂</span>
+    <span id="toggle_text" class="transition-all duration-300">نمایش ذخیره‌ها</span>
+  </button>
+  <button id="quick_prune" class="small-btn bg-rose-600 hover:bg-rose-700 hidden">پاک ۳۰ روزه</button>
+</div>
 
         <div id="history_panel" class="mt-3 hidden">
           <div class="multi-date-controls">
@@ -1781,6 +1865,29 @@ if(toggleHistoryBtn) toggleHistoryBtn.addEventListener('click', ()=>{
   }
 });
 
+
+function updateToggleButton(isOpen) {
+  const toggleIcon = document.getElementById('toggle_icon');
+  const toggleText = document.getElementById('toggle_text');
+  const toggleBtn = document.getElementById('toggle_history_btn');
+  
+  if (isOpen) {
+    toggleIcon.textContent = '📁';
+    toggleIcon.style.transform = 'rotate(0deg) scale(1.1)';
+    toggleText.textContent = 'بستن ذخیره‌ها';
+    toggleBtn.classList.remove('closed');
+    toggleBtn.classList.add('open');
+  } else {
+    toggleIcon.textContent = '📂';
+    toggleIcon.style.transform = 'rotate(0deg) scale(1)';
+    toggleText.textContent = 'نمایش ذخیره‌ها';
+    toggleBtn.classList.remove('open');
+    toggleBtn.classList.add('closed');
+  }
+}
+
+
+  
 if(historyDate) historyDate.addEventListener('change', renderHistory);
 if(historyPairFilter) historyPairFilter.addEventListener('change', renderHistory);
 
