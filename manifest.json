@@ -1,0 +1,11 @@
+{
+  "start_url": "https://199166.github.io/cst/index.html",
+  "scope": "https://199166.github.io/cst/",
+  "icons": [
+    {
+      "src": "https://199166.github.io/cst/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
