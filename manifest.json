@@ -1,16 +1,25 @@
 {
-  "start_url": "/cst/index.html",
-  "scope": "/cst/",
   "name": "ربات CST",
   "short_name": "CST Robot",
+  "description": "سیستم مدیریت و تحلیل ربات CST",
+  "start_url": "/cst/",
   "display": "standalone",
   "background_color": "#6a11cb",
   "theme_color": "#2575fc",
+  "orientation": "portrait",
+  "scope": "/cst/",
   "icons": [
     {
-      "src": "icons/icon-192x192.png",
+      "src": "/cst/icons/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/cst/icons/icon-512x512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
