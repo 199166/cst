@@ -328,204 +328,6 @@
 }
 
 
-
-
-
-
-
-
-
-
-
-.container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .main-header {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .main-header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 300;
-        }
-
-        .main-header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        /* Tab System Styles */
-        .tab-system {
-            display: flex;
-            flex-direction: column;
-            height: 80vh;
-        }
-
-        .tab-buttons-container {
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-            padding: 0 20px;
-            overflow-x: auto;
-        }
-
-        .tab-buttons {
-            display: flex;
-            gap: 5px;
-            min-width: max-content;
-            padding: 10px 0;
-        }
-
-        .tab-btn {
-            padding: 12px 20px;
-            background: #e9ecef;
-            border: none;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-        }
-
-        .tab-btn:hover {
-            background: #dee2e6;
-        }
-
-        .tab-btn.active {
-            background: white;
-            color: #007bff;
-            font-weight: 600;
-            border-bottom: 3px solid #007bff;
-        }
-
-        .tab-btn .close-tab {
-            margin-left: 8px;
-            opacity: 0.5;
-            transition: opacity 0.3s ease;
-        }
-
-        .tab-btn .close-tab:hover {
-            opacity: 1;
-            color: #dc3545;
-        }
-
-        .tab-content {
-            flex: 1;
-            position: relative;
-        }
-
-        .tab-frame {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: none;
-        }
-
-        .tab-frame.active {
-            display: block;
-        }
-
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #6c757d;
-            text-align: center;
-            padding: 40px;
-        }
-
-        .empty-state i {
-            font-size: 4em;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        .empty-state h3 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
-
-        /* Buttons Grid Styles */
-        .buttons-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 30px;
-        }
-
-        .btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 30px 20px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            text-decoration: none;
-            border-radius: 15px;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn i {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-        }
-
-        .btn span {
-            font-size: 1.1em;
-            font-weight: 500;
-            text-align: center;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .buttons-grid {
-                grid-template-columns: 1fr;
-                padding: 20px;
-            }
-            
-            .main-header h1 {
-                font-size: 2em;
-            }
-            
-            .tab-btn {
-                padding: 10px 15px;
-                font-size: 12px;
-            }
-        }
-
-
-
-
-
-
-
 		
     </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -560,61 +362,44 @@
     </div>
     
     <!-- محتوای اصلی سایت (پس از ورود) -->
-        <!-- تب سیستم -->
-        <div class="tab-system">
-            <div class="tab-buttons-container">
-                <div class="tab-buttons" id="tabButtons">
-                    <!-- تب‌ها به صورت داینامیک اضافه می‌شوند -->
-                </div>
-            </div>
-            <div class="tab-content" id="tabContent">
-                <div class="empty-state" id="emptyState">
-                    <i class="fas fa-window-restore"></i>
-                    <h3>هیچ صفحه‌ای باز نیست</h3>
-                    <p>برای شروع، یکی از ابزارها را انتخاب کنید</p>
-                </div>
-                <!-- iframe ها به صورت داینامیک اضافه می‌شوند -->
-            </div>
-        </div>
-
-        <!-- دکمه‌های اصلی -->
-        <div class="buttons-grid" id="mainButtons">
-            <button class="btn" data-url="calculator_pro_w_d/" data-title="Calculator pro W/D">
-                <i class="fas fa-pie-chart"></i>
+    <div class="container main-content" id="mainContent">
+        <h1>ربات CST</h1>
+        <div class="buttons-grid">
+            <a href="calculator_pro_w_d/" target="_blank" class="btn">
+                <i class="fa fa-pie-chart"></i>
                 <span>Calculator pro W/D</span>
-            </button>
-            
-            <button class="btn" data-url="calculator_pro_formula_4/" data-title="Calculator pro Formula 4">
-                <i class="fas fa-bar-chart"></i>
+            </a>
+			
+            <a href="calculator_pro_formula_4/" target="_blank" class="btn">
+                <i class="fa fa-bar-chart"></i>
                 <span>Calculator pro Formula 4</span>
-            </button>
-            
-            <button class="btn" data-url="calculator_pro_formula_2/" data-title="Calculator pro Formula 2">
-                <i class="fas fa-area-chart"></i>
+            </a>
+			
+            <a href="calculator_pro_formula_2/" target="_blank" class="btn">
+                <i class="fa fa-area-chart"></i>
                 <span>Calculator pro Formula 2</span>
-            </button>
-            
-            <button class="btn" data-url="calculator_pro_center_w_d/" data-title="Calculator pro Center W/D">
-                <i class="fas fa-sort-alpha-asc"></i>
+            </a>
+			
+            <a href="calculator_pro_center_w_d/" target="_blank" class="btn">
+                <i class="fa fa-sort-alpha-asc"></i>
                 <span>Calculator pro Center W/D</span>
-            </button>
+            </a>
             
-            <button class="btn" data-url="cst_analyzer/" data-title="CST Analyzer">
-                <i class="fas fa-line-chart"></i>
+            <a href="cst_analyzer/" target="_blank" class="btn">
+                <i class="fa fa-line-chart"></i>
                 <span>CST Analyzer</span>
-            </button>
+            </a>
             
-            <button class="btn" data-url="forex_manager/" data-title="Forex Manager">
-                <i class="fas fa-exchange-alt"></i>
+            <a href="forex_manager/" target="_blank" class="btn">
+                <i class="fa fa-exchange-alt"></i>
                 <span>Forex Manager</span>
-            </button>
-            
-            <button class="btn" data-url="calculator_pro_cd/" data-title="Calculator pro C/D">
-                <i class="fas fa-calculator"></i>
+            </a>
+			
+            <a href="calculator_pro_cd/" target="_blank" class="btn">
+                <i class="fa fa-calculator"></i>
                 <span>Calculator pro C/D</span>
-            </button>
+            </a>
         </div>
-    </div>
         
         <div class="signature">
             طراحی و ساخت توسط ⦙ سعید شیخ احمد صفاری
@@ -994,146 +779,6 @@ function installFirefoxGuide() {
 
 // اجرای تشخیص
 window.addEventListener('load', detectXiaomiAndShowGuide);
-
-
-
-
-
-
-
-
- class TabManager {
-            constructor() {
-                this.tabs = new Map();
-                this.activeTabId = null;
-                this.tabCounter = 0;
-                
-                this.initializeEventListeners();
-            }
-            
-            initializeEventListeners() {
-                // دکمه‌های اصلی
-                document.getElementById('mainButtons').addEventListener('click', (e) => {
-                    if (e.target.closest('.btn')) {
-                        const btn = e.target.closest('.btn');
-                        const url = btn.dataset.url;
-                        const title = btn.dataset.title;
-                        this.openTab(url, title);
-                    }
-                });
-            }
-            
-            openTab(url, title) {
-                const tabId = `tab_${++this.tabCounter}`;
-                
-                // ایجاد تب جدید
-                this.createTabButton(tabId, title);
-                this.createTabFrame(tabId, url);
-                
-                // فعال کردن تب جدید
-                this.activateTab(tabId);
-                
-                // مخفی کردن حالت خالی
-                document.getElementById('emptyState').style.display = 'none';
-                
-                this.tabs.set(tabId, { url, title, element: document.getElementById(tabId) });
-            }
-            
-            createTabButton(tabId, title) {
-                const tabButtons = document.getElementById('tabButtons');
-                
-                const tabBtn = document.createElement('button');
-                tabBtn.className = 'tab-btn';
-                tabBtn.innerHTML = `
-                    <span>${title}</span>
-                    <span class="close-tab" onclick="tabManager.closeTab('${tabId}')">
-                        <i class="fas fa-times"></i>
-                    </span>
-                `;
-                
-                tabBtn.addEventListener('click', () => this.activateTab(tabId));
-                tabButtons.appendChild(tabBtn);
-            }
-            
-            createTabFrame(tabId, url) {
-                const tabContent = document.getElementById('tabContent');
-                
-                const iframe = document.createElement('iframe');
-                iframe.id = tabId;
-                iframe.className = 'tab-frame';
-                iframe.src = url;
-                iframe.loading = 'lazy';
-                
-                tabContent.appendChild(iframe);
-            }
-            
-            activateTab(tabId) {
-                // غیرفعال کردن همه تب‌ها
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-frame').forEach(frame => frame.classList.remove('active'));
-                
-                // فعال کردن تب انتخاب شده
-                const activeBtn = [...document.querySelectorAll('.tab-btn')].find(btn => 
-                    btn.querySelector('.close-tab').onclick.toString().includes(tabId)
-                );
-                
-                if (activeBtn) {
-                    activeBtn.classList.add('active');
-                }
-                
-                const activeFrame = document.getElementById(tabId);
-                if (activeFrame) {
-                    activeFrame.classList.add('active');
-                }
-                
-                this.activeTabId = tabId;
-            }
-            
-            closeTab(tabId) {
-                const event = new Event('click');
-                event.stopPropagation();
-                
-                // حذف دکمه تب
-                const tabBtn = [...document.querySelectorAll('.tab-btn')].find(btn => 
-                    btn.querySelector('.close-tab').onclick.toString().includes(tabId)
-                );
-                if (tabBtn) tabBtn.remove();
-                
-                // حذف iframe
-                const tabFrame = document.getElementById(tabId);
-                if (tabFrame) tabFrame.remove();
-                
-                // حذف از Map
-                this.tabs.delete(tabId);
-                
-                // اگر تب فعالی بود، اولین تب دیگر را فعال کن
-                if (this.activeTabId === tabId) {
-                    const remainingTabs = document.querySelectorAll('.tab-btn');
-                    if (remainingTabs.length > 0) {
-                        const firstTabId = [...remainingTabs][0].querySelector('.close-tab')
-                            .onclick.toString().match(/'(tab_\d+)'/)[1];
-                        this.activateTab(firstTabId);
-                    } else {
-                        // اگر تبی نماند، حالت خالی را نشان بده
-                        document.getElementById('emptyState').style.display = 'flex';
-                        this.activeTabId = null;
-                    }
-                }
-            }
-        }
-        
-        // مقداردهی Tab Manager
-        const tabManager = new TabManager();
-        
-        // باز کردن اولین تب به صورت پیش‌فرض (اختیاری)
-        window.addEventListener('load', () => {
-            // اگر می‌خواهید به صورت پیش‌فرض یک تب باز شود، این خط را آنکامنت کنید:
-            // tabManager.openTab('calculator_pro_w_d/', 'Calculator pro W/D');
-        });
-    </script>
-
-
-
 		
     </script>
 </body>
