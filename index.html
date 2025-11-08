@@ -12,6 +12,7 @@
 <head>
     <!-- این تگ‌ها رو حتماً داشته باشید -->
     <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
+	  <link rel="manifest" href="/cst/manifest.json">
     <meta name="theme-color" content="#2575fc">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -357,6 +358,40 @@
         left: 20px;
     }
 }
+
+
+
+
+
+
+
+ .tabs {
+      display: flex;
+      background: #0d47a1;
+      color: #fff;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .tab:hover, .tab.active {
+      background: #1565c0;
+    }
+    /* iframeها */
+    iframe {
+      width: 100%;
+      height: calc(100vh - 48px);
+      border: none;
+      display: none;
+    }
+    iframe.active {
+      display: block;
+    }
+
+
 		
     </style>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -389,46 +424,29 @@
             طراحی و ساخت توسط ⦙ سعید شیخ احمد صفاری
         </div>
     </div>
-    
-    <!-- محتوای اصلی سایت (پس از ورود) -->
-    <div class="container main-content" id="mainContent">
-        <h1>ربات CST</h1>
-        <div class="buttons-grid">
-            <a href="calculator_pro_w_d/" target="_blank" class="btn">
-                <i class="fa fa-pie-chart"></i>
-                <span>Calculator pro W/D</span>
-            </a>
-			
-            <a href="calculator_pro_formula_4/"target="_blank" class="btn">
-                <i class="fa fa-bar-chart"></i>
-                <span>Calculator pro Formula 4</span>
-            </a>
-			
-            <a href="calculator_pro_formula_2/"target="_blank" class="btn">
-                <i class="fa fa-area-chart"></i>
-                <span>Calculator pro Formula 2</span>
-            </a>
-			
-            <a href="calculator_pro_center_w_d/"target="_blank" class="btn">
-                <i class="fa fa-sort-alpha-asc"></i>
-                <span>Calculator pro Center W/D</span>
-            </a>
-            
-            <a href="cst_analyzer/"target="_blank" class="btn">
-                <i class="fa fa-line-chart"></i>
-                <span>CST Analyzer</span>
-            </a>
-            
-            <a href="forex_manager/"target="_blank" class="btn">
-                <i class="fa fa-exchange-alt"></i>
-                <span>Forex Manager</span>
-            </a>
-			
-            <a href="calculator_pro_cd/"target="_blank" class="btn">
-                <i class="fa fa-calculator"></i>
-                <span>Calculator pro C/D</span>
-            </a>
-        </div>
+
+
+
+  <div class="tabs">
+    <div class="tab active" onclick="openTab(0)">📘 Calculator</div>
+    <div class="tab" onclick="openTab(1)">🧮 Tool</div>
+    <div class="tab" onclick="openTab(2)">📊 Stats</div>
+<div class="tab" onclick="openTab(3)">📊 Stats</div>
+<div class="tab" onclick="openTab(4)">📊 Stats</div>
+<div class="tab" onclick="openTab(5)">📊 Stats</div>
+	  <div class="tab" onclick="openTab(6)">📊 Stats</div>
+  </div>
+
+  <!-- iframeها برای هر صفحه -->
+  <iframe src="calculator_pro_center_w_d/index.html" class="active"></iframe>
+  <iframe src="calculator_pro_formula_4/index.html"></iframe>
+  <iframe src="calculator_pro_formula_2/index.html"></iframe>
+	  <iframe src="calculator_pro_center_w_d/index.html"></iframe>
+  <iframe src="cst_analyzer/index.html"></iframe>
+	  <iframe src="forex_manager/index.html"></iframe>
+  <iframe src="calculator_pro_cd/index.html"></iframe>
+	
+   
         
         <div class="signature">
             طراحی و ساخت توسط ⦙ سعید شیخ احمد صفاری
@@ -744,7 +762,18 @@ if ('serviceWorker' in navigator) {
 }
 
 
+    // تابع جابه‌جایی بین تب‌ها
+    function openTab(n) {
+      document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active', i===n));
+      document.querySelectorAll('iframe').forEach((f,i)=>f.classList.toggle('active', i===n));
+    }
 
+    // ثبت Service Worker برای PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/cst/sw.js')
+        .then(reg => console.log('✅ Service Worker registered:', reg))
+        .catch(err => console.error('❌ Service Worker failed:', err));
+    }
 		
     </script>
 </body>
