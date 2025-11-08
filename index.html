@@ -51,6 +51,7 @@
             display: flex;
             flex-direction: column;
             padding: 0;
+            overflow: hidden;
         }
         
         /* حالت standalone برای وقتی که اپ نصب شده */
@@ -59,89 +60,6 @@
             padding-bottom: env(safe-area-inset-bottom);
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
-        }
-        
-        /* ========== TAB STYLES ========== */
-        .tabs-container {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
-            border-radius: 0 0 20px 20px;
-            padding: 15px 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-top: none;
-            margin-bottom: 0;
-            position: relative;
-            z-index: 1000;
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            padding-bottom: 5px;
-        }
-        
-        .tabs::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .tab {
-            flex: 0 0 auto;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 0.9rem;
-            font-weight: 500;
-            white-space: nowrap;
-            min-width: fit-content;
-        }
-        
-        .tab:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        .tab.active {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .tab i {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        /* ========== IFRAME CONTAINER ========== */
-        .iframe-container {
-            flex: 1;
-            position: relative;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px 20px 0 0;
-            overflow: hidden;
-            margin: 0;
-        }
-        
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: none;
-            background: white;
-        }
-        
-        iframe.active {
-            display: block;
         }
         
         /* ========== LOGIN STYLES ========== */
@@ -260,6 +178,9 @@
         
         .main-content {
             display: none;
+            flex: 1;
+            flex-direction: column;
+            height: 100vh;
         }
         
         .signature, .login-signature {
@@ -278,6 +199,110 @@
             width: fit-content;
             max-width: 90%;
             box-sizing: border-box;
+        }
+
+        /* ========== TAB STYLES ========== */
+        .tabs-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 0 0 20px 20px;
+            padding: 15px 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: none;
+            margin-bottom: 10px; /* فاصله بین تب و ایفریم */
+            position: relative;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+        
+        .tabs-scroll-container {
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+            padding-bottom: 5px;
+        }
+        
+        .tabs-scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .tabs-scroll-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .tabs-scroll-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+        
+        .tabs-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            min-width: min-content;
+        }
+        
+        .tab {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            min-width: fit-content;
+        }
+        
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .tab.active {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tab i {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        /* ========== IFRAME CONTAINER ========== */
+        .iframe-container {
+            flex: 1;
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 0 10px 10px 10px; /* فاصله از اطراف */
+            min-height: 0; /* برای flexbox */
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+            background: white;
+            border-radius: 12px;
+        }
+        
+        iframe.active {
+            display: block;
         }
 
         /* ========== PWA INSTALL BUTTON ========== */
@@ -309,19 +334,33 @@
         }
 
         /* ========== RESPONSIVE DESIGN ========== */
+        @media (max-width: 1024px) {
+            .tab {
+                padding: 8px 14px;
+                font-size: 0.8rem;
+                gap: 6px;
+            }
+            
+            .tab i {
+                font-size: 0.9rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .tabs-container {
                 padding: 12px 15px;
                 border-radius: 0 0 15px 15px;
+                margin-bottom: 8px;
             }
             
             .tab {
-                padding: 10px 15px;
-                font-size: 0.85rem;
+                padding: 8px 12px;
+                font-size: 0.75rem;
+                gap: 5px;
             }
             
             .tab i {
-                font-size: 1rem;
+                font-size: 0.85rem;
             }
             
             .login-container {
@@ -346,20 +385,27 @@
                 font-size: 14px;
                 padding: 15px;
             }
+            
+            .iframe-container {
+                margin: 0 8px 8px 8px;
+                border-radius: 12px;
+            }
         }
 
         @media (max-width: 480px) {
-            .tabs {
-                gap: 5px;
+            .tabs-container {
+                padding: 10px 12px;
             }
             
             .tab {
-                padding: 8px 12px;
-                font-size: 0.8rem;
+                padding: 6px 10px;
+                font-size: 0.7rem;
+                gap: 4px;
+                border-radius: 10px;
             }
             
             .tab i {
-                font-size: 0.9rem;
+                font-size: 0.8rem;
             }
             
             h1 {
@@ -370,6 +416,11 @@
                 font-size: 11px;
                 padding: 12px;
             }
+            
+            .iframe-container {
+                margin: 0 5px 5px 5px;
+                border-radius: 10px;
+            }
         }
 
         /* حالت نمایش در حالت مستقل PWA */
@@ -377,9 +428,17 @@
             .tabs-container {
                 padding-top: calc(15px + env(safe-area-inset-top));
             }
+        }
+
+        /* حالت برای نمایشگرهای بسیار کوچک */
+        @media (max-width: 360px) {
+            .tab {
+                padding: 5px 8px;
+                font-size: 0.65rem;
+            }
             
-            .iframe-container {
-                height: calc(100vh - 80px - env(safe-area-inset-top));
+            .tab i {
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -412,37 +471,39 @@
     </div>
 
     <!-- محتوای اصلی بعد از ورود -->
-    <div class="main-content" id="mainContent" style="display: none; flex: 1; display: flex; flex-direction: column;">
+    <div class="main-content" id="mainContent">
         <!-- تب‌ها -->
         <div class="tabs-container">
-            <div class="tabs">
-                <div class="tab active" onclick="openTab(0)">
-                    <i class="fa fa-pie-chart"></i>
-                    Calculator Pro W/D
-                </div>
-                <div class="tab" onclick="openTab(1)">
-                    <i class="fa fa-bar-chart"></i>
-                    Calculator Pro Formula 4
-                </div>
-                <div class="tab" onclick="openTab(2)">
-                    <i class="fa fa-area-chart"></i>
-                    Calculator Pro Formula 2
-                </div>
-                <div class="tab" onclick="openTab(3)">
-                    <i class="fa fa-sort-alpha-asc"></i>
-                    Calculator Pro Center W/D
-                </div>
-                <div class="tab" onclick="openTab(4)">
-                    <i class="fa fa-line-chart"></i>
-                    Cst Analyzer
-                </div>
-                <div class="tab" onclick="openTab(5)">
-                    <i class="fa fa-exchange-alt"></i>
-                    Forex Manager
-                </div>
-                <div class="tab" onclick="openTab(6)">
-                    <i class="fa fa-calculator"></i>
-                    Calculator Pro C/D
+            <div class="tabs-scroll-container">
+                <div class="tabs">
+                    <div class="tab active" onclick="openTab(0)">
+                        <i class="fa fa-pie-chart"></i>
+                        Calculator Pro W/D
+                    </div>
+                    <div class="tab" onclick="openTab(1)">
+                        <i class="fa fa-bar-chart"></i>
+                        Calculator Pro Formula 4
+                    </div>
+                    <div class="tab" onclick="openTab(2)">
+                        <i class="fa fa-area-chart"></i>
+                        Calculator Pro Formula 2
+                    </div>
+                    <div class="tab" onclick="openTab(3)">
+                        <i class="fa fa-sort-alpha-asc"></i>
+                        Calculator Pro Center W/D
+                    </div>
+                    <div class="tab" onclick="openTab(4)">
+                        <i class="fa fa-line-chart"></i>
+                        Cst Analyzer
+                    </div>
+                    <div class="tab" onclick="openTab(5)">
+                        <i class="fa fa-exchange-alt"></i>
+                        Forex Manager
+                    </div>
+                    <div class="tab" onclick="openTab(6)">
+                        <i class="fa fa-calculator"></i>
+                        Calculator Pro C/D
+                    </div>
                 </div>
             </div>
         </div>
@@ -565,6 +626,9 @@
                 mainContent.style.display = 'flex';
                 sessionStorage.setItem('cst_authenticated', 'true');
                 sessionStorage.setItem('cst_login_time', new Date().getTime());
+                
+                // تنظیم مجدد ارتفاع ایفریم بعد از لاگین
+                setTimeout(adjustIframeHeight, 100);
             } else {
                 verifyError.textContent = 'کد نامعتبر است. لطفاً کد جدید را از اپلیکیشن دریافت کنید.';
                 verifyError.style.display = 'block';
@@ -588,6 +652,10 @@
         if (sessionStorage.getItem('cst_authenticated') === 'true') {
             loginPage.style.display = 'none';
             mainContent.style.display = 'flex';
+        } else {
+            // اطمینان از نمایش صفحه لاگین
+            loginPage.style.display = 'block';
+            mainContent.style.display = 'none';
         }
 
         // تمرکز روی فیلد کد
@@ -603,6 +671,29 @@
             document.querySelectorAll('iframe').forEach((f, i) => {
                 f.classList.toggle('active', i === n);
             });
+        }
+
+        // ==================== IFRAME HEIGHT ADJUSTMENT ====================
+        function adjustIframeHeight() {
+            const iframeContainer = document.querySelector('.iframe-container');
+            const tabsContainer = document.querySelector('.tabs-container');
+            
+            if (iframeContainer && tabsContainer) {
+                const windowHeight = window.innerHeight;
+                const tabsHeight = tabsContainer.offsetHeight;
+                const margin = 20; // مجموع فاصله بالا و پایین
+                
+                const iframeHeight = windowHeight - tabsHeight - margin;
+                iframeContainer.style.height = iframeHeight + 'px';
+            }
+        }
+
+        // تنظیم ارتفاع هنگام تغییر سایز پنجره
+        window.addEventListener('resize', adjustIframeHeight);
+
+        // تنظیم ارتفاع اولیه
+        if (sessionStorage.getItem('cst_authenticated') === 'true') {
+            setTimeout(adjustIframeHeight, 100);
         }
 
         // ==================== PWA INSTALL ====================
