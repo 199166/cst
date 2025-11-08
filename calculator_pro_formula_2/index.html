@@ -27,6 +27,10 @@
             --menu-border: #e0e0e0;
             --category-bg: #e8f4fd;
             --category-border: #3498db;
+            --signature-bg-light: rgba(0, 0, 0, 0.05);
+            --signature-text-light: #666;
+            --signature-bg-dark: rgba(255, 255, 255, 0.1);
+            --signature-text-dark: white;
         }
         * {
             box-sizing: border-box;
@@ -123,10 +127,12 @@
             margin-bottom: 20px;
             border-bottom: 1px solid var(--input-border);
             overflow-x: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
             scrollbar-color: var(--button-primary) var(--bg-color);
-            -webkit-overflow-scrolling: touch;
             padding-bottom: 5px;
+            cursor: grab;
         }
 
         .tabs::-webkit-scrollbar {
@@ -145,6 +151,10 @@
 
         .tabs::-webkit-scrollbar-thumb:hover {
             background: var(--button-primary-hover);
+        }
+
+        .tabs:active {
+            cursor: grabbing;
         }
 
         .tab {
@@ -931,6 +941,7 @@
 
             .tabs {
                 display: none;
+                cursor: default;
             }
             
             .mobile-menu-toggle {
@@ -964,6 +975,7 @@
                 align-items: center;
                 gap: 4px;
                 min-height: 32px;
+                cursor: default;
             }
             
             .currency-pair-name {
@@ -1079,6 +1091,7 @@
             
             .tabs {
                 display: flex !important;
+                cursor: grab;
             }
             
             .currency-pair-name {
@@ -1111,30 +1124,32 @@
             width: auto;
             margin: 0;
         }
-		
+        
     .signature {
-    color: white;
-    text-align: center;
-    padding: 16px;
-    font-family: Vazirmatn, system-ui;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 14px;
-    font-weight: 500;
-    display: block;
-    margin: 30px auto;
-    width: fit-content;
-    max-width: 90%;
-    box-sizing: border-box;
-}
+        color: var(--signature-text-light);
+        text-align: center;
+        padding: 16px;
+        font-family: Vazirmatn, system-ui;
+        background: var(--signature-bg-light);
+        border-radius: 10px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        font-size: 14px;
+        font-weight: 500;
+        display: block;
+        margin: 30px auto;
+        width: fit-content;
+        max-width: 90%;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
 
-	        .dark-mode .signature {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-dark);
-        }
+    .dark-mode .signature {
+        color: var(--signature-text-dark);
+        background: var(--signature-bg-dark);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
 @media only screen and (max-width: 768px) {
     .signature {
         font-size: 14px;
@@ -1157,8 +1172,8 @@
             <h1>Calculator Pro Formula 2</h1>
             <button class="theme-toggle" id="themeToggle">🌙</button>
         </div>
-       		<HR>
-		<BR>
+               <HR>
+        <BR>
         <!-- منوی همبرگری برای موبایل -->
         <div class="mobile-tabs" id="mobileTabs">
             <div class="mobile-tab active" data-tab="calculator">ماشین حساب</div>
@@ -1170,9 +1185,9 @@
         </div>
         
 
-	
+    
         <!-- تب‌های اصلی -->
-        <div class="tabs">
+        <div class="tabs" id="tabs">
             <div class="tab active" data-tab="calculator">ماشین حساب</div>
             <div class="tab" data-tab="history">تاریخچه محاسبات</div>
             <div class="tab" data-tab="comparison">مقایسه داده‌ها</div>
@@ -1409,8 +1424,8 @@
                 <p><strong>هشدار:</strong> عملیات حذف قابل بازگشت نیست. قبل از حذف از داده‌های خود پشتیبان بگیرید.</p>
             </div>
         </div>
-		
-		<div class="signature">
+        
+        <div class="signature">
             طراحی و ساخت توسط ⦙ سعید شیخ احمد صفاری
         </div>
     </div>
@@ -1551,9 +1566,86 @@
         let currentEditType = null;
         let currentDeleteCategoryId = null;
 
+        // متغیرهای اسکرول پیشرفته
+        let isDragging = false;
+        let startX = 0;
+        let scrollLeft = 0;
+        let isDesktopOrTablet = window.matchMedia('(min-width: 769px)').matches;
+        const tabs = document.getElementById('tabs');
+
         document.addEventListener('DOMContentLoaded', function() {
             initializeApp();
+            setupAdvancedScroll();
         });
+
+        // تابع تنظیم اسکرول پیشرفته
+        function setupAdvancedScroll() {
+            // Wheel event برای اسکرول افقی با چرخ موس
+            tabs.addEventListener('wheel', handleWheel, { passive: false });
+
+            // Drag events
+            tabs.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', doDrag);
+            document.addEventListener('mouseup', endDrag);
+
+            // Hover روی تب‌ها برای تغییر cursor
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('mouseenter', () => {
+                    if (isDesktopOrTablet) {
+                        tabs.style.cursor = 'grab';
+                    }
+                });
+                tab.addEventListener('mouseleave', () => {
+                    if (!isDragging && isDesktopOrTablet) {
+                        tabs.style.cursor = 'grab'; // یا default اگر لازم
+                    }
+                });
+            });
+
+            // به‌روزرسانی تشخیص اندازه صفحه
+            window.addEventListener('resize', () => {
+                isDesktopOrTablet = window.matchMedia('(min-width: 769px)').matches;
+                if (!isDesktopOrTablet) {
+                    endDrag();
+                    tabs.style.cursor = 'default';
+                } else {
+                    tabs.style.cursor = 'grab';
+                }
+            });
+        }
+
+        // تابع wheel
+        function handleWheel(e) {
+            if (!isDesktopOrTablet) return;
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 50 : -50; // سرعت اسکرول
+            tabs.scrollLeft += delta;
+        }
+
+        // Drag functions
+        function startDrag(e) {
+            if (!isDesktopOrTablet) return;
+            isDragging = true;
+            startX = e.pageX - tabs.offsetLeft;
+            scrollLeft = tabs.scrollLeft;
+            tabs.style.cursor = 'grabbing';
+            e.preventDefault();
+        }
+
+        function doDrag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.pageX - tabs.offsetLeft;
+            const walk = (x - startX) * 2; // سرعت drag
+            tabs.scrollLeft = scrollLeft - walk;
+        }
+
+        function endDrag() {
+            isDragging = false;
+            if (isDesktopOrTablet) {
+                tabs.style.cursor = 'grab';
+            }
+        }
 
         // تابع نمایش اعلان
         function showNotification(message, type = 'success', duration = 3000) {
@@ -2467,7 +2559,7 @@
                     showNotification(`${oldCalculations.length} محاسبه با موفقیت حذف شد.`);
                 }
             } catch (error) {
-                console.error('خطا در حذف داده‌های بر اساس تاریخ:', error);
+                console.error('خطا در حذف داد��‌های بر اساس تاریخ:', error);
                 showNotification('خطا در حذف داده‌ها.', 'error');
             }
         }
@@ -3102,6 +3194,6 @@
     </script>
   <BR>
     <BR>
-	
+    
 </body>
 </html>
