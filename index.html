@@ -9,8 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ربات CST - ورود با Google Authenticator</title>
     
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
     <link rel="manifest" href="/cst/manifest.json">
     <meta name="theme-color" content="#2575fc">
     <meta name="mobile-web-app-capable" content="yes">
@@ -18,23 +16,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ربات CST">
     
-    <!-- آیکون برای iOS -->
     <link rel="apple-touch-icon" href="icons/icon-180x180.png">
     <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180x180.png">
     <link rel="apple-touch-icon" sizes="167x167" href="icons/icon-167x167.png">
     <link rel="apple-touch-startup-image" href="icons/icon-512x512.png">
 
-    <!-- فونت‌های فارسی -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css" />
     
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- CryptoJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
     <style>
@@ -45,13 +39,19 @@
             font-family: 'Vazirmatn', 'Sahel', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
+        /* * تغییر مهم: html و body باید 100% ارتفاع داشته باشند تا 
+         * flexbox بتواند کل صفحه را مدیریت کند.
+        */
+        html, body {
+            height: 100%;
+        }
+
         body {
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            min-height: 100vh;
-            display: flex;
+            display: flex; /* برای مدیریت صفحه لاگین و محتوای اصلی */
             flex-direction: column;
             padding: 0;
-            overflow: hidden;
+            overflow: hidden; /* جلوگیری از اسکرول کل صفحه */
         }
         
         /* حالت standalone برای وقتی که اپ نصب شده */
@@ -74,7 +74,7 @@
             width: 100%;
             text-align: center;
             position: relative;
-            margin: auto;
+            margin: auto; /* این باعث می‌شود وسط صفحه (عمودی و افقی) قرار گیرد */
         }
         
         h1 {
@@ -176,11 +176,13 @@
             margin-bottom: 8px;
         }
         
+        /* * تغییرات مهم در این بخش
+        */
         .main-content {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            height: 100vh;
+            display: none; /* در حالت عادی مخفی است */
+            flex-direction: column; /* فرزندان (تب و ایفریم) زیر هم قرار می‌گیرند */
+            flex: 1; /* تمام ارتفاع باقی‌مانده body را می‌گیرد */
+            min-height: 0; /* برای جلوگیری از سرریز flexbox */
         }
         
         .signature, .login-signature {
@@ -213,7 +215,7 @@
             margin-bottom: 10px; /* فاصله بین تب و ایفریم */
             position: relative;
             z-index: 1000;
-            flex-shrink: 0;
+            flex-shrink: 0; /* این بخش کوچک نمی‌شود و ارتفاع ثابت خود را حفظ می‌کند */
         }
         
         .tabs-scroll-container {
@@ -281,20 +283,21 @@
             opacity: 0.9;
         }
         
-        /* ========== IFRAME CONTAINER ========== */
+        /* * تغییرات مهم در این بخش
+        */
         .iframe-container {
-            flex: 1;
+            flex: 1; /* این باعث می‌شود کانتینر تمام ارتفاع باقی‌مانده را پر کند */
             position: relative;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
             overflow: hidden;
             margin: 0 10px 10px 10px; /* فاصله از اطراف */
-            min-height: 0; /* برای flexbox */
+            min-height: 0; /* کلید اصلی برای کارکرد صحیح flex: 1 در ستون‌ها */
         }
         
         iframe {
             width: 100%;
-            height: 100%;
+            height: 100%; /* iframe به اندازه 100% والدش (.iframe-container) خواهد بود */
             border: none;
             display: none;
             background: white;
@@ -441,42 +444,11 @@
                 font-size: 0.75rem;
             }
         }
-
-
-#app-frame {
-      width: 100vw;
-      height: 100vh;
-      border: none;
-      display: block;
-    }
-
-    #install-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 1000;
-      background: #0d6efd;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 12px 18px;
-      font-size: 15px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      display: none;
-    }
-
-    #install-btn:hover {
-      background: #0b5ed7;
-    }
-
-
         
     </style>
 </head>
 
 <body>
-    <!-- صفحه ورود با Google Authenticator -->
     <div class="login-container" id="loginPage">
         <h1>ورود به ربات CST</h1>
         
@@ -501,9 +473,7 @@
         </div>
     </div>
 
-    <!-- محتوای اصلی بعد از ورود -->
     <div class="main-content" id="mainContent">
-        <!-- تب‌ها -->
         <div class="tabs-container">
             <div class="tabs-scroll-container">
                 <div class="tabs">
@@ -539,7 +509,6 @@
             </div>
         </div>
 
-        <!-- کانتینر ایفریم -->
         <div class="iframe-container">
             <iframe src="calculator_pro_w_d/index.html" class="active"></iframe>
             <iframe src="calculator_pro_formula_4/index.html"></iframe>
@@ -551,12 +520,21 @@
         </div>
     </div>
 
-    <!-- دکمه نصب PWA -->
     <button class="pwa-install-btn" id="pwaInstallButton">📥 نصب برنامه</button>
 
     <script>
         // ==================== AUTHENTICATION ====================
+        
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // !!!!!! توجه بسیار مهم !!!!!!
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //
+        // این کلید مخفی ('JBSWY3DPEHPK3PXP') باید دقیقاً با کلید مخفی 
+        // که در اپلیکیشن Google Authenticator خود وارد کرده‌اید، یکی باشد.
+        // اگر کد شما کار نمی‌کند، این مقدار را با کلید مخفی صحیح جایگزین کنید.
+        //
         const secretKey = 'JBSWY3DPEHPK3PXP';
+        
         const verifyOtpBtn = document.getElementById('verifyOtpBtn');
         const otpInput = document.getElementById('otp');
         const verifyError = document.getElementById('verifyError');
@@ -654,12 +632,12 @@
             
             if (verifyOTP(enteredOtp)) {
                 loginPage.style.display = 'none';
-                mainContent.style.display = 'flex';
+                mainContent.style.display = 'flex'; // تغییر به flex برای فعال شدن چیدمان CSS
                 sessionStorage.setItem('cst_authenticated', 'true');
                 sessionStorage.setItem('cst_login_time', new Date().getTime());
                 
-                // تنظیم مجدد ارتفاع ایفریم بعد از لاگین
-                setTimeout(adjustIframeHeight, 100);
+                // (کد تنظیم ارتفاع حذف شد - دیگر نیازی به آن نیست)
+                
             } else {
                 verifyError.textContent = 'کد نامعتبر است. لطفاً کد جدید را از اپلیکیشن دریافت کنید.';
                 verifyError.style.display = 'block';
@@ -682,17 +660,23 @@
         // بررسی اگر کاربر قبلاً در این session وارد شده
         if (sessionStorage.getItem('cst_authenticated') === 'true') {
             loginPage.style.display = 'none';
-            mainContent.style.display = 'flex';
+            mainContent.style.display = 'flex'; // تغییر به flex
         } else {
             // اطمینان از نمایش صفحه لاگین
-            loginPage.style.display = 'block';
+            loginPage.style.display = 'block'; // یا 'flex' یا 'grid' بسته به استایل login-container
             mainContent.style.display = 'none';
         }
 
         // تمرکز روی فیلد کد
-        setTimeout(() => {
-            otpInput.focus();
-        }, 1000);
+        // (این را به 'load' منتقل می‌کنیم تا مطمئن شویم صفحه لاگین دیده می‌شود)
+        window.addEventListener('load', () => {
+            if (loginPage.style.display !== 'none') {
+                 setTimeout(() => {
+                    otpInput.focus();
+                }, 500); // تاخیر کوتاه برای اطمینان از رندر شدن
+            }
+        });
+
 
         // ==================== TAB MANAGEMENT ====================
         function openTab(n) {
@@ -704,29 +688,9 @@
             });
         }
 
-        // ==================== IFRAME HEIGHT ADJUSTMENT ====================
-        function adjustIframeHeight() {
-            const iframeContainer = document.querySelector('.iframe-container');
-            const tabsContainer = document.querySelector('.tabs-container');
-            
-            if (iframeContainer && tabsContainer) {
-                const windowHeight = window.innerHeight;
-                const tabsHeight = tabsContainer.offsetHeight;
-                const margin = 20; // مجموع فاصله بالا و پایین
-                
-                const iframeHeight = windowHeight - tabsHeight - margin;
-                iframeContainer.style.height = iframeHeight + 'px';
-            }
-        }
-
-        // تنظیم ارتفاع هنگام تغییر سایز پنجره
-        window.addEventListener('resize', adjustIframeHeight);
-
-        // تنظیم ارتفاع اولیه
-        if (sessionStorage.getItem('cst_authenticated') === 'true') {
-            setTimeout(adjustIframeHeight, 100);
-        }
-
+        // ==================== IFRAME HEIGHT ADJUSTMENT (حذف شد) ====================
+        // دیگر نیازی به این بخش نیست. CSS Flexbox به صورت خودکار ارتفاع را مدیریت می‌کند.
+        
         // ==================== PWA INSTALL ====================
         let deferredPrompt;
         const pwaInstallButton = document.getElementById('pwaInstallButton');
@@ -792,60 +756,13 @@
         }
 
         // نمایش کد فعلی هر 30 ثانیه برای دیباگ
+        // (توصیه می‌شود این خط را برای نسخه نهایی حذف کنید یا کامنت کنید)
+        /*
         setInterval(() => {
             console.log('کد فعلی:', generateTOTP());
         }, 30000);
+        */
 
-
-  
-const installBtn = document.getElementById('install-btn');
-    const iframe = document.getElementById('app-frame');
-    let deferredPrompt;
-
-    // ✅ تنظیم خودکار ارتفاع فریم در هر تغییر اندازه
-    function adjustIframeHeight() {
-      iframe.style.height = window.innerHeight + 'px';
-      iframe.style.width = window.innerWidth + 'px';
-    }
-
-    window.addEventListener('resize', adjustIframeHeight);
-    window.addEventListener('load', adjustIframeHeight);
-
-    // ✅ نمایش دکمه نصب PWA در صورت مجاز بودن
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = 'block';
-    });
-
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      const result = await deferredPrompt.userChoice;
-      if (result.outcome === 'accepted') {
-        console.log('کاربر نصب را پذیرفت ✅');
-        installBtn.style.display = 'none';
-      } else {
-        console.log('کاربر نصب را لغو کرد ❌');
-      }
-      deferredPrompt = null;
-    });
-
-    window.addEventListener('appinstalled', () => {
-      installBtn.style.display = 'none';
-      console.log('اپ با موفقیت نصب شد 🎉');
-    });
-
-    // ✅ ثبت Service Worker برای حالت آفلاین
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .then(reg => console.log('Service Worker ثبت شد ✅', reg.scope))
-          .catch(err => console.error('خطا در ثبت Service Worker ❌', err));
-      });
-    }
-
-        
     </script>
 </body>
 </html>
