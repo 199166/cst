@@ -7,15 +7,13 @@
     <meta name="language" content="fa">
     <meta name="locale" content="fa_IR">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ربات CST - ورود با Google Authenticator</title>
-    
-    <link rel="manifest" href="/cst/manifest.json">
     <meta name="theme-color" content="#2575fc">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ربات CST">
+    <meta name="apple-mobile-web-app-title" content="پنل مدیریتی">
     
+    <link rel="manifest" href="/cst/manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-180x180.png">
     <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180x180.png">
@@ -31,6 +29,8 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
+    <title>پنل مدیریتی</title>
+
     <style>
         * {
             margin: 0;
@@ -41,6 +41,9 @@
         
         html, body {
             height: 100%;
+            background-color: #121212;
+            color: #fff;
+            overflow: hidden;
         }
 
         body {
@@ -48,14 +51,13 @@
             display: flex;
             flex-direction: column;
             padding: 0;
-            overflow: hidden;
             min-height: 100vh;
         }
         
         /* پس‌زمینه ساده برای موبایل */
         @media (max-width: 768px) {
             body {
-                background: #2575fc !important; /* فقط رنگ آبی در موبایل */
+                background: #2575fc !important;
             }
         }
         
@@ -65,7 +67,14 @@
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
         }
-        
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
         /* ========== LOGIN STYLES ========== */
         .login-container {
             background-color: rgba(255, 255, 255, 0.1);
@@ -81,7 +90,6 @@
             margin: auto;
         }
         
-        /* استایل برای موبایل */
         @media (max-width: 768px) {
             .login-container {
                 background-color: rgba(255, 255, 255, 0.15);
@@ -195,6 +203,7 @@
             flex-direction: column;
             flex: 1;
             min-height: 0;
+            height: 100%;
         }
         
         .signature, .login-signature {
@@ -300,7 +309,7 @@
             font-size: 1rem;
             opacity: 0.9;
         }
-        
+
         /* ========== IFRAME CONTAINER ========== */
         .iframe-container {
             flex: 1;
@@ -321,7 +330,7 @@
             border-radius: 12px;
         }
         
-        /* استایل زیبا برای اسکرول بار عمودی ایفریم */
+        /* اسکرول‌بار زیبا و مدرن برای iframe */
         iframe {
             scrollbar-width: thin;
             scrollbar-color: #6a11cb #f1f5ff;
@@ -522,13 +531,12 @@
                 font-size: 1.5rem;
             }
         }
-        
     </style>
 </head>
 
 <body>
     <div class="login-container" id="loginPage">
-        <h1>ورود به ربات CST</h1>
+        <h1>ورود به پنل مدیریتی</h1>
         
         <div class="setup-guide">
             <h3>📱 راهنمای ورود</h3>
@@ -557,44 +565,24 @@
                 <div class="tabs" id="tabs">
                     <div class="tab active" onclick="openTab(0)">
                         <i class="fa fa-pie-chart"></i>
-                        Calculator Pro W/D
+                        صفحه ۱
                     </div>
                     <div class="tab" onclick="openTab(1)">
                         <i class="fa fa-bar-chart"></i>
-                        Calculator Pro Formula 4
+                        صفحه ۲
                     </div>
                     <div class="tab" onclick="openTab(2)">
                         <i class="fa fa-area-chart"></i>
-                        Calculator Pro Formula 2
-                    </div>
-                    <div class="tab" onclick="openTab(3)">
-                        <i class="fa fa-sort-alpha-asc"></i>
-                        Calculator Pro Center W/D
-                    </div>
-                    <div class="tab" onclick="openTab(4)">
-                        <i class="fa fa-line-chart"></i>
-                        Cst Analyzer
-                    </div>
-                    <div class="tab" onclick="openTab(5)">
-                        <i class="fa fa-exchange-alt"></i>
-                        Forex Manager
-                    </div>
-                    <div class="tab" onclick="openTab(6)">
-                        <i class="fa fa-calculator"></i>
-                        Calculator Pro C/D
+                        صفحه ۳
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="iframe-container">
-            <iframe src="calculator_pro_w_d/index.html" class="active"></iframe>
-            <iframe src="calculator_pro_formula_4/index.html"></iframe>
-            <iframe src="calculator_pro_formula_2/index.html"></iframe>
-            <iframe src="calculator_pro_center_w_d/index.html"></iframe>
-            <iframe src="cst_analyzer/index.html"></iframe>
-            <iframe src="forex_manager/index.html"></iframe>
-            <iframe src="calculator_pro_cd/index.html"></iframe>
+            <iframe src="page1.html" class="active"></iframe>
+            <iframe src="page2.html"></iframe>
+            <iframe src="page3.html"></iframe>
         </div>
     </div>
 
@@ -890,7 +878,6 @@
                     });
             });
         }
-
     </script>
 </body>
 </html>
