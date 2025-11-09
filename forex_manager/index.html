@@ -146,7 +146,7 @@
         }
 
         .dark-mode .glass-btn {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 0.1, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
@@ -1289,7 +1289,7 @@
                     
                     <div class="input-group">
                         <label for="pip-price">قیمت جفت ارز</label>
-                        <input type="number" id="pip-price" step="0.00001" placeholder="مثال: 1.1250" value="1.1250">
+                        <input type="number" id="pip-price" step="0.00001" placeholder="مثال: 1.1250">
                     </div>
                     
                     <div class="input-group">
@@ -2003,18 +2003,16 @@
         });
 
         document.getElementById('reset').addEventListener('click', function() {
-            document.getElementById('currency-pair-calc').value = '';
-            document.getElementById('trade-date').value = '';
-            document.getElementById('lot-size').value = '0.1';
-            document.getElementById('entry-price').value = '1.1250';
-            document.getElementById('take-profit').value = '1.1350';
-            document.getElementById('stop-loss').value = '1.1200';
+            // فقط فیلدهای عددی ورودی و یادداشت را پاک می‌کند، جفت ارز، تاریخ و نوع پوزیشن حفظ می‌شود
+            document.getElementById('lot-size').value = '';
+            document.getElementById('entry-price').value = '';
+            document.getElementById('take-profit').value = '';
+            document.getElementById('stop-loss').value = '';
             document.getElementById('exit-price').value = '';
-            document.getElementById('position-type').value = 'buy';
             document.getElementById('trade-notes').value = '';
             document.getElementById('result').style.display = 'none';
             
-            showAlert('فرم با موفقیت ریست شد', 'info');
+            showAlert('فیلدهای عددی با موفقیت ریست شد', 'info');
         });
 
         // محاسبه ارزش پیپ
@@ -2061,7 +2059,7 @@
 
         document.getElementById('reset-pip-calculator').addEventListener('click', function() {
             document.getElementById('pip-lot-size').value = '0.1';
-            document.getElementById('pip-price').value = '1.1250';
+            document.getElementById('pip-price').value = '';
             document.getElementById('account-currency').value = 'USD';
             document.getElementById('pip-result').style.display = 'none';
             
