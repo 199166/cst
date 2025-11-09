@@ -1337,21 +1337,22 @@ if(calculateButton) calculateButton.addEventListener('click', ()=>{
 });
 
 if(resetButton) resetButton.addEventListener('click', ()=>{
-  if(inputY1) inputY1.value=''; 
-  if(inputY2) inputY2.value=''; 
-  if(inputCurrentHigh) inputCurrentHigh.value=''; 
-  if(inputCurrentLow) inputCurrentLow.value='';
-  if(inputDailyHigh) inputDailyHigh.value='';
-  if(inputDailyLow) inputDailyLow.value='';
-  if(noteInput) noteInput.value=''; 
-  if(datePicker) datePicker.value=''; 
-  if(resultsList) resultsList.innerHTML=''; 
-  if(errorMessage) errorMessage.textContent=''; 
-  if(voiceStatus) voiceStatus.textContent='';
+  // فقط فیلدهای عددی ورودی را پاک کن
+  if(inputY1) inputY1.value = '';
+  if(inputY2) inputY2.value = '';
+  if(inputCurrentHigh) inputCurrentHigh.value = '';
+  if(inputCurrentLow) inputCurrentLow.value = '';
+  if(inputDailyHigh) inputDailyHigh.value = '';
+  if(inputDailyLow) inputDailyLow.value = '';
+  
+  // نتایج و خطاها را پاک کن، اما تاریخ، یادداشت و وضعیت صوتی را نه
+  if(resultsList) resultsList.innerHTML = '';
+  if(errorMessage) errorMessage.textContent = '';
   if(closestInfo) {
     closestInfo.innerHTML = '';
     closestInfo.classList.add('hidden');
   }
+  // voiceStatus را دست نزن (فرمان صوتی قطع نشود)
 });
 
 // ---------- مدیریت جفت‌ارزها ----------
