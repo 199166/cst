@@ -1,7 +1,7 @@
 {
   "name": "ربات CST",
   "short_name": "CST Robot",
-  "description": "سیستم مدیریت و تحلیل ربات CST",
+  "description": "سیستم مدیریت و تحلیل ترید - طراحی شده توسط سعید شیخ احمد صفاری",
   "start_url": "/cst/",
   "display": "standalone",
   "background_color": "#6a11cb",
