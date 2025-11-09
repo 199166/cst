@@ -2355,7 +2355,7 @@
             collapseIcon.textContent = '▼';
         } else {
             pairsContainer.classList.add('collapsed');
-            collapseIcon.textContent = '';
+            collapseIcon.textContent = '▶';
         }
     }
 
@@ -2734,7 +2734,7 @@
                 return;
             }
             
-            if (confirm(`آیا از حذف ${oldCalculations.length} محاسبه قبل از تاریخ ${deleteBeforeDate} مطمئن هستید؟`)) {
+            if (confirm(`آیا از حذف ${oldCalculations.length} محاسبه قبل از ��اریخ ${deleteBeforeDate} مطمئن هستید؟`)) {
                 for (const calc of oldCalculations) {
                     await deleteFromDatabase(STORE_CALCULATIONS, calc.id);
                 }
@@ -2884,7 +2884,7 @@
                 
                 showNotification('داده‌ها با موفقیت بازیابی شدند.');
             } catch (error) {
-                console.error('خطا در بازیابی داده‌ها:', error);
+                console.error('خطا در بازیابی د��ده‌ها:', error);
                 showNotification('خطا در بازیابی داده‌ها. فایل معتبر نیست.', 'error');
             }
             
@@ -3335,11 +3335,11 @@
         // تغییر حالت تاریک/روشن
         document.getElementById('themeToggle').addEventListener('click', toggleTheme);
         
-        // کپی کردن نتایج
+        // کپی کردن نتایج - تغییر: فقط عدد از dataset.value کپی می‌شود
         ['outputFormula1', 'outputFormula2', 'outputFormula3', 'outputFormula4'].forEach(id => {
             document.getElementById(id).addEventListener('click', function() {
-                if (this.textContent && !this.classList.contains('error')) {
-                    copyToClipboard(this);
+                if (this.dataset.value && !this.classList.contains('error')) {
+                    copyToClipboard(this, this.dataset.value);
                 }
             });
         });
