@@ -306,43 +306,27 @@
             opacity: 0.9;
         }
         
-        /* ========== RESPONSIVE TABS ONLY FOR DESKTOP ========== */
-        /* فقط برای دسکتاپ - حالت بسیار فشرده برای سایزهای بسیار کوچک */
-        @media (min-width: 769px) and (max-width: 500px) {
-            .tabs-container {
-                padding: 8px 5px;
-            }
-            
-            .tab {
-                padding: 10px 12px;
-                min-width: 50px;
-                justify-content: center;
-            }
-            
-            .tab-text {
-                display: none !important;
-            }
-            
-            .tab i {
-                font-size: 1.4rem;
-                margin: 0;
-            }
+        /* ========== RESPONSIVE TABS - ONLY FOR DESKTOP ========== */
+        /* حالت پیش‌فرض: متن بلند نمایش داده میشه، متن کوتاه مخفیه */
+        .tab-text.short {
+            display: none;
         }
         
-        /* فقط برای دسکتاپ - حالت بسیار فشرده */
-        @media (min-width: 769px) and (max-width: 600px) {
-            .tabs-container {
-                padding: 10px 8px;
+        .tab-text.long {
+            display: inline;
+        }
+
+        /* فقط برای دسکتاپ: وقتی صفحه کوچیک میشه */
+        @media (min-width: 769px) and (max-width: 1100px) {
+            /* فقط آیکون - متن کاملاً مخفی */
+            .tab-text {
+                display: none !important;
             }
             
             .tab {
-                padding: 12px 14px;
-                min-width: 55px;
+                min-width: 60px;
                 justify-content: center;
-            }
-            
-            .tab-text {
-                display: none !important;
+                padding: 12px 16px;
             }
             
             .tab i {
@@ -351,35 +335,8 @@
             }
         }
         
-        /* فقط برای دسکتاپ - حالت فشرده */
-        @media (min-width: 769px) and (max-width: 700px) {
-            .tab {
-                padding: 10px 12px;
-                min-width: 60px;
-                justify-content: center;
-            }
-            
-            .tab-text {
-                display: none !important;
-            }
-            
-            .tab i {
-                font-size: 1.4rem;
-                margin: 0;
-            }
-        }
-        
-        /* فقط برای دسکتاپ - حالت نیمه فشرده */
-        @media (min-width: 769px) and (max-width: 850px) {
-            .tab {
-                padding: 10px 12px;
-                min-width: 70px;
-            }
-            
-            .tab-text {
-                font-size: 0.7rem;
-            }
-            
+        /* فقط برای دسکتاپ: صفحه متوسط */
+        @media (min-width: 1101px) and (max-width: 1300px) {
             .tab-text.long {
                 display: none;
             }
@@ -388,38 +345,14 @@
                 display: inline;
             }
             
-            .tab i {
-                font-size: 1.3rem;
-            }
-        }
-        
-        /* فقط برای دسکتاپ - حالت متوسط */
-        @media (min-width: 769px) and (max-width: 1000px) {
             .tab {
                 padding: 10px 14px;
-                min-width: 80px;
-            }
-            
-            .tab-text {
-                font-size: 0.75rem;
-            }
-            
-            .tab-text.long {
-                display: none;
-            }
-            
-            .tab-text.short {
-                display: inline;
+                font-size: 0.8rem;
             }
             
             .tab i {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
-        }
-
-        /* حالت عادی برای دسکتاپ بزرگ و موبایل */
-        .tab-text.short {
-            display: none;
         }
 
         /* ========== IFRAME CONTAINER ========== */
@@ -482,19 +415,7 @@
             background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
         }
 
-        /* ========== RESPONSIVE DESIGN ========== */
-        @media (max-width: 1024px) {
-            .tab {
-                padding: 8px 14px;
-                font-size: 0.8rem;
-                gap: 6px;
-            }
-            
-            .tab i {
-                font-size: 1.1rem;
-            }
-        }
-
+        /* ========== RESPONSIVE DESIGN FOR MOBILE ========== */
         @media (max-width: 768px) {
             .tabs-container {
                 padding: 12px 15px;
@@ -723,49 +644,15 @@
         // تنظیم theme-color بر اساس اندازه صفحه
         function updateThemeColor() {
             if (window.innerWidth <= 480) {
-                setThemeColor('#2575fc'); // تک‌رنگ برای موبایل‌های کوچک
+                setThemeColor('#2575fc');
             } else {
-                setThemeColor('#6a11cb'); // گرادیان برای تبلت و دسکتاپ
+                setThemeColor('#6a11cb');
             }
         }
 
-        // ==================== DETECT DESKTOP AND APPLY RESPONSIVE TABS ====================
-        function handleDesktopResponsiveTabs() {
-            const tabsContainer = document.getElementById('tabsContainer');
-            const windowWidth = window.innerWidth;
-            
-            // فقط برای دسکتاپ (عرض بیشتر از 768px)
-            if (windowWidth > 768) {
-                // حذف تمام کلاس‌های قبلی
-                tabsContainer.classList.remove('extra-compact', 'compact', 'semi-compact', 'medium');
-                
-                if (windowWidth < 600) {
-                    // حالت بسیار فشرده برای دسکتاپ کوچک
-                    tabsContainer.classList.add('extra-compact');
-                } else if (windowWidth < 700) {
-                    // حالت فشرده
-                    tabsContainer.classList.add('compact');
-                } else if (windowWidth < 850) {
-                    // حالت نیمه فشرده
-                    tabsContainer.classList.add('semi-compact');
-                } else if (windowWidth < 1000) {
-                    // حالت متوسط
-                    tabsContainer.classList.add('medium');
-                }
-            }
-        }
-
-        // اعمال در لود اولیه
-        document.addEventListener('DOMContentLoaded', () => {
-            updateThemeColor();
-            handleDesktopResponsiveTabs();
-        });
-
-        // اعمال در تغییر سایز صفحه
-        window.addEventListener('resize', () => {
-            updateThemeColor();
-            handleDesktopResponsiveTabs();
-        });
+        // اعمال در لود اولیه و تغییر سایز
+        document.addEventListener('DOMContentLoaded', updateThemeColor);
+        window.addEventListener('resize', updateThemeColor);
 
         // ==================== AUTHENTICATION ====================
         const secretKey = 'JBSWY3DPEHPK3PXP';
@@ -895,7 +782,6 @@
         if (sessionStorage.getItem('cst_authenticated') === 'true') {
             loginPage.style.display = 'none';
             mainContent.style.display = 'flex';
-            // فعال کردن اسکرول موس برای تب‌ها
             setTimeout(initMouseWheelScroll, 100);
         } else {
             loginPage.style.display = 'block';
@@ -934,12 +820,11 @@
                 this.scrollLeft += e.deltaY;
             });
             
-            // اسکرول با کلیک و درگ روی هر قسمتی از تب‌ها
+            // اسکرول با کلیک و درگ
             let isDragging = false;
             let startX;
             let scrollLeft;
             
-            // برای کل کانتینر تب‌ها
             tabsScrollContainer.addEventListener('mousedown', function(e) {
                 isDragging = true;
                 startX = e.pageX - this.offsetLeft;
@@ -948,7 +833,6 @@
                 this.style.userSelect = 'none';
             });
             
-            // برای خود تب‌ها (اگر کاربر روی تب کلیک کرد)
             tabs.addEventListener('mousedown', function(e) {
                 isDragging = true;
                 startX = e.pageX - tabsScrollContainer.offsetLeft;
