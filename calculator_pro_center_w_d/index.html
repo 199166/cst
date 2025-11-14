@@ -2494,41 +2494,49 @@
     }
 
     /* ---------- backup/import/prune ---------- */
-    if(exportBtn) exportBtn.addEventListener('click', ()=>{
-      try {
-        const payload = { 
-          pairs: storageGet('pairs')||[], 
-          entries: storageGet('entries')||[], 
-          categories: storageGet('categories')||[],
-          meta: {
-            created: new Date().toISOString(),
-            version: '2.0',
-            entryCount: (storageGet('entries')||[]).length,
-            pairCount: (storageGet('pairs')||[]).length,
-            categoryCount: (storageGet('categories')||[]).length,
-            backupId: uid(),
-            pairInfo: (storageGet('pairs')||[]).map(p => ({
-              id: p.id,
-              name: p.name,
-              categoryId: p.categoryId
-            }))
-          }
-        };
-        const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json;charset=utf-8'});
-        const url = URL.createObjectURL(blob); 
-        const a = document.createElement('a'); 
-        a.href = url; 
-        a.download = 'calculator_pro_center_w_d-'+new Date().toISOString().slice(0,10)+'.json'; 
-        document.body.appendChild(a); 
-        a.click(); 
-        a.remove(); 
-        URL.revokeObjectURL(url);
-        showToast('فایل پشتیبان با موفقیت دانلود شد!', 'success');
-      } catch (error) {
-        console.error('خطا در دانلود:', error);
-        showToast('خطا در دانلود فایل پشتیبان. لطفاً دوباره تلاش کنید.', 'error');
+	
+	function showNotification(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce ${type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`;
+  toast.innerHTML = message;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    if (document.body.contains(toast)) {
+      document.body.removeChild(toast);
+    }
+  }, 3000);
+}
+	
+if(exportBtn) exportBtn.addEventListener('click', ()=>{
+  try {
+    const payload = { 
+      pairs: storageGet('pairs')||[], 
+      entries: storageGet('entries')||[], 
+      categories: storageGet('categories')||[],
+      meta: {
+        created: new Date().toISOString(),
+        version: '3.0',
+        entryCount: (storageGet('entries')||[]).length,
+        pairCount: (storageGet('pairs')||[]).length,
+        categoryCount: (storageGet('categories')||[]).length,
+        backupId: uid()
       }
-    });
+    };
+    const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json;charset=utf-8'});
+    const url = URL.createObjectURL(blob); 
+    const a = document.createElement('a'); 
+    a.href = url; 
+    a.download = 'calculator_pro_w_d-'+new Date().toISOString().slice(0,10)+'.json'; 
+    document.body.appendChild(a); 
+    a.click(); 
+    a.remove(); 
+    URL.revokeObjectURL(url);
+    showNotification('✅ فایل پشتیبان با موفقیت دانلود شد');
+  } catch (err) {
+    console.error('خطا در دانلود بک‌آپ:', err);
+    showNotification('❌ خطا در دانلود فایل پشتیبان: ' + err.message, 'error');
+  }
+});
 
     if(importBtn) importBtn.addEventListener('click', ()=> {
       if(importFile) importFile.click();
