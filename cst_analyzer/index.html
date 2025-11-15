@@ -2255,7 +2255,7 @@ window.addEventListener('resize', function() {
   resizeHorizontalLines(); // استفاده از تابع استخراج‌شده
 });
 
-// تابع toggle برای collapsible sections با ذخیره state
+// تابع toggle برای collapsible sections با ذخیره state (بهینه‌شده برای بخش ۲)
 function toggleSection(sectionId) {
   const card = document.querySelector(`[data-section="${sectionId}"]`);
   const content = card.querySelector('.collapsible-content');
@@ -2263,6 +2263,24 @@ function toggleSection(sectionId) {
   card.classList.toggle('open');
   content.style.display = isOpen ? 'none' : 'block';
   saveSectionOpenState(sectionId, !isOpen);
+
+  // بهینه‌سازی خاص برای بخش ۲: اگر باز می‌شود و summary نمایش داده شده، چارت‌ها و خطوط را بازسازی کن
+  if (sectionId === '2' && !isOpen) { // اگر قبلاً بسته بود و حالا باز می‌شود
+    const symName = document.getElementById('selectedSymbol3').value;
+    if (symName) {
+      const isDaysRange = document.getElementById('daysRangeToggle').classList.contains('active');
+      if (isDaysRange) {
+        const requestedDays = parseInt(document.getElementById('analysisDays').value) || 5;
+        setTimeout(() => renderSummaryForRange(symName, true, requestedDays), 100); // timeout برای اطمینان از کامل شدن animation
+      } else {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        if (startDate && endDate) {
+          setTimeout(() => renderSummaryForRange(symName, false, null, startDate, endDate), 100);
+        }
+      }
+    }
+  }
 }
 
 // ---------- Drag & Drop برای بخش‌ها ----------
