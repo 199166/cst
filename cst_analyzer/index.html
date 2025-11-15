@@ -37,13 +37,63 @@
     margin: 0 auto;
   }
   
+  #sectionsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
   .card {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    padding: 16px;
     border-radius: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 0;
     overflow: hidden;
+    cursor: grab;
+  }
+  
+  /* استایل collapsible برای هر card */
+  .collapsible-card {
+    max-height: 60px; /* ارتفاع پیش‌فرض برای عنوان */
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+  
+  .collapsible-card.open {
+    max-height: 2000px; /* ارتفاع کافی برای محتوای باز */
+    transition: max-height 0.3s ease-in;
+  }
+  
+  .collapsible-header {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .collapsible-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    border-bottom: none;
+    padding-bottom: 0;
+    flex: 1;
+  }
+  
+  .toggle-icon {
+    font-size: 1.2rem;
+    transition: transform 0.3s;
+    color: var(--accent-color);
+  }
+  
+  .collapsible-card.open .toggle-icon {
+    transform: rotate(180deg);
+  }
+  
+  .collapsible-content {
+    padding: 0 16px 16px;
   }
   
   h1, h2, h3 {
@@ -416,8 +466,11 @@
     }
     
     .card {
+      margin-bottom: 0;
+    }
+    
+    .collapsible-header {
       padding: 12px;
-      margin-bottom: 12px;
     }
     
     h1 {
@@ -498,7 +551,7 @@
     }
     
     .card {
-      padding: 10px;
+      margin-bottom: 0;
     }
     
     h1 {
@@ -628,172 +681,238 @@
       top: 10px;
     }
   }
+
+  /* استایل برای drag & drop بخش‌ها */
+  .section-chip {
+    display: inline-flex;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #062b2a, #0a3a38);
+    color: #9ff;
+    cursor: grab;
+    margin: 4px;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    user-select: none;
+    border: 1px solid #0ea5a4;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    min-width: 80px;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .section-chip:hover {
+    background: linear-gradient(135deg, #0ea5a4, #0d9488);
+    color: #021;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(14, 165, 164, 0.3);
+  }
+  
+  .section-chip.dragging {
+    opacity: 0.8;
+    cursor: grabbing;
+    transform: rotate(5deg) scale(1.05);
+    z-index: 1000;
+    box-shadow: 0 6px 12px rgba(14, 165, 164, 0.4);
+  }
 </style>
 </head>
 <body>
 <div class="container">
   <h1>CST Geometry Analyzer — پیشرفته</h1>
 
-  <div class="card">
-    <h3>۱) مدیریت جفت‌ارزها (با قابلیت جابجایی کاملاً آزاد)</h3>
-    <div class="form-group">
-      <label>نام جفت‌ارز (مثال: EURUSD یا BTCUSD)</label>
-      <input id="newSymbol" placeholder="نام جفت‌ارز را بنویسید">
-    </div>
-    
-    <div class="btn-group">
-      <button id="addSymbolBtn">افزودن / انتخاب</button>
-    </div>
-
-    <div class="small">لیست جفت‌ارزها (برای انتخاب کلیک کنید / برای جابجایی کاملاً آزاد بکشید و رها کنید):</div>
-    
-    <div id="symbolsList" class="symbols-grid">
-    </div>
-    
-    <div style="margin-top:8px" class="small">
-      💡 <strong>امکان جابجایی کاملاً آزاد:</strong> هر جفت ارزی را می‌توانید در هر موقعیتی از صفحه و کنار هر جفت ارز دیگری قرار دهید
-    </div>
-    <BR>
-    <div class="btn-group">
-      <button id="deleteSelectedSymbol" class="btn-danger">حذف جفت انتخاب‌شده</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>۲) وارد کردن / ثبت روز جدید</h3>
-    <div class="small">ابتدا یک جفت را انتخاب کن. سپس High و Low روز جدید را وارد کن (یا Mid).</div>
-
-    <div class="row">
-      <div class="col">
-        <label>جفت انتخاب‌شده</label>
-        <select id="selectedSymbol"></select>
+  <div id="sectionsContainer">
+    <!-- بخش ۱: وارد کردن / ثبت روز جدید -->
+    <div class="card collapsible-card" data-section="1">
+      <div class="collapsible-header" onclick="toggleSection('1')">
+        <h3>۱) وارد کردن / ثبت روز جدید</h3>
+        <span class="toggle-icon">▼</span>
       </div>
-      <div class="col">
-        <label>تاریخ (اختیاری)</label>
-        <input id="inputDate" type="date">
-      </div>
-    </div>
+      <div class="collapsible-content">
+        <div class="small">ابتدا یک جفت را انتخاب کن. سپس High و Low روز جدید را وارد کن (یا Mid).</div>
 
-    <div class="row">
-      <div class="col">
-        <label>High روز جدید</label>
-        <input id="inputHigh" placeholder="مثال: 76500">
-      </div>
-      <div class="col">
-        <label>Low روز جدید</label>
-        <input id="inputLow" placeholder="مثال: 76300">
-      </div>
-    </div>
-    
-    <div class="btn-group">
-      <button id="addDayBtn">ثبت روز جدید</button>
-      <button id="useMidBtn" class="btn-small">میانگین خودکار</button>
-      <button id="voiceToggle" class="btn-small">🔊 فعال/غیرفعال فرمان صوتی</button>
-    </div>
-
-    <div style="margin-top:6px" class="small">اگر فقط Mid داری، High = Low = Mid قرار بده یا از دکمه «میانگین خودکار» استفاده کن.</div>
-  </div>
-
-  <div class="card">
-    <h3>۳) نمایش تاریخچه و تحلیل (ویرایش / حذف / جابجایی رکوردها)</h3>
-    
-    <div style="margin-bottom:12px">
-      <label>نوع بازه تحلیل</label>
-      <div class="btn-group">
-        <button id="daysRangeToggle" class="date-range-toggle active">تعداد روز از جدیدترین</button>
-        <button id="dateRangeToggle" class="date-range-toggle">بازه تاریخ دلخواه</button>
-      </div>
-    </div>
-
-    <div id="daysRangeSection">
-      <div class="form-group">
-        <label>بازهٔ تحلیل (تعداد روز از جدیدترین)</label>
-        <input id="analysisDays" type="number" min="2" max="1000" value="5">
-        <div class="small">پیش‌فرض = 5 روز. برای مثال 7 یا 17 وارد کن و سپس «نمایش تاریخچه و تحلیل» را بزن.</div>
-      </div>
-      
-      <div class="btn-group">
-        <button id="showHistoryBtn">نمایش تاریخچه و تحلیل</button>
-      </div>
-    </div>
-
-    <div id="dateRangeSection" class="hidden">
-      <div class="row">
-        <div class="col">
-          <label>تاریخ شروع</label>
-          <input id="startDate" type="date">
+        <div class="row">
+          <div class="col">
+            <label>جفت انتخاب‌شده</label>
+            <select id="selectedSymbol"></select>
+          </div>
+          <div class="col">
+            <label>تاریخ (اختیاری)</label>
+            <input id="inputDate" type="date">
+          </div>
         </div>
-        <div class="col">
-          <label>تاریخ پایان</label>
-          <input id="endDate" type="date">
+
+        <div class="row">
+          <div class="col">
+            <label>High روز جدید</label>
+            <input id="inputHigh" placeholder="مثال: 76500">
+          </div>
+          <div class="col">
+            <label>Low روز جدید</label>
+            <input id="inputLow" placeholder="مثال: 76300">
+          </div>
+        </div>
+        
+        <div class="btn-group">
+          <button id="addDayBtn">ثبت روز جدید</button>
+          <button id="useMidBtn" class="btn-small">میانگین خودکار</button>
+        </div>
+
+        <div style="margin-top:6px" class="small">اگر فقط Mid داری، High = Low = Mid قرار بده یا از دکمه «میانگین خودکار» استفاده کن.</div>
+      </div>
+    </div>
+
+    <!-- بخش ۲: نمایش تاریخچه و تحلیل -->
+    <div class="card collapsible-card" data-section="2">
+      <div class="collapsible-header" onclick="toggleSection('2')">
+        <h3>۲) نمایش تاریخچه و تحلیل</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <div class="row">
+          <div class="col">
+            <label>جفت انتخاب‌شده برای تحلیل</label>
+            <select id="selectedSymbol3"></select>
+          </div>
+        </div>
+        
+        <div style="margin-bottom:12px">
+          <label>نوع بازه تحلیل</label>
+          <div class="btn-group">
+            <button id="daysRangeToggle" class="date-range-toggle active">تعداد روز از جدیدترین</button>
+            <button id="dateRangeToggle" class="date-range-toggle">بازه تاریخ دلخواه</button>
+          </div>
+        </div>
+
+        <div id="daysRangeSection">
+          <div class="form-group">
+            <label>بازهٔ تحلیل (تعداد روز از جدیدترین)</label>
+            <input id="analysisDays" type="number" min="2" max="1000" value="5">
+            <div class="small">پیش‌فرض = 5 روز. برای مثال 7 یا 17 وارد کن و سپس «نمایش تاریخچه و تحلیل» را بزن.</div>
+          </div>
+          
+          <div class="btn-group">
+            <button id="showHistoryBtn">نمایش تاریخچه و تحلیل</button>
+          </div>
+        </div>
+
+        <div id="dateRangeSection" class="hidden">
+          <div class="row">
+            <div class="col">
+              <label>تاریخ شروع</label>
+              <input id="startDate" type="date">
+            </div>
+            <div class="col">
+              <label>تاریخ پایان</label>
+              <input id="endDate" type="date">
+            </div>
+          </div>
+          
+          <div class="btn-group">
+            <button id="showDateRangeBtn">نمایش تاریخچه و تحلیل</button>
+          </div>
+          
+          <div class="small">تاریخ شروع و پایان دلخواه را انتخاب کنید (مثال: 2024-09-10 تا 2024-09-13)</div>
+        </div>
+
+        <div id="analysisOut" style="margin-top:12px;display:none"></div>
+        
+        <div class="chart-wrapper">
+          <div class="chart-container">
+            <canvas id="midChart"></canvas>
+          </div>
         </div>
       </div>
-      
-      <div class="btn-group">
-        <button id="showDateRangeBtn">نمایش تاریخچه و تحلیل</button>
-      </div>
-      
-      <div class="small">تاریخ شروع و پایان دلخواه را انتخاب کنید (مثال: 2024-09-10 تا 2024-09-13)</div>
     </div>
 
-    <div id="analysisOut" style="margin-top:12px;display:none"></div>
-    
-    <div class="chart-wrapper">
-      <div class="chart-container">
-        <canvas id="midChart"></canvas>
+    <!-- بخش ۳: مدیریت جفت‌ارزها -->
+    <div class="card collapsible-card" data-section="3">
+      <div class="collapsible-header" onclick="toggleSection('3')">
+        <h3>۳) مدیریت جفت‌ارزها</h3>
+        <span class="toggle-icon">▼</span>
       </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>۴) هشدارها و مدیریت پیشرفته داده‌ها</h3>
-    
-    <div class="row">
-      <div class="col">
-        <label>نوع هشدار صوتی هنگام «احتمال تغییر روند»</label>
-        <select id="alertSoundMode">
-          <option value="tts">TTS (صدای زنانه فارسی)</option>
-          <option value="beep">Beep ساده</option>
-          <option value="both">هر دو (TTS + Beep)</option>
-          <option value="off">خاموش</option>
-        </select>
-      </div>
-      <div class="col">
-        <label>&nbsp;</label>
-        <button id="testAlertBtn">آزمایش هشدار</button>
-      </div>
-    </div>
-
-    <div class="btn-group">
-      <button id="exportBtn">خروجی (Backup)</button>
-    </div>
-    
-    <div class="form-group">
-      <label>ورودی (Restore)</label>
-      <input id="importFile" type="file" accept=".json">
-    </div>
-
-    <div class="danger-zone">
-      <div class="text-center mb-2">
-        <span style="color: white; font-weight: bold;">⚙ مدیریت پیشرفته داده‌ها</span>
-      </div>
-      
-      <div class="mb-3">
-        <label class="small block mb-1">حذف رکوردهای قدیمی‌تر از:</label>
-        <div class="flex gap-2">
-          <input id="manualPruneDays" type="number" min="1" max="3650" value="365" style="flex:1; text-align:center;">
-          <span class="small flex items-center">روز</span>
+      <div class="collapsible-content">
+        <div class="form-group">
+          <label>نام جفت‌ارز (مثال: EURUSD یا BTCUSD)</label>
+          <input id="newSymbol" placeholder="نام جفت‌ارز را بنویسید">
         </div>
-        <button id="manualPruneBtn" class="btn-danger w-full mt-2">
-          حذف رکوردهای قدیمی
-        </button>
+        
+        <div class="btn-group">
+          <button id="addSymbolBtn">افزودن / انتخاب</button>
+        </div>
+
+        <div class="small">لیست جفت‌ارزها (برای انتخاب کلیک کنید / برای جابجایی کاملاً آزاد بکشید و رها کنید):</div>
+        
+        <div id="symbolsList" class="symbols-grid">
+        </div>
+        
+        <div style="margin-top:8px" class="small">
+          💡 <strong>امکان جابجایی کاملاً آزاد:</strong> هر جفت ارزی را می‌توانید در هر موقعیتی از صفحه و کنار هر جفت ارز دیگری قرار دهید
+        </div>
+        <BR>
+        <div class="btn-group">
+          <button id="deleteSelectedSymbol" class="btn-danger">حذف جفت انتخاب‌شده</button>
+        </div>
       </div>
+    </div>
 
-      <button id="showStatsBtn" class="w-full mb-2">
-        نمایش آمار و اطلاعات
-      </button>
+    <!-- بخش ۴: هشدارها و مدیریت پیشرفته داده‌ها -->
+    <div class="card collapsible-card" data-section="4">
+      <div class="collapsible-header" onclick="toggleSection('4')">
+        <h3>۴) هشدارها و مدیریت پیشرفته داده‌ها</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <div class="row">
+          <div class="col">
+            <label>نوع هشدار صوتی هنگام «احتمال تغییر روند»</label>
+            <select id="alertSoundMode">
+              <option value="tts">TTS (صدای زنانه فارسی)</option>
+              <option value="beep">Beep ساده</option>
+              <option value="both">هر دو (TTS + Beep)</option>
+              <option value="off">خاموش</option>
+            </select>
+          </div>
+          <div class="col">
+            <label>&nbsp;</label>
+            <button id="testAlertBtn">آزمایش هشدار</button>
+          </div>
+        </div>
 
-      <p class="small text-center mt-2">این عملیات غیرقابل بازگشت هستند</p>
+        <div class="btn-group">
+          <button id="exportBtn">خروجی (Backup)</button>
+        </div>
+        
+        <div class="form-group">
+          <label>ورودی (Restore)</label>
+          <input id="importFile" type="file" accept=".json">
+        </div>
+
+        <div class="danger-zone">
+          <div class="text-center mb-2">
+            <span style="color: white; font-weight: bold;">⚙ مدیریت پیشرفته داده‌ها</span>
+          </div>
+          
+          <div class="mb-3">
+            <label class="small block mb-1">حذف رکوردهای قدیمی‌تر از:</label>
+            <div class="flex gap-2">
+              <input id="manualPruneDays" type="number" min="1" max="3650" value="365" style="flex:1; text-align:center;">
+              <span class="small flex items-center">روز</span>
+            </div>
+            <button id="manualPruneBtn" class="btn-danger w-full mt-2">
+              حذف رکوردهای قدیمی
+            </button>
+          </div>
+
+          <button id="showStatsBtn" class="w-full mb-2">
+            نمایش آمار و اطلاعات
+          </button>
+
+          <p class="small text-center mt-2">این عملیات غیرقابل بازگشت هستند</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -803,7 +922,6 @@
       <li>✅ <strong>ذخیره‌سازی نامحدود:</strong> همه داده‌ها به طور دائمی حفظ می‌شوند (حتی تاریخ‌های قدیمی)</li>
       <li>✅ <strong>حذف دستی:</strong> فقط از طریق بخش "مدیریت پیشرفته داده‌ها" می‌توانید رکوردهای قدیمی را حذف کنید</li>
       <li>تحلیل زاویه بر اساس Mid هر روز انجام می‌شود (Mid = (High+Low)/2). پیش‌فرض نمایش تحلیل برای هر جفت ۵ روزه است اما می‌توانی عدد دلخواه 2..1000 وارد کنی.</li>
-      <li>فرمان صوتی نیاز به اجازه مرورگر دارد — ممکن است یک‌بار اجازه بخواهد.</li>
     </ul>
   </div>
 
@@ -867,8 +985,10 @@ function parseNum(v){
 }
 
 const STORAGE_KEY = 'cst_data_final_v5';
+const SECTIONS_ORDER_KEY = 'cst_sections_order';
+const SECTION_OPEN_KEY = 'cst_section_open_';
 let store = { symbols: {}, symbolOrder: [] };
-let voiceEnabled = false;
+let sectionsOrder = [1, 2, 3, 4]; // ترتیب پیش‌فرض
 let lastAlertShownAt = 0;
 const ALERT_THROTTLE_MS = 3000;
 
@@ -903,14 +1023,41 @@ function loadStore(){
 
 function saveStore(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); }
 
-// ---------- Drag & Drop کاملاً آزاد ----------
+function loadSectionsOrder() {
+  try {
+    const saved = localStorage.getItem(SECTIONS_ORDER_KEY);
+    if (saved) sectionsOrder = JSON.parse(saved);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function saveSectionsOrder() {
+  localStorage.setItem(SECTIONS_ORDER_KEY, JSON.stringify(sectionsOrder));
+}
+
+function saveSectionOpenState(sectionId, isOpen) {
+  localStorage.setItem(SECTION_OPEN_KEY + sectionId, isOpen ? 'open' : 'closed');
+}
+
+function loadSectionOpenState(sectionId) {
+  try {
+    return localStorage.getItem(SECTION_OPEN_KEY + sectionId) === 'open';
+  } catch (e) {
+    return false;
+  }
+}
+
+// ---------- Drag & Drop برای جفت‌ارزها ----------
 function refreshSymbolsList(){
   const container = document.getElementById('symbolsList');
   const sel = document.getElementById('selectedSymbol');
+  const sel3 = document.getElementById('selectedSymbol3');
   const currentSelected = sel.value;
   
   container.innerHTML = ''; 
   sel.innerHTML = '';
+  sel3.innerHTML = '';
   
   const names = store.symbolOrder || [];
   if(names.length === 0){
@@ -919,6 +1066,7 @@ function refreshSymbolsList(){
     opt.value = '';
     opt.text = '-- جفت انتخاب نشده --';
     sel.appendChild(opt);
+    sel3.appendChild(opt.cloneNode(true));
     return;
   }
 
@@ -932,12 +1080,15 @@ function refreshSymbolsList(){
     opt.value = name;
     opt.text = name;
     sel.appendChild(opt);
+    sel3.appendChild(opt.cloneNode(true));
   });
   
   if (currentSelected && names.includes(currentSelected)) {
     sel.value = currentSelected;
+    sel3.value = currentSelected;
   } else if (names.length > 0) {
     sel.value = names[0];
+    sel3.value = names[0];
   }
 
   setupFreeDragAndDrop(container);
@@ -958,6 +1109,7 @@ function createSymbolChip(name, index) {
   
   chip.onclick = () => { 
     document.getElementById('selectedSymbol').value = name; 
+    document.getElementById('selectedSymbol3').value = name;
     renderAnalysisFor(name); 
   };
   
@@ -1056,20 +1208,25 @@ function updateSymbolOrderFromFreeDOM() {
 
 function refreshSymbolDropdown() {
   const sel = document.getElementById('selectedSymbol');
+  const sel3 = document.getElementById('selectedSymbol3');
   const currentSelected = sel.value;
   sel.innerHTML = '';
+  sel3.innerHTML = '';
   
   store.symbolOrder.forEach(name => {
     const opt = document.createElement('option');
     opt.value = name;
     opt.text = name;
     sel.appendChild(opt);
+    sel3.appendChild(opt.cloneNode(true));
   });
   
   if (currentSelected && store.symbolOrder.includes(currentSelected)) {
     sel.value = currentSelected;
+    sel3.value = currentSelected;
   } else if (store.symbolOrder.length > 0) {
     sel.value = store.symbolOrder[0];
+    sel3.value = store.symbolOrder[0];
   }
 }
 
@@ -1312,8 +1469,6 @@ function renderAnalysisForDateRange(symName, startDate, endDate) {
 }
 
 // ---------- Event Listeners ----------
-// [همان event listeners قبلی بدون تغییر]
-
 document.getElementById('deleteSelectedSymbol').addEventListener('click', ()=>{
   const sym = document.getElementById('selectedSymbol').value;
   if(!sym){ alert('یک جفت انتخاب کنید'); return; }
@@ -1333,6 +1488,7 @@ document.getElementById('addSymbolBtn').addEventListener('click', ()=>{
   const sym = ensureSymbol(name);
   if(sym){
     document.getElementById('selectedSymbol').value = name;
+    document.getElementById('selectedSymbol3').value = name;
     renderAnalysisFor(name);
   }
 });
@@ -1379,7 +1535,7 @@ document.getElementById('dateRangeToggle').addEventListener('click', () => {
 });
 
 document.getElementById('showDateRangeBtn').addEventListener('click', ()=>{
-  const symName = document.getElementById('selectedSymbol').value;
+  const symName = document.getElementById('selectedSymbol3').value;
   if(!symName){ alert('یک جفت انتخاب کنید'); return; }
   const startDate = document.getElementById('startDate').value;
   const endDate = document.getElementById('endDate').value;
@@ -1391,9 +1547,13 @@ document.getElementById('showDateRangeBtn').addEventListener('click', ()=>{
 });
 
 document.getElementById('showHistoryBtn').addEventListener('click', ()=>{
-  const symName = document.getElementById('selectedSymbol').value;
+  const symName = document.getElementById('selectedSymbol3').value;
   if(!symName){ alert('یک جفت انتخاب کنید'); return; }
   renderAnalysisFor(symName);
+});
+
+document.getElementById('selectedSymbol3').addEventListener('change', () => {
+  renderAnalysisFor(document.getElementById('selectedSymbol3').value);
 });
 
 document.getElementById('manualPruneBtn').addEventListener('click', function() {
@@ -1407,7 +1567,7 @@ document.getElementById('manualPruneBtn').addEventListener('click', function() {
     const result = manualPruneOldEntries(days);
     if (result.totalDeleted > 0) {
       alert(`✅ ${result.totalDeleted} رکورد قدیمی حذف شد.\nجفت‌ارزهای affected: ${result.affectedSymbols.join(', ')}`);
-      const currentSymbol = document.getElementById('selectedSymbol').value;
+      const currentSymbol = document.getElementById('selectedSymbol3').value;
       if (currentSymbol) {
         renderAnalysisFor(currentSymbol);
       }
@@ -1465,7 +1625,7 @@ document.getElementById('importFile').addEventListener('change', (e) => {
         try {
             let importedObj = JSON.parse(reader.result);
             if (!importedObj || !importedObj.symbols) {
-                alert('فایل بک‌آپ معتبر نیست یا ��اختار اشتباهی دارد.');
+                alert('فایل بک‌آپ معتبر نیست یا ساختار اشتباهی دارد.');
                 return;
             }
 
@@ -1488,8 +1648,10 @@ document.getElementById('importFile').addEventListener('change', (e) => {
             refreshSymbolsList();
             
             const sel = document.getElementById('selectedSymbol');
+            const sel3 = document.getElementById('selectedSymbol3');
             if (sel.options.length > 0 && sel.options[0].value) {
                 sel.value = sel.options[0].value;
+                sel3.value = sel.options[0].value;
                 renderAnalysisFor(sel.value);
             } else {
                 document.getElementById('analysisOut').style.display = 'none';
@@ -1555,29 +1717,6 @@ document.getElementById('doMoveBtn').addEventListener('click', ()=>{
   recomputeAnalysesForSymbol(sym); saveStore();
   currentMove = null; document.getElementById('moveModal').style.display='none'; document.getElementById('modalBg').style.display='none';
   renderAnalysisFor(symName); checkAndAlertIfChange(symName);
-});
-
-function enableVoiceForField(fieldId){
-  const el = document.getElementById(fieldId); if(!el) return;
-  el.addEventListener('click', ()=>{
-    if(!window.webkitSpeechRecognition && !window.SpeechRecognition){ alert('مرورگر شما از فرمان صوتی پشتیبانی نمی‌کند (Chrome پیشنهاد می‌شود).'); return; }
-    const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new Rec();
-    recognition.lang = 'fa-IR'; recognition.interimResults = false; recognition.maxAlternatives = 1;
-    recognition.start();
-    recognition.onresult = (ev) => { el.value = ev.results[0][0].transcript.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[^\d\.\-\,]/g, ''); };
-  });
-}
-document.getElementById('voiceToggle').addEventListener('click', ()=>{
-  voiceEnabled = !voiceEnabled;
-  if(voiceEnabled){
-    ['inputHigh','inputLow','editHigh','editLow'].forEach(id=>enableVoiceForField(id));
-    alert('فرمان صوتی فعال شد.');
-    document.getElementById('voiceToggle').textContent = '🔊 فرمان صوتی فعال است';
-  } else {
-    alert('فرمان صوتی خاموش شد.');
-    document.getElementById('voiceToggle').textContent = '🔊 فعال/غیرفعال فرمان صوتی';
-  }
 });
 
 function speakTTS(text){
@@ -1693,55 +1832,138 @@ window.addEventListener('resize', function() {
   }
 });
 
-// ---------- init ----------
-document.addEventListener('DOMContentLoaded', () => {
-  loadStore();
-  refreshSymbolsList();
-  const sel = document.getElementById('selectedSymbol');
-  if(sel.value) { renderAnalysisFor(sel.value); }
-  sel.addEventListener('change', ()=>{ renderAnalysisFor(sel.value); });
-  if('speechSynthesis' in window){ window.speechSynthesis.onvoiceschanged = () => {}; }
+// تابع toggle برای collapsible sections با ذخیره state
+function toggleSection(sectionId) {
+  const card = document.querySelector(`[data-section="${sectionId}"]`);
+  const content = card.querySelector('.collapsible-content');
+  const isOpen = card.classList.contains('open');
+  card.classList.toggle('open');
+  content.style.display = isOpen ? 'none' : 'block';
+  saveSectionOpenState(sectionId, !isOpen);
+}
 
-  // حفظ و بازیابی موقعیت اسکرول (بهینه‌شده برای JS tabs در iframe)
-  const pageId = window.location.pathname + window.location.hash || 'default'; // key منحصربه‌فرد برای هر صفحه/iframe
-  const SCROLL_KEY = `cst_scroll_position_${btoa(pageId)}`; // encode برای key امن
-  let currentScrollY = 0;
+// ---------- Drag & Drop برای بخش‌ها ----------
+function setupSectionsDragAndDrop() {
+  const container = document.getElementById('sectionsContainer');
+  let draggedItem = null;
+  let placeholder = null;
 
-  // ذخیره موقع scroll (real-time)
-  const handleScroll = () => {
-    currentScrollY = window.scrollY;
-    sessionStorage.setItem(SCROLL_KEY, currentScrollY);
-  };
-  window.addEventListener('scroll', handleScroll, { passive: true });
+  container.querySelectorAll('.card').forEach(card => {
+    card.draggable = true;
+    card.addEventListener('dragstart', function(e) {
+      draggedItem = this;
+      this.classList.add('dragging');
+      
+      placeholder = document.createElement('div');
+      placeholder.className = 'section-placeholder';
+      placeholder.style.height = this.offsetHeight + 'px';
+      placeholder.style.border = '2px dashed var(--accent-color)';
+      placeholder.style.borderRadius = '10px';
+      placeholder.style.background = 'transparent';
+      this.parentNode.insertBefore(placeholder, this.nextSibling);
+      
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', this.dataset.section);
+    });
 
-  // ذخیره اضافی موقع hidden شدن (visibilitychange برای detect hide/show در JS tabs)
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-      sessionStorage.setItem(SCROLL_KEY, currentScrollY);
+    card.addEventListener('dragend', function() {
+      this.classList.remove('dragging');
+      
+      if (placeholder && placeholder.parentNode) {
+        placeholder.parentNode.removeChild(placeholder);
+      }
+      
+      draggedItem = null;
+      placeholder = null;
+      
+      updateSectionsOrderFromDOM();
+    });
+  });
+
+  container.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    if (!draggedItem) return;
+    
+    const afterElement = getDragAfterElement(container, e.clientY);
+    
+    if (afterElement == null) {
+      container.appendChild(placeholder);
+    } else {
+      container.insertBefore(placeholder, afterElement);
     }
   });
 
-  // restore موقع visible شدن یا لود اولیه
-  const restoreScroll = () => {
-    if (document.visibilityState === 'visible') {
-      const savedScroll = sessionStorage.getItem(SCROLL_KEY);
-      if (savedScroll !== null) {
-        // کمی تاخیر برای اطمینان از رندر کامل (مخصوصاً در iframe)
-        requestAnimationFrame(() => {
-          window.scrollTo(0, parseInt(savedScroll));
-        });
-      }
+  container.addEventListener('drop', function(e) {
+    e.preventDefault();
+    if (!draggedItem) return;
+    
+    if (placeholder && placeholder.parentNode) {
+      container.insertBefore(draggedItem, placeholder);
+      placeholder.parentNode.removeChild(placeholder);
     }
-  };
+    
+    draggedItem.classList.remove('dragging');
+    draggedItem = null;
+    placeholder = null;
+    
+    updateSectionsOrderFromDOM();
+  });
+}
 
-  // restore موقع visibilitychange (وقتی tab/iframe visible می‌شه)
-  document.addEventListener('visibilitychange', restoreScroll);
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.card:not(.dragging)')];
+  
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
 
-  // restore اولیه
-  restoreScroll();
+function updateSectionsOrderFromDOM() {
+  const container = document.getElementById('sectionsContainer');
+  sectionsOrder = Array.from(container.querySelectorAll('.card'))
+    .map(card => parseInt(card.dataset.section));
+  
+  saveSectionsOrder();
+}
 
-  // اگر iframe reload بشه، restore بعد از لود
-  window.addEventListener('load', restoreScroll);
+// ---------- init ----------
+document.addEventListener('DOMContentLoaded', () => {
+  loadStore();
+  loadSectionsOrder();
+  refreshSymbolsList();
+  const sel = document.getElementById('selectedSymbol');
+  const sel3 = document.getElementById('selectedSymbol3');
+  if(sel.value) { 
+    renderAnalysisFor(sel.value); 
+    sel3.value = sel.value;
+  }
+  sel.addEventListener('change', ()=>{ 
+    sel3.value = sel.value;
+    renderAnalysisFor(sel.value); 
+  });
+  if('speechSynthesis' in window){ window.speechSynthesis.onvoiceschanged = () => {}; }
+
+  // لود state باز/بسته بخش‌ها از localStorage (پیش‌فرض بسته)
+  document.querySelectorAll('.collapsible-card').forEach(card => {
+    const sectionId = card.dataset.section;
+    const isOpen = loadSectionOpenState(sectionId);
+    if (isOpen) {
+      card.classList.add('open');
+      card.querySelector('.collapsible-content').style.display = 'block';
+    } else {
+      card.classList.remove('open');
+      card.querySelector('.collapsible-content').style.display = 'none';
+    }
+  });
+
+  setupSectionsDragAndDrop();
 });
 </script>
 
