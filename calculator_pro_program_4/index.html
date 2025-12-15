@@ -1,0 +1,1868 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>calculator pro center w/d - برنامه چهارم</title>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+<style>
+    :root{
+      --bg:#1e293b;
+      --card:#334155;
+      --muted:#9aa6bf;
+      --input-bg:#475569;
+      --text-light:#f1f5f9;
+    }
+    
+    body{
+      font-family: 'Vazirmatn', sans-serif;
+      background:var(--bg); 
+      color:var(--text-light); 
+      min-height:100vh; 
+      padding:20px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* حذف فلش‌های بالا/پایین در اینپوت‌های عددی */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    input, button, select, textarea {
+      font-family: 'Vazirmatn', sans-serif;
+    }
+    
+    .card{
+      background:var(--card); 
+      border:1px solid rgba(255,255,255,0.08); 
+      border-radius:10px; 
+      padding:12px;
+    }
+    
+    .section-header{
+      display:flex; 
+      align-items:center; 
+      justify-content:space-between; 
+      gap:8px; 
+      cursor:pointer; 
+      padding:.5rem;
+      border-radius:8px; 
+      background:var(--input-bg); 
+      border:1px solid rgba(255,255,255,0.08);
+    }
+    
+    .section-title{
+      font-weight:700;
+    }
+    
+    .muted{
+      color:var(--muted); 
+      font-size:.95rem;
+    }
+    
+    input[type="text"], input[type="date"], input[type="number"], select, textarea { 
+      background:var(--input-bg);
+      border:1px solid rgba(255,255,255,0.1); 
+      color:var(--text-light); 
+      padding:.5rem; 
+      border-radius:6px; 
+      width:100%; 
+      outline: none;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+    }
+    
+    input[type="text"]:focus, input[type="date"]:focus, input[type="number"]:focus, select:focus, textarea:focus { 
+      border-color: rgba(59, 130, 246, 0.5);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+    
+    input::placeholder{ 
+      color:#9ca3af;
+    }
+    
+    .box-out{ 
+      padding:.35rem .6rem; 
+      border-radius:6px; 
+      display:inline-block; 
+      cursor:pointer;
+      margin:.25rem 0; 
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+    
+    .small-btn{ 
+      padding:0.5rem 0.75rem;
+      border-radius:0.5rem; 
+      font-size:0.875rem; 
+      cursor:pointer; 
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: var(--input-bg);
+      color: var(--text-light);
+      transition: all 0.3s ease;
+      outline: none;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      font-weight: 500;
+      text-decoration: none;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      font-family: 'Vazirmatn', sans-serif;
+    }
+    
+    .small-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .small-btn:focus {
+      outline: 2px solid rgba(59, 130, 246, 0.6);
+      outline-offset: 2px;
+      border-color: rgba(59, 130, 246, 0.8);
+    }
+    
+    .small-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* رنگ‌بندی دکمه‌ها */
+    .small-btn.bg-slate-600 { background: #475569; border-color: #64748b; color: #fff; }
+    .small-btn.bg-slate-600:hover { background: #64748b; border-color: #94a3b8; }
+    
+    .small-btn.bg-emerald-600 { background: #059669; border-color: #10b981; color: #fff; }
+    .small-btn.bg-emerald-600:hover { background: #10b981; border-color: #34d399; }
+    
+    .small-btn.bg-rose-600 { background: #dc2626; border-color: #ef4444; color: #fff; }
+    .small-btn.bg-rose-600:hover { background: #ef4444; border-color: #f87171; }
+    
+    .small-btn.bg-rose-700 { background: #be123c; border-color: #e11d48; color: #fff; }
+    .small-btn.bg-rose-700:hover { background: #e11d48; border-color: #fb7185; }
+
+    .small-btn.bg-blue-600 { background: #2563eb; border-color: #3b82f6; color: #fff; }
+    .small-btn.bg-blue-600:hover { background: #3b82f6; border-color: #60a5fa; }
+    
+    .small-btn.bg-yellow-600 { background: #d97706; border-color: #f59e0b; color: #fff; }
+    .small-btn.bg-yellow-600:hover { background: #f59e0b; border-color: #fbbf24; }
+    
+    .small-btn.bg-indigo-600 { background: #4f46e5; border-color: #6366f1; color: #fff; }
+    .small-btn.bg-indigo-600:hover { background: #6366f1; border-color: #818cf8; }
+    
+    .small-btn.bg-green-600 { background: #059669; border-color: #10b981; color: #fff; }
+    .small-btn.bg-green-600:hover { background: #10b981; border-color: #34d399; }
+    
+    /* استایل‌های فهرست */
+    #categories_container .small-btn {
+      padding: 0.2rem 0.4rem !important;
+      font-size: 0.7rem !important;
+      min-height: 24px !important;
+      border-width: 1px !important;
+      white-space: nowrap;
+    }
+    
+    #categories_container select.small-btn {
+      padding: 0.15rem 0.3rem !important;
+      font-size: 0.65rem !important;
+      min-height: 22px !important;
+      max-width: 120px;
+    }
+    
+    #categories_container button.small-btn {
+      min-width: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #categories_container li {
+      padding: 0.4rem 0.5rem !important;
+      gap: 0.3rem !important;
+    }
+    
+    .thin-scroll::-webkit-scrollbar{ width:8px; height:8px; }
+    .thin-scroll::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.1); border-radius:8px; }
+    
+    .hidden{ display:none !important; }
+    
+    .title-click{ display:flex; align-items:center; gap:8px; }
+    
+    .category-header{ 
+      background:rgba(255,255,255,0.08); 
+      padding:.5rem; 
+      border-radius:6px; 
+      margin:.5rem 0;
+      cursor:pointer; 
+      border:1px solid rgba(255,255,255,0.08);
+      transition: all 0.2s ease;
+    }
+    
+    .category-header:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.15); }
+    
+    .category-content{ padding:.5rem; border-right:2px solid #0ea5a4; margin-right:.5rem; }
+    
+    .danger-zone{ background:#7f1d1d; border:1px solid rgba(239,68,68,0.3); padding:12px; border-radius:8px; margin-top:12px; }
+    
+    .show-picker-btn{ 
+      color:var(--text-light) !important; 
+      background:rgba(255,255,255,0.15) !important;
+      border:1px solid rgba(255,255,255,0.2) !important; 
+      padding: 0.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .show-picker-btn:hover { background: rgba(255, 255, 255, 0.25) !important; border-color: rgba(255, 255, 255, 0.3) !important; }
+    
+    .center-modal{ display:flex !important; align-items:center; justify-content:center; }
+    
+    .category-item{ background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); }
+    
+    .resizable-container { resize: vertical; overflow: auto; min-height: 120px; max-height: 400px; }
+    
+    .history-compact { max-height: none !important; overflow: visible !important; }
+    
+    .history-entry-compact {
+      background: var(--input-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .history-entry-compact:hover { border-color: rgba(255,255,255,0.2); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); }
+
+    .modal-overlay {
+      position: fixed; top: 0;
+      left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+    }
+    
+    .modal-content { position: relative; max-height: 90vh; overflow-y: auto; margin: auto; }
+
+    .deleted-pair {
+      background: #7f1d1d; color: white; padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem; margin-right: 4px;
+      border: 1px solid #991b1b;
+    }
+
+    .multi-date-controls {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    
+    .date-range-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 8px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:nowrap;
+    }
+    
+    .date-range-item input[type="date"]{ flex:1; }
+    .date-range-item button{ flex-shrink:0; }
+    
+    .date-comparison-header {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .comparison-group {
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+    
+    .comparison-group:hover { border-color: rgba(255,255,255,0.2); }
+
+    .signature {
+      color: white;
+      text-align: center;
+      padding: 16px;
+      font-family: 'Vazirmatn', system-ui;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 14px;
+      font-weight: 500;
+      display: block;
+      margin: 30px auto;
+      width: fit-content;
+      max-width: 90%;
+      box-sizing: border-box;
+    }
+
+    /* موبایل */
+    @media only screen and (max-width: 768px) {
+      body { padding: 10px; }
+      .max-w-6xl { padding: 0; }
+      .small-btn {
+        min-height: 44px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        border-width: 2px;
+      }
+      input[type="text"], input[type="date"], input[type="number"], select, textarea { font-size: 16px; }
+      
+      #categories_container .small-btn { padding: 0.15rem 0.3rem !important; font-size: 0.75rem !important; min-height: 28px !important; }
+      #categories_container select.small-btn { padding: 0.1rem 0.25rem !important; font-size: 0.7rem !important; min-height: 26px !important; max-width: 100px; }
+      #categories_container button.small-btn { min-width: 24px; }
+      #categories_container li { padding: 0.3rem 0.4rem !important; gap: 0.2rem !important; flex-wrap: wrap; }
+      #categories_container .flex.gap-1 { gap: 0.15rem !important; order: 2; width: 100%; justify-content: flex-start; margin-top: 0.3rem; padding-top: 0.3rem; border-top: 1px solid rgba(255,255,255,0.1); }
+      #categories_container .flex-1 { order: 1; width: 100%; }
+      .signature { font-size: 12px; padding: 15px; }
+      .small-btn:active { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4); transform: scale(0.98); }
+      .box-out { padding: 0.5rem 0.75rem; min-height: 44px; display: flex; align-items: center; }
+    }
+
+    #toggle_icon { transition: all 0.3s ease; font-weight: bold; display: inline-block; }
+    #toggle_history_btn:hover #toggle_icon { transform: scale(1.2); }
+    #toggle_history_btn.open { background: #374151 !important; border-color: #6b7280 !important; }
+    #toggle_history_btn.closed { background: #475569 !important; border-color: #64748b !important; }
+
+    .toast-notification {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      padding: 12px 20px; border-radius: 8px;
+      font-size: 14px; font-weight: 500; z-index: 9999;
+      min-width: 280px; max-width: 90vw;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      opacity: 0; transform: translateX(-50%) translateY(-20px) scale(0.9);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center; gap: 8px;
+      backdrop-filter: blur(10px);
+      font-family: 'Vazirmatn', sans-serif;
+    }
+    .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    .toast-success { background: rgba(34, 197, 94, 0.95); color: white; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .toast-error { background: rgba(239, 68, 68, 0.95); color: white; border: 1px solid rgba(239, 68, 68, 0.3); }
+</style>
+</head>
+<body>
+  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
+  
+    <aside class="card">
+      <div id="hdr_pairs" class="section-header">
+        <div class="title-click">  <span class="hamburger-icon">⇅</span> <span class="section-title">مدیریت جفت‌ارز - برنامه چهارم</span></div>
+      </div>
+      <div id="box_pairs" class="mt-3">
+        <div class="mb-4 p-3 rounded bg-[var(--input-bg)] border border-white/10">
+          <label class="muted block mb-2">مدیریت دسته‌بندی‌ها</label>
+          <div class="flex gap-2 mb-2">
+            <input id="new_category_name" placeholder="نام دسته‌بندی جدید" type="text" class="flex-1"/>
+            <button id="add_category_btn" class="small-btn bg-blue-600 hover:bg-blue-700">افزودن</button>
+          </div>
+          <div class="flex gap-2 mb-2">
+            <select id="category_select" class="flex-1">
+              <option value="">بدون دسته‌بندی</option>
+            </select>
+            <button id="delete_category_btn" class="small-btn bg-rose-600 hover:bg-rose-700" title="حذف دسته‌بندی انتخاب شده">🗑</button>
+          </div>
+          <div class="mt-2">
+            <label class="muted text-xs">دسته‌بندی‌های موجود:</label>
+            <div id="categories_list" class="mt-1 space-y-1 max-h-20 overflow-y-auto thin-scroll"></div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <input id="new_pair_name" placeholder="مثال: EURUSD" type="text"/>
+          <div class="flex gap-2 mt-2">
+            <button id="add_pair_btn" class="small-btn bg-emerald-600 hover:bg-emerald-700">افزودن</button>
+            <button id="clear_pairs_btn" class="small-btn bg-rose-600 hover:bg-rose-700">حذف همه</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="muted">فهرست جفت‌ارزها</label>
+            <span class="text-xs muted">(قابل تغییر سایز)</span>
+          </div>
+          <div id="categories_container" class="resizable-container mt-2 thin-scroll border border-white/10 rounded p-2 space-y-3">
+            </div>
+        </div>
+
+        <div class="border-t border-white/10 pt-3 mt-3">
+          <div class="mb-2">
+            <button id="export_btn" class="small-btn bg-blue-600 hover:bg-blue-700 w-full">دانلود بک‌آپ (JSON)</button>
+          </div>
+          <div class="mb-2">
+            <input id="import_file" type="file" accept="application/json" class="hidden"/>
+            <button id="import_btn" class="small-btn bg-yellow-600 hover:bg-yellow-700 w-full">بارگذاری بک‌آپ (JSON)</button>
+          </div>
+          
+          <div class="danger-zone">
+            <div class="text-center mb-2">
+              <span class="text-white font-semibold">⚙ مدیریت پیشرفته داده‌ها</span>
+            </div>
+            
+            <div class="mb-3">
+              <label class="muted text-xs block mb-1">حذف رکوردهای قدیمی‌تر از:</label>
+              <div class="flex gap-2">
+                <input id="manual_prune_days" type="number" min="1" max="3650" value="365" class="flex-1 text-center"/>
+                <span class="muted text-xs flex items-center">روز</span>
+              </div>
+              <button id="manual_prune_btn" class="small-btn bg-rose-700 hover:bg-rose-800 text-white w-full mt-2">
+                 حذف رکوردهای قدیمی
+              </button>
+            </div>
+            
+            <p class="muted text-xs mt-2 text-center">این عملیات غیرقابل بازگشت است</p>
+          </div>
+          
+          <p class="muted text-xs mt-2">تاریخ‌ها میلادی ذخیره و نمایش داده می‌شوند.</p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="card">
+      <div id="hdr_calc" class="section-header">
+        <div class="title-click">  <span class="hamburger-icon">⇅</span><span class="section-title">محاسبه زاویه - برنامه چهارم</span></div>
+      </div>
+
+      <div id="box_calc" class="mt-3">
+        <div class="mb-3">
+          <div class="flex items-center gap-2 mb-2">
+            <label class="muted flex-1">جفت‌ارز</label>
+          </div>
+          <select id="pair_select"></select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label class="muted">عدد اول</label>
+            <input id="input_v1" type="number" placeholder="عدد اول"/>
+          </div>
+          <div>
+            <label class="muted">عدد دوم</label>
+            <input id="input_v2" type="number" placeholder="عدد دوم"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label class="muted">عدد سوم</label>
+            <input id="input_v3" type="number" placeholder="عدد سوم"/>
+          </div>
+          <div>
+            <label class="muted">عدد چهارم</label>
+            <input id="input_v4" type="number" placeholder="عدد چهارم"/>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="muted">تاریخ (میلادی)</label>
+          <div class="flex items-center gap-2">
+            <input id="date_picker" type="date" class="flex-1"/>
+            <button type="button" onclick="document.getElementById('date_picker').showPicker()" class="small-btn show-picker-btn" title="نمایش تقویم">
+               📅
+            </button>
+          </div>
+          <p class="muted text-xs mt-1">تاریخ انتخاب‌شده برای ذخیره رکورد استفاده می‌شود.</p>
+        </div>
+
+        <div class="mb-3">
+          <label class="muted">یادداشت (اختیاری)</label>
+          <textarea id="note_input" rows="2" placeholder=""></textarea>
+        </div>
+
+        <div class="flex gap-2 mb-3">
+          <button id="calculate_button" class="small-btn bg-emerald-600 hover:bg-emerald-700 flex-1">محاسبه و ذخیره</button>
+          <button id="reset_button" class="small-btn bg-slate-600 hover:bg-slate-700 flex-1">ریست</button>
+        </div>
+
+        <div class="bg-[var(--input-bg)] p-3 rounded border border-white/10 mb-3">
+          <h4 class="muted mb-2">نتایج محاسبه</h4>
+          <div id="results_output" class="space-y-2 min-h-[120px]"></div>
+        </div>
+
+        <div class="bg-[var(--input-bg)] p-3 rounded border border-white/10">
+          <h4 class="muted mb-2">نزدیک‌ترین زاویه‌ها</h4>
+          <div id="closest_output" class="font-semibold text-center space-y-2"></div>
+          <p id="error_message" class="muted text-rose-400 mt-2 text-center"></p>
+        </div>
+      </div>
+    </main>
+
+    <section class="card">
+      <div id="hdr_history" class="section-header">
+        <div class="title-click"> 
+          <span class="hamburger-icon">⇅</span> <span class="section-title">تاریخچه - برنامه چهارم</span></div>
+      </div>
+
+      <div id="box_history" class="mt-3">
+        <div class="flex items-center justify-between mb-2">
+          <div class="text-sm font-semibold">تاریخچه</div>
+          <div class="muted">کل: <span id="entries_count">0</span></div>
+        </div>
+
+        <div class="flex gap-2 mb-3">
+          <button id="toggle_history_btn" class="small-btn flex-1 bg-slate-600 hover:bg-slate-700 flex items-center justify-center gap-2 transition-all duration-300 closed">
+            <span id="toggle_icon" class="text-lg transition-all duration-300 transform">📁</span>
+            <span id="toggle_text" class="transition-all duration-300">نمایش ذخیره‌ها</span>
+          </button>
+        </div>
+
+        <div id="history_panel" class="mt-3 hidden">
+          <div class="multi-date-controls">
+            <div class="flex items-center justify-between mb-3">
+              <label class="muted font-semibold">📅 مشاهده چند تاریخ همزمان</label>
+              <button id="toggle_multi_date" class="small-btn bg-blue-600 hover:bg-blue-700 text-xs">
+                فعال کردن حالت چندتاریخی
+              </button>
+            </div>
+            
+            <div id="single_date_section">
+              <div class="mb-2 grid grid-cols-2 gap-2">
+                <input id="history_date" type="date"/>
+                <select id="history_pair_filter">
+                  <option value="">همه جفت‌ارزها</option>
+                </select>
+              </div>
+            </div>
+            
+            <div id="multi_date_section" class="hidden">
+              <div class="mb-3">
+                <div class="flex items-center gap-2 mb-2">
+                  <select id="multi_date_pair_filter" class="flex-1">
+                    <option value="">همه جفت‌ارزها</option>
+                  </select>
+                </div>
+                
+                <div id="date_ranges_container" class="space-y-2">
+                  </div>
+                
+                <div class="flex gap-2 mt-3">
+                  <button id="add_date_btn" class="small-btn bg-green-600 hover:bg-green-700 flex-1">
+                    ➕ افزودن تاریخ
+                  </button>
+                  <button id="apply_multi_date_btn" class="small-btn bg-blue-600 hover:bg-blue-700 flex-1">
+                    🔍 اعمال فیلتر
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="history_list" class="history-compact space-y-2"></div>
+        </div>
+
+        <div id="detail_modal" class="hidden fixed inset-0 bg-black bg-opacity-60 items-center justify-center p-4 z-50">
+          <div class="bg-[var(--card)] p-6 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/10">
+            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
+              <h4 class="font-bold text-lg">جزئیات کامل رکورد - برنامه چهارم</h4>
+              <button id="close_detail" class="small-btn bg-slate-600 hover:bg-slate-700">بستن</button>
+            </div>
+            <div id="detail_content" class="mt-2 text-sm space-y-4"></div>
+            <div class="flex gap-2 mt-6 pt-4 border-t border-white/10">
+              <button id="edit_record_btn" class="small-btn bg-yellow-600 hover:bg-yellow-700 flex-1">ویرایش</button>
+              <button id="move_record_btn" class="small-btn bg-indigo-600 hover:bg-indigo-700 flex-1">انتقال تاریخ</button>
+              <button id="delete_record_btn" class="small-btn bg-rose-600 hover:bg-rose-700 flex-1">حذف</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast_container"></div>
+  
+  <script>
+    /* ---------- helpers ---------- */
+    const uid = ()=> Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    // ایزوله‌سازی کامل با کلید اختصاصی برنامه چهارم
+    const storageGet = k => JSON.parse(localStorage.getItem('calc_pro_4_' + k) || '[]');
+    const storageSet = (k,v) => localStorage.setItem('calc_pro_4_' + k, JSON.stringify(v));
+    
+    const AUTO_PRUNE_ENABLED = false;
+    
+    function nowISO(){ return new Date().toISOString(); }
+    function formatGregorian(dtISO){
+      const d = new Date(dtISO);
+      const pad = n => n.toString().padStart(2,'0');
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+    
+    function ensureDefaults(){ 
+      if(!storageGet('pairs').length) storageSet('pairs',[]);
+      if(!storageGet('entries').length) storageSet('entries',[]);
+      if(!storageGet('categories').length) storageSet('categories',[
+        {id: 'default', name: 'اصلی'},
+        {id: 'forex', name: 'فارکس'},
+        {id: 'crypto', name: 'ارز دیجیتال'}
+      ]);
+    }
+    ensureDefaults();
+
+    // ---------- تشخیص دستگاه موبایل/تبلت ----------
+    function isMobileOrTablet() {
+        return window.innerWidth <= 1024;
+    }
+
+    // ---------- مدیریت وضعیت باکس‌ها بر اساس دستگاه ----------
+    function initializeBoxStates() {
+        if (isMobileOrTablet()) {
+            if(boxPairs) boxPairs.classList.add('hidden');
+            if(boxCalc) boxCalc.classList.add('hidden');
+            if(boxHistory) boxHistory.classList.add('hidden');
+        } else {
+            if(boxPairs) boxPairs.classList.remove('hidden');
+            if(boxCalc) boxCalc.classList.remove('hidden');
+            if(boxHistory) boxHistory.classList.remove('hidden');
+        }
+    }
+
+    /* ---------- safe DOM refs ---------- */
+    const $ = id => document.getElementById(id);
+    const pairSelect = $('pair_select');
+    const historyPairFilter = $('history_pair_filter');
+    const newPairName = $('new_pair_name');
+    const addPairBtn = $('add_pair_btn');
+    const clearPairsBtn = $('clear_pairs_btn');
+    const categoriesContainer = $('categories_container');
+    const categorySelect = $('category_select');
+    const newCategoryName = $('new_category_name');
+    const addCategoryBtn = $('add_category_btn');
+    const deleteCategoryBtn = $('delete_category_btn');
+    const categoriesList = $('categories_list');
+
+    const inputV1 = $('input_v1');
+    const inputV2 = $('input_v2');
+    const inputV3 = $('input_v3');
+    const inputV4 = $('input_v4');
+    const noteInput = $('note_input');
+    const datePicker = $('date_picker');
+    const calculateButton = $('calculate_button');
+    const resetButton = $('reset_button');
+    const resultsOutput = $('results_output');
+    const closestOutput = $('closest_output');
+    const errorMessage = $('error_message');
+
+    const exportBtn = $('export_btn');
+    const importFile = $('import_file');
+    const importBtn = $('import_btn');
+    const historyDate = $('history_date');
+    const historyList = $('history_list');
+    const entriesCount = $('entries_count');
+
+    const toggleHistoryBtn = $('toggle_history_btn');
+    const historyPanel = $('history_panel');
+
+    const detailModal = $('detail_modal');
+    const detailContent = $('detail_content');
+    const closeDetail = $('close_detail');
+    const editRecordBtn = $('edit_record_btn');
+    const moveRecordBtn = $('move_record_btn');
+    const deleteRecordBtn = $('delete_record_btn');
+
+    const togglePairsHdr = $('hdr_pairs');
+    const boxPairs = $('box_pairs');
+    const toggleCalcHdr = $('hdr_calc');
+    const boxCalc = $('box_calc');
+    const toggleHistoryHdr = $('hdr_history');
+    const boxHistory = $('box_history');
+    
+    // عناصر تاریخ چندگانه
+    const toggleMultiDateBtn = $('toggle_multi_date');
+    const singleDateSection = $('single_date_section');
+    const multiDateSection = $('multi_date_section');
+    const multiDatePairFilter = $('multi_date_pair_filter');
+    const dateRangesContainer = $('date_ranges_container');
+    const addDateBtn = $('add_date_btn');
+    const applyMultiDateBtn = $('apply_multi_date_btn');
+
+    // ---------- تابع جدید برای مدیریت دکمه تاگل ----------
+    function updateToggleButton(isOpen) {
+      const toggleIcon = document.getElementById('toggle_icon');
+      const toggleText = document.getElementById('toggle_text');
+      const toggleBtn = document.getElementById('toggle_history_btn');
+      
+      if (isOpen) {
+        toggleIcon.textContent = '📂';
+        toggleIcon.style.transform = 'rotate(0deg) scale(1.1)';
+        toggleText.textContent = 'بستن ذخیره‌ها';
+        toggleBtn.classList.remove('closed');
+        toggleBtn.classList.add('open');
+      } else {
+        toggleIcon.textContent = '📁';
+        toggleIcon.style.transform = 'rotate(0deg) scale(1)';
+        toggleText.textContent = 'نمایش ذخیره‌ها';
+        toggleBtn.classList.remove('open');
+        toggleBtn.classList.add('closed');
+      }
+    }
+
+    /* ---------- UI utils ---------- */
+    function safeForEach(arr, fn){ if(!Array.isArray(arr)) return; arr.forEach(fn); }
+
+    // ---------- تابع اعلان toast زیبا ----------
+    function showToast(message, type = 'success') {
+      const container = $('toast_container');
+      if (!container) return;
+
+      const existingToast = container.querySelector('.toast-notification');
+      if (existingToast) { existingToast.remove(); }
+
+      const toast = document.createElement('div');
+      toast.className = `toast-notification ${type === 'success' ? 'toast-success' : 'toast-error'}`;
+      toast.innerHTML = `<span>${type === 'success' ? '✅' : '❌'}</span><span>${message}</span>`;
+      
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('show');
+        toast.classList.add('animate-bounce');
+      }, 100);
+      setTimeout(() => {
+        if (toast.classList.contains('show')) {
+          toast.classList.remove('show');
+          toast.classList.remove('animate-bounce');
+          setTimeout(() => toast.remove(), 300);
+        }
+      }, 3000);
+    }
+
+    // ---------- فرمول محاسبه زاویه ----------
+    function angle(x){
+        return 0.03362287833*x*x - 7.3464992896*x + 285.36822709;
+    }
+
+    // ---------- محاسبه برای هر ورودی ----------
+    function calculateAngles(inputs) {
+        const results = [];
+        inputs.forEach((val, index) => {
+            if(val !== null && val !== undefined && val !== ''){
+                const num = parseFloat(val);
+                if(!isNaN(num)){
+                    const angleValue = angle(num);
+                    results.push({
+                        index: index + 1,
+                        input: num,
+                        angle: angleValue,
+                        anglePlus90: angleValue + 90,
+                        angleMinus90: angleValue - 90
+                    });
+                }
+            }
+        });
+        return results;
+    }
+
+    // ---------- پیدا کردن نزدیک‌ترین زاویه‌ها ----------
+    function findClosestAngles(results) {
+        if(results.length < 2) return null;
+        let minDiff = Infinity;
+        let closestPair = null;
+        
+        for(let i = 0; i < results.length; i++){
+            for(let j = i + 1; j < results.length; j++){
+                const diff = Math.abs(results[i].angle - results[j].angle);
+                if(diff < minDiff){
+                    minDiff = diff;
+                    closestPair = {
+                        first: results[i],
+                        second: results[j],
+                        difference: diff
+                    };
+                }
+            }
+        }
+        return closestPair;
+    }
+
+    // ---------- نمایش نتایج (اصلاح شده و ضد خطا) ----------
+    function displayResults(results, closest) {
+        if(!resultsOutput) return;
+        resultsOutput.innerHTML = '';
+        
+        if(!results || results.length === 0){
+            resultsOutput.innerHTML = '<div class="text-xs muted text-center">لطفاً حداقل یک عدد وارد کنید</div>';
+            return;
+        }
+        
+        results.forEach(r => {
+            // جلوگیری از خطا: اگر زاویه عدد نبود، صفر در نظر گرفته شود
+            const ang = (typeof r.angle === 'number') ? r.angle : 0;
+            const angP = (typeof r.anglePlus90 === 'number') ? r.anglePlus90 : 0;
+            const angM = (typeof r.angleMinus90 === 'number') ? r.angleMinus90 : 0;
+
+            const div = document.createElement('div');
+            div.className = 'bg-white/5 p-3 rounded border border-white/10';
+            div.innerHTML = `
+                <div class="font-semibold mb-2">عدد ${r.index}: ${r.input}</div>
+                <div class="space-y-1 text-sm">
+                    <div class="flex justify-between">
+                        <span class="muted">تبدیل به درجه:</span>
+                        <span class="font-mono cursor-pointer hover:text-blue-400" onclick="copyToClipboard('${ang.toFixed(7)}')" title="کلیک برای کپی">${ang.toFixed(7)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="muted">زاویه +90:</span>
+                        <span class="font-mono cursor-pointer hover:text-blue-400" onclick="copyToClipboard('${angP.toFixed(7)}')" title="کلیک برای کپی">${angP.toFixed(7)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="muted">زاویه -90:</span>
+                        <span class="font-mono cursor-pointer hover:text-blue-400" onclick="copyToClipboard('${angM.toFixed(7)}')" title="کلیک برای کپی">${angM.toFixed(7)}</span>
+                    </div>
+                </div>
+            `;
+            resultsOutput.appendChild(div);
+        });
+        
+        // نمایش نزدیک‌ترین زاویه‌ها
+        if(closestOutput){
+            if(closest && closest.first && closest.second){
+                // چک کردن وجود اعداد برای جلوگیری از خطا
+                const cAng1 = (typeof closest.first.angle === 'number') ? closest.first.angle : 0;
+                const cAng2 = (typeof closest.second.angle === 'number') ? closest.second.angle : 0;
+                const cDiff = (typeof closest.difference === 'number') ? closest.difference : 0;
+
+                closestOutput.innerHTML = `
+                    <div class="bg-green-900/30 p-3 rounded border border-green-500/30">
+                        <div class="text-lg font-bold text-green-400 mb-2">نزدیک‌ترین زاویه‌ها</div>
+                         <div class="space-y-2">
+                            <div>عدد ${closest.first.index} و عدد ${closest.second.index}</div>
+                            <div class="text-sm">
+                                <span class="muted">زاویه عدد ${closest.first.index}:</span> 
+                                <span class="font-mono">${cAng1.toFixed(7)}</span>
+                            </div>
+                            <div class="text-sm">
+                                <span class="muted">زاویه عدد ${closest.second.index}:</span> 
+                                <span class="font-mono">${cAng2.toFixed(7)}</span>
+                            </div>
+                            <div class="text-lg font-bold text-yellow-400 mt-2">
+                                فاصله: ${cDiff.toFixed(7)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                closestOutput.innerHTML = '<div class="text-xs muted">برای نمایش نزدیک‌ترین زاویه‌ها، حداقل دو عدد وارد کنید</div>';
+            }
+        }
+    }
+
+    /* ---------- تابع کپی به کلیپ‌بورد ---------- */
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showCopySuccess(text);
+      }).catch(err => {
+        console.error('خطا در کپی کردن: ', err);
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showCopySuccess(text);
+      });
+    }
+
+    // نمایش پیام موفقیت کپی
+    function showCopySuccess(text) {
+      const message = document.createElement('div');
+      message.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce';
+      message.innerHTML = `✅ عدد <strong>${text}</strong> کپی شد`;
+      document.body.appendChild(message);
+      setTimeout(() => {
+        if (document.body.contains(message)) {
+          document.body.removeChild(message);
+        }
+      }, 2000);
+    }
+
+    /* ---------- entries save/prune ---------- */
+    function saveEntry(pairId, inputs, results, closest, note='', dateISO=null){
+      const entries = storageGet('entries')||[];
+      const si = dateISO || nowISO();
+      
+      const entry = { 
+        id: uid(), 
+        pairId, 
+        dateISO: si, 
+        dateDisplay: formatGregorian(si), 
+        inputs: inputs,
+        results: results || [],
+        closest: closest || null,
+        note
+      };
+      entries.push(entry); 
+      storageSet('entries', entries);
+      renderHistory();
+    }
+
+    // تابع حذف دستی رکوردهای قدیمی
+    function manualPruneOldEntries(days = 365) {
+      const entries = storageGet('entries') || [];
+      // محاسبه زمان قطع: زمان حال منهای تعداد روز ضربدر میلی‌ثانیه در روز
+      const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
+      
+      // نگه داشتن رکوردهایی که زمانشان جدیدتر (بزرگتر) از زمان قطع است
+      const kept = entries.filter(e => new Date(e.dateISO).getTime() >= cutoff);
+      const deletedCount = entries.length - kept.length;
+      
+      if (deletedCount > 0) {
+        storageSet('entries', kept);
+        renderHistory();
+        return deletedCount;
+      }
+      return 0;
+    }
+
+    /* ---------- calculate logic ---------- */
+    if(calculateButton) calculateButton.addEventListener('click', ()=>{
+      if(errorMessage) errorMessage.textContent = '';
+      
+      try{
+        const inputs = [
+            inputV1 && inputV1.value ? parseFloat(inputV1.value) : null,
+            inputV2 && inputV2.value ? parseFloat(inputV2.value) : null,
+            inputV3 && inputV3.value ? parseFloat(inputV3.value) : null,
+            inputV4 && inputV4.value ? parseFloat(inputV4.value) : null
+        ];
+        
+        const validInputs = inputs.filter(v => v !== null && !isNaN(v));
+        
+        if(validInputs.length === 0){
+            throw new Error('لطفاً حداقل یک عدد معتبر وارد کنید.');
+        }
+        
+        const results = calculateAngles(inputs);
+        const closest = findClosestAngles(results);
+        
+        displayResults(results, closest);
+        
+        // تعیین تاریخ
+        let chosenISO = null;
+        if(datePicker && datePicker.value){
+          const dp = datePicker.value;
+          const now = new Date();
+          const timePart = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+          const iso = new Date(dp + 'T' + timePart);
+          if(!isNaN(iso)) chosenISO = iso.toISOString();
+        }
+        if(!chosenISO) chosenISO = nowISO();
+
+        const pairId = pairSelect ? pairSelect.value || null : null;
+        const note = noteInput ? noteInput.value || '' : '';
+        saveEntry(pairId, {v1: inputs[0], v2: inputs[1], v3: inputs[2], v4: inputs[3]}, results, closest, note, chosenISO);
+        
+        showToast('محاسبه انجام و ذخیره شد!', 'success');
+      }catch(err){ 
+        if(errorMessage) errorMessage.textContent = 'خطا: '+err.message; 
+      }
+    });
+
+    if(resetButton) resetButton.addEventListener('click', ()=>{
+      if(inputV1) inputV1.value=''; 
+      if(inputV2) inputV2.value=''; 
+      if(inputV3) inputV3.value=''; 
+      if(inputV4) inputV4.value=''; 
+      if(resultsOutput) resultsOutput.innerHTML=''; 
+      if(closestOutput) closestOutput.innerHTML=''; 
+      if(errorMessage) errorMessage.textContent=''; 
+    });
+
+    /* ---------- مدیریت دسته‌بندی‌ها ---------- */
+    function renderCategories(){
+      const categories = storageGet('categories') || [];
+      const pairs = storageGet('pairs') || [];
+      
+      if(categorySelect){
+        categorySelect.innerHTML = '<option value="">بدون دسته‌بندی</option>';
+        categories.forEach(cat => {
+          const opt = document.createElement('option');
+          opt.value = cat.id;
+          opt.textContent = cat.name;
+          categorySelect.appendChild(opt);
+        });
+      }
+      
+      if(categoriesList){
+        categoriesList.innerHTML = '';
+        if(categories.length === 0){
+          categoriesList.innerHTML = '<div class="text-xs muted text-center py-1">دسته‌بندی‌ای وجود ندارد</div>';
+        } else {
+          categories.forEach(cat => {
+            const div = document.createElement('div');
+            div.className = 'flex justify-between items-center p-1 px-2 rounded category-item';
+            div.innerHTML = `
+              <span class="text-xs">${cat.name}</span>
+              <span class="text-xs muted">${pairs.filter(p => p.categoryId === cat.id).length} جفت‌ارز</span>
+            `;
+            categoriesList.appendChild(div);
+          });
+        }
+      }
+      
+      if(categoriesContainer){
+        categoriesContainer.innerHTML = '';
+        const uncategorizedPairs = pairs.filter(p => !p.categoryId);
+        if(uncategorizedPairs.length > 0){
+          renderCategorySection(null, 'بدون دسته‌بندی', uncategorizedPairs);
+        }
+        
+        categories.forEach(category => {
+          const categoryPairs = pairs.filter(p => p.categoryId === category.id);
+          if(categoryPairs.length > 0){
+            renderCategorySection(category.id, category.name, categoryPairs);
+          }
+        });
+      }
+    }
+
+    function renderCategorySection(categoryId, categoryName, pairs){
+      const section = document.createElement('div');
+      section.className = 'category-section';
+      section.innerHTML = `
+        <div class="category-header flex justify-between items-center" data-category="${categoryId || ''}">
+          <div class="font-semibold text-sm">${categoryName} (${pairs.length})</div>
+          <div class="muted text-xs">▼</div>
+        </div>
+        <div class="category-content">
+          <ul class="space-y-2 pairs-list-${categoryId || 'uncategorized'}"></ul>
+        </div>
+      `;
+      categoriesContainer.appendChild(section);
+      
+      const pairsList = section.querySelector(`.pairs-list-${categoryId || 'uncategorized'}`);
+      pairs.forEach(p => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between gap-2 p-2 rounded bg-white/5';
+        
+        const categories = storageGet('categories') || [];
+        const categoryOptions = categories.map(cat => 
+          `<option value="${cat.id}" ${p.categoryId === cat.id ? 'selected' : ''}>${cat.name}</option>`
+        ).join('');
+        
+        li.innerHTML = `
+          <div class="flex-1 text-sm">${p.name}</div>
+          <div class="flex gap-1">
+            <select class="small-btn bg-slate-600 text-xs move-category" data-id="${p.id}">
+              <option value="">انتقال به...</option>
+              ${categoryOptions}
+              <option value="" ${!p.categoryId ? 'selected' : ''}>بدون دسته‌بندی</option>
+            </select>
+            <button data-action="up" data-id="${p.id}" class="small-btn bg-slate-600">▲</button>
+            <button data-action="down" data-id="${p.id}" class="small-btn bg-slate-600">▼</button>
+            <button data-action="edit" data-id="${p.id}" class="small-btn bg-yellow-600">✎</button>
+            <button data-action="delete" data-id="${p.id}" class="small-btn bg-rose-600">🗑</button>
+          </div>
+        `;
+        pairsList.appendChild(li);
+      });
+      
+      const header = section.querySelector('.category-header');
+      header.addEventListener('click', () => {
+        const content = section.querySelector('.category-content');
+        content.classList.toggle('hidden');
+      });
+    }
+
+    function addCategory(name){
+      if(!name || !name.trim()) return;
+      const categories = storageGet('categories') || [];
+      if(categories.some(cat => cat.name === name.trim())){
+        alert('این نام دسته‌بندی قبلاً وجود دارد!');
+        return;
+      }
+      categories.push({id: uid(), name: name.trim()});
+      storageSet('categories', categories);
+      renderCategories();
+    }
+
+    function deleteCategory(){
+      const selectedCategoryId = categorySelect ? categorySelect.value : null;
+      if(!selectedCategoryId){
+        alert('لطفاً یک دسته‌بندی را انتخاب کنید!');
+        return;
+      }
+      
+      const categories = storageGet('categories') || [];
+      const category = categories.find(cat => cat.id === selectedCategoryId);
+      if(!category) return;
+      
+      const pairs = storageGet('pairs') || [];
+      const pairsInCategory = pairs.filter(p => p.categoryId === selectedCategoryId);
+      
+      if(pairsInCategory.length > 0){
+        if(!confirm(`دسته‌بندی "${category.name}" دارای ${pairsInCategory.length} جفت‌ارز است. آیا می‌خواهید این دسته‌بندی حذف شود و جفت‌ارزهای آن به "بدون دسته‌بندی" منتقل شوند؟`)){
+          return;
+        }
+        pairsInCategory.forEach(p => {
+          p.categoryId = null;
+        });
+        storageSet('pairs', pairs);
+      } else {
+        if(!confirm(`آیا از حذف دسته‌بندی "${category.name}" مطمئن هستید؟`)){
+          return;
+        }
+      }
+      
+      const updatedCategories = categories.filter(cat => cat.id !== selectedCategoryId);
+      storageSet('categories', updatedCategories);
+      renderCategories();
+      renderPairs();
+    }
+
+    /* ---------- pairs management ---------- */
+    function renderPairs(){
+      const pairs = storageGet('pairs') || [];
+      
+      if(pairSelect) pairSelect.innerHTML = '';
+      if(historyPairFilter) {
+        historyPairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
+      }
+      if(multiDatePairFilter) {
+        multiDatePairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
+      }
+      
+      pairs.forEach(p => {
+        if(pairSelect){
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = p.name;
+          pairSelect.appendChild(opt);
+        }
+        if(historyPairFilter){
+          const opt2 = document.createElement('option');
+          opt2.value = p.id;
+          opt2.textContent = p.name;
+          historyPairFilter.appendChild(opt2);
+        }
+        if(multiDatePairFilter){
+          const opt3 = document.createElement('option');
+          opt3.value = p.id;
+          opt3.textContent = p.name;
+          multiDatePairFilter.appendChild(opt3);
+        }
+      });
+      if(pairs.length === 0){
+        if(pairSelect){
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.textContent = 'ابتدا یک جفت‌ارز اضافه کنید';
+          pairSelect.appendChild(opt);
+        }
+      }
+      
+      renderCategories();
+    }
+
+    function addPair(name){
+      if(!name || !name.trim()) return;
+      const pairs = storageGet('pairs')||[];
+      const selectedCategory = categorySelect ? categorySelect.value : null;
+      
+      pairs.push({
+        id: uid(), 
+        name: name.trim(),
+        categoryId: selectedCategory || null
+      });
+      storageSet('pairs', pairs);
+      renderPairs();
+    }
+
+    function swapPairs(i,j){
+      const pairs = storageGet('pairs')||[];
+      if(!pairs[i] || !pairs[j]) return;
+      [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+      storageSet('pairs', pairs);
+      renderPairs();
+    }
+
+    function movePairToCategory(pairId, newCategoryId){
+      const pairs = storageGet('pairs')||[];
+      const pair = pairs.find(p => p.id === pairId);
+      if(pair){
+        pair.categoryId = newCategoryId || null;
+        storageSet('pairs', pairs);
+        renderPairs();
+      }
+    }
+
+    if(categoriesContainer){
+      categoriesContainer.addEventListener('click', (e)=>{
+        const btn = e.target.closest('button'); if(!btn) return;
+        const action = btn.dataset.action; const id = btn.dataset.id;
+        const pairs = storageGet('pairs')||[]; const idx = pairs.findIndex(p => p.id === id);
+        if(action === 'up' && idx > 0) swapPairs(idx, idx-1);
+        if(action === 'down' && idx < pairs.length-1) swapPairs(idx, idx+1);
+        if(action === 'delete'){ if(!confirm('آیا حذف شود؟')) return; pairs.splice(idx,1); storageSet('pairs', pairs); renderPairs(); }
+        if(action === 'edit'){ const newName = prompt('نام جدید:', pairs[idx].name); if(newName && newName.trim()){ pairs[idx].name = newName.trim(); storageSet('pairs', pairs); renderPairs(); } }
+      });
+      categoriesContainer.addEventListener('change', (e) => {
+        if(e.target.classList.contains('move-category')){
+          const pairId = e.target.dataset.id;
+          const newCategoryId = e.target.value || null;
+          movePairToCategory(pairId, newCategoryId);
+        }
+      });
+    }
+
+    if(addPairBtn) addPairBtn.addEventListener('click', ()=>{ addPair(newPairName ? newPairName.value : ''); if(newPairName) newPairName.value=''; });
+    if(clearPairsBtn) clearPairsBtn.addEventListener('click', ()=>{ if(confirm('آیا همه جفت‌ارزها حذف شوند؟')){ storageSet('pairs', []); renderPairs(); } });
+    if (addCategoryBtn) {
+      addCategoryBtn.addEventListener('click', () => {
+        addCategory(newCategoryName ? newCategoryName.value : '');
+        if (newCategoryName) newCategoryName.value = '';
+      });
+    }
+    if(deleteCategoryBtn) deleteCategoryBtn.addEventListener('click', deleteCategory);
+
+    /* ---------- مدیریت تاریخ چندگانه ---------- */
+    let dateRanges = [];
+    function toggleMultiDateMode() {
+      const isMultiDateActive = multiDateSection.classList.contains('hidden');
+      if (isMultiDateActive) {
+        singleDateSection.classList.add('hidden');
+        multiDateSection.classList.remove('hidden');
+        toggleMultiDateBtn.textContent = 'بازگشت به حالت عادی';
+        toggleMultiDateBtn.classList.remove('bg-blue-600');
+        toggleMultiDateBtn.classList.add('bg-gray-600');
+        if (dateRanges.length === 0) {
+          addDateRange();
+        }
+      } else {
+        singleDateSection.classList.remove('hidden');
+        multiDateSection.classList.add('hidden');
+        toggleMultiDateBtn.textContent = 'فعال کردن حالت چندتاریخی';
+        toggleMultiDateBtn.classList.remove('bg-gray-600');
+        toggleMultiDateBtn.classList.add('bg-blue-600');
+        
+        renderHistory();
+      }
+    }
+
+    function addDateRange() {
+      const dateId = uid();
+      dateRanges.push({
+        id: dateId,
+        date: ''
+      });
+      renderDateRanges();
+    }
+
+    function renderDateRanges() {
+      if (!dateRangesContainer) return;
+      
+      dateRangesContainer.innerHTML = '';
+      dateRanges.forEach((range, index) => {
+        const dateItem = document.createElement('div');
+        dateItem.className = 'date-range-item';
+        dateItem.innerHTML = `
+          <div class="flex items-center gap-2">
+            <label class="text-xs muted flex-1">تاریخ ${index + 1}:</label>
+            <button onclick="removeDateRange('${range.id}')" class="small-btn bg-rose-600 hover:bg-rose-700 text-xs" title="حذف این تاریخ">
+              🗑
+            </button>
+          </div>
+          <input type="date" 
+                 class="w-full mt-1" 
+                 value="${range.date}"
+                 onchange="updateDateRange('${range.id}', this.value)">
+        `;
+        dateRangesContainer.appendChild(dateItem);
+      });
+    }
+
+    function updateDateRange(dateId, newDate) {
+      const range = dateRanges.find(r => r.id === dateId);
+      if (range) {
+        range.date = newDate;
+      }
+    }
+
+    function removeDateRange(dateId) {
+      dateRanges = dateRanges.filter(r => r.id !== dateId);
+      renderDateRanges();
+    }
+
+    function applyMultiDateFilter() {
+      const selectedPair = multiDatePairFilter ? multiDatePairFilter.value : null;
+      const selectedDates = dateRanges.filter(r => r.date).map(r => r.date);
+      if (selectedDates.length === 0) {
+        alert('لطفاً حداقل یک تاریخ انتخاب کنید.');
+        return;
+      }
+      
+      renderMultiDateHistory(selectedPair, selectedDates);
+    }
+
+    function renderMultiDateHistory(pairFilter = null, dates = []) {
+      const entries = (storageGet('entries')||[]).slice();
+      entries.sort((a,b)=> new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
+      
+      if(historyList) historyList.innerHTML = '';
+      
+      let filtered = entries;
+      if(pairFilter){
+        filtered = filtered.filter(e => e.pairId === pairFilter);
+      }
+      
+      const dateFiltered = filtered.filter(e => {
+        const entryDate = e.dateISO.split('T')[0];
+        return dates.includes(entryDate);
+      });
+      if(dateFiltered.length === 0){ 
+        if(historyList) historyList.innerHTML = '<div class="muted text-sm text-center py-4">رکوردی جهت نمایش وجود ندارد.</div>';
+        return; 
+      }
+      
+      const groupedByPair = {};
+      dateFiltered.forEach(e => {
+        const pairId = e.pairId || 'unknown';
+        if (!groupedByPair[pairId]) {
+          groupedByPair[pairId] = [];
+        }
+        groupedByPair[pairId].push(e);
+      });
+      Object.keys(groupedByPair).forEach(pairId => {
+        const pairEntries = groupedByPair[pairId];
+        const pair = (storageGet('pairs')||[]).find(p=>p.id===pairId);
+        const pairName = pair?.name || '—';
+        const category = pair ? (storageGet('categories')||[]).find(c=>c.id===pair.categoryId) : null;
+        
+        const groupWrapper = document.createElement('div');
+        groupWrapper.className = 'comparison-group';
+        groupWrapper.innerHTML = `
+          <div class="date-comparison-header flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="text-sm font-semibold">${pairName}</div>
+              ${category ? `<span class="text-xs bg-blue-600 px-2 py-1 rounded">${category.name}</span>` : ''}
+            </div>
+            <div class="text-xs muted">${pairEntries.length} رکورد در ${dates.length} تاریخ</div>
+          </div>
+        `;
+        
+        pairEntries.forEach(e => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'history-entry-compact flex flex-col gap-3 hover:border-white/20 transition-colors mt-2';
+          
+          wrapper.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="text-xs muted">${e.dateDisplay}</div>
+            </div>
+            ${renderEntryContent(e)}
+          `;
+          const bottom = document.createElement('div'); 
+          bottom.className = 'flex gap-2 justify-end';
+          const viewBtn = document.createElement('button');
+          viewBtn.className = 'small-btn bg-indigo-600 hover:bg-indigo-700 rounded transition-colors text-xs'; 
+          viewBtn.textContent = 'جزئیات'; 
+          viewBtn.addEventListener('click', ()=> showDetail(e.id));
+          bottom.appendChild(viewBtn);
+          wrapper.appendChild(bottom);
+          
+          groupWrapper.appendChild(wrapper);
+        });
+        
+        historyList.appendChild(groupWrapper);
+      });
+    }
+
+    // ---------- نمایش محتوای رکورد (ایمن‌سازی شده برای رفع خطای toFixed) ----------
+    function renderEntryContent(e) {
+      let html = '<div class="space-y-2">';
+      if(e.results && e.results.length > 0){
+        e.results.forEach(r => {
+          // ایمن‌سازی: اگر مقدار نامعتبر بود، 0 قرار بده
+          const ang = (typeof r.angle === 'number') ? r.angle : 0;
+          const angP = (typeof r.anglePlus90 === 'number') ? r.anglePlus90 : 0;
+          const angM = (typeof r.angleMinus90 === 'number') ? r.angleMinus90 : 0;
+
+          html += `
+            <div class="bg-white/5 p-2 rounded text-sm">
+              <div class="font-semibold mb-1">عدد ${r.index}: ${r.input}</div>
+              <div class="grid grid-cols-3 gap-2 text-xs">
+                <div><span class="muted">زاویه:</span> ${ang.toFixed(4)}</div>
+                <div><span class="muted">+90:</span> ${angP.toFixed(4)}</div>
+                <div><span class="muted">-90:</span> ${angM.toFixed(4)}</div>
+              </div>
+            </div>
+          `;
+        });
+      }
+      
+      if(e.closest && e.closest.first && e.closest.second){
+         const cDiff = (typeof e.closest.difference === 'number') ? e.closest.difference : 0;
+        html += `
+          <div class="bg-green-900/30 p-2 rounded border border-green-500/30 text-center">
+            <div class="text-xs font-bold text-green-400 mb-1">نزدیک‌ترین زاویه‌ها</div>
+            <div class="text-xs">عدد ${e.closest.first.index} و عدد ${e.closest.second.index}</div>
+            <div class="text-sm font-bold text-yellow-400">فاصله: ${cDiff.toFixed(7)}</div>
+          </div>
+        `;
+      }
+      
+      html += '</div>';
+      return html;
+    }
+
+    /* ---------- history rendering & actions ---------- */
+    function renderHistory(){
+      if (multiDateSection && !multiDateSection.classList.contains('hidden')) {
+        const selectedPair = multiDatePairFilter ? multiDatePairFilter.value : null;
+        const selectedDates = dateRanges.filter(r => r.date).map(r => r.date);
+        if (selectedDates.length > 0) {
+          renderMultiDateHistory(selectedPair, selectedDates);
+          return;
+        }
+      }
+      
+      const entries = (storageGet('entries')||[]).slice();
+      entries.sort((a,b)=> new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
+      if(entriesCount) entriesCount.textContent = entries.length;
+      const filterDate = historyDate && historyDate.value ? new Date(historyDate.value).toDateString() : null;
+      const filterPair = historyPairFilter && historyPairFilter.value ? historyPairFilter.value : null;
+      if(historyList) historyList.innerHTML = '';
+      let filtered = entries;
+      if(!filterDate){
+        const today = new Date().toDateString();
+        filtered = entries.filter(e => new Date(e.dateISO).toDateString() === today);
+      } else {
+        filtered = entries.filter(e => new Date(e.dateISO).toDateString() === filterDate);
+      }
+
+      if(filterPair){
+        filtered = filtered.filter(e => e.pairId === filterPair);
+      }
+
+      if(filtered.length === 0){ 
+        if(historyList) historyList.innerHTML = '<div class="muted text-sm text-center py-4">رکوردی جهت نمایش وجود ندارد.</div>';
+        return; 
+      }
+
+      safeForEach(filtered, e=>{
+        const pair = (storageGet('pairs')||[]).find(p=>p.id===e.pairId);
+        const pairName = pair?.name || '—';
+        const category = pair ? (storageGet('categories')||[]).find(c=>c.id===pair.categoryId) : null;
+        
+        const wrapper = document.createElement('div'); 
+        wrapper.className = 'history-entry-compact flex flex-col gap-3 hover:border-white/20 transition-colors';
+        
+        wrapper.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="text-sm font-semibold">${pairName}</div>
+              ${category ? `<span class="text-xs bg-blue-600 px-2 py-1 rounded">${category.name}</span>` : ''}
+              ${!pair ? `<span class="deleted-pair">حذف شده</span>` : ''}
+            </div>
+            <div class="text-xs muted">${e.dateDisplay}</div>
+          </div>
+          
+          ${renderEntryContent(e)}
+        `;
+        
+        const bottom = document.createElement('div');
+        bottom.className = 'flex gap-2 justify-end';
+        const viewBtn = document.createElement('button'); 
+        viewBtn.className = 'small-btn bg-indigo-600 hover:bg-indigo-700 rounded transition-colors'; 
+        viewBtn.textContent = 'نمایش جزئیات';
+        viewBtn.addEventListener('click', ()=> showDetail(e.id));
+        bottom.appendChild(viewBtn);
+        wrapper.appendChild(bottom);
+        historyList.appendChild(wrapper);
+      });
+    }
+
+    function showDetail(entryId){
+      const entries = storageGet('entries')||[];
+      const e = entries.find(x=>x.id===entryId); 
+      if(!e) return;
+      
+      const pair = (storageGet('pairs')||[]).find(p=>p.id===e.pairId);
+      const pairName = pair?.name || '—';
+      const category = pair ? (storageGet('categories')||[]).find(c=>c.id===pair.categoryId) : null;
+      
+      if(detailContent) detailContent.innerHTML = '';
+      
+      let resultsHtml = '';
+      if(e.results && e.results.length > 0){
+        e.results.forEach(r => {
+          // ایمن‌سازی مقادیر جزئیات
+          const ang = (typeof r.angle === 'number') ? r.angle : 0;
+          const angP = (typeof r.anglePlus90 === 'number') ? r.anglePlus90 : 0;
+          const angM = (typeof r.angleMinus90 === 'number') ? r.angleMinus90 : 0;
+
+          resultsHtml += `
+            <div class="bg-white/5 p-3 rounded">
+              <div class="font-semibold mb-2">عدد ${r.index}: ${r.input}</div>
+              <div class="grid grid-cols-1 gap-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="muted">تبدیل به درجه:</span>
+                  <span class="font-mono">${ang.toFixed(7)}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="muted">زاویه +90:</span>
+                  <span class="font-mono">${angP.toFixed(7)}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="muted">زاویه -90:</span>
+                  <span class="font-mono">${angM.toFixed(7)}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      }
+      
+      let closestHtml = '';
+      if(e.closest && e.closest.first && e.closest.second){
+        const cAng1 = (typeof e.closest.first.angle === 'number') ? e.closest.first.angle : 0;
+        const cAng2 = (typeof e.closest.second.angle === 'number') ? e.closest.second.angle : 0;
+        const cDiff = (typeof e.closest.difference === 'number') ? e.closest.difference : 0;
+
+        closestHtml = `
+          <div class="bg-green-900/30 p-4 rounded border border-green-500/30">
+            <div class="text-xs muted mb-3 text-center">نزدیک‌ترین زاویه‌ها</div>
+            <div class="text-center space-y-2">
+              <div class="text-sm font-semibold">عدد ${e.closest.first.index} و عدد ${e.closest.second.index}</div>
+              <div class="text-xs">
+                <div>زاویه عدد ${e.closest.first.index}: ${cAng1.toFixed(7)}</div>
+                <div>زاویه عدد ${e.closest.second.index}: ${cAng2.toFixed(7)}</div>
+              </div>
+              <div class="text-lg font-bold text-yellow-400">فاصله: ${cDiff.toFixed(7)}</div>
+            </div>
+          </div>
+        `;
+      }
+      
+      detailContent.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div class="space-y-3">
+            <div class="bg-white/5 p-3 rounded">
+              <div class="text-xs muted mb-1">جفت‌ارز</div>
+              <div class="font-semibold flex items-center gap-2">
+                ${pairName}
+                ${category ? `<span class="text-xs bg-blue-600 px-2 py-1 rounded">${category.name}</span>` : ''}
+                ${!pair ? `<span class="deleted-pair">حذف شده</span>` : ''}
+              </div>
+            </div>
+            <div class="bg-white/5 p-3 rounded">
+              <div class="text-xs muted mb-1">تاریخ (میلادی)</div>
+              <div class="font-semibold">${e.dateDisplay}</div>
+            </div>
+          </div>
+          
+          <div class="space-y-3">
+            <div class="bg-white/5 p-3 rounded">
+              <div class="text-xs muted mb-1">یادداشت</div>
+              <div class="font-semibold">${e.note||'---'}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="space-y-3">
+          ${resultsHtml}
+          ${closestHtml}
+        </div>
+      `;
+      if(detailModal) {
+        detailModal.classList.remove('hidden');
+        detailModal.classList.add('center-modal');
+      }
+
+      if(editRecordBtn) editRecordBtn.onclick = ()=> editRecord(e.id);
+      if(deleteRecordBtn) deleteRecordBtn.onclick = ()=> deleteRecord(e.id);
+      if(moveRecordBtn) moveRecordBtn.onclick = ()=> moveRecord(e.id);
+    }
+
+    if(closeDetail) closeDetail.addEventListener('click', ()=> { 
+      if(detailModal) {
+        detailModal.classList.add('hidden');
+        detailModal.classList.remove('center-modal');
+      }
+    });
+
+    function deleteRecord(id){ 
+      if(!confirm('آیا از حذف این رکورد مطمئن هستید؟')) return; 
+      const entries = storageGet('entries')||[];
+      const idx = entries.findIndex(x=>x.id===id); 
+      if(idx===-1) return; 
+      entries.splice(idx,1); 
+      storageSet('entries',entries); 
+      renderHistory(); 
+      
+      // بستن پنجره پاپ‌آپ پس از حذف
+      if(detailModal) {
+        detailModal.classList.add('hidden');
+        detailModal.classList.remove('center-modal');
+      }
+    }
+
+    function editRecord(id){
+      const entries = storageGet('entries')||[];
+      const e = entries.find(x=>x.id===id); if(!e) return;
+      if(!confirm('مقادیر رکورد در فرم بارگذاری خواهد شد. پس از ویرایش دکمهٔ محاسبه را بزنید تا رکورد جدید ذخیره شود. رکورد قدیمی حذف می‌شود. ادامه می‌دهید؟')) return;
+      if(pairSelect) pairSelect.value = e.pairId || '';
+      if(inputV1 && e.inputs) inputV1.value = e.inputs.v1 || '';
+      if(inputV2 && e.inputs) inputV2.value = e.inputs.v2 || ''; 
+      if(inputV3 && e.inputs) inputV3.value = e.inputs.v3 || '';
+      if(inputV4 && e.inputs) inputV4.value = e.inputs.v4 || ''; 
+      if(noteInput) noteInput.value = e.note||''; 
+      if(datePicker) datePicker.value = e.dateDisplay.split(' ')[0] || '';
+      if(e.results){
+        displayResults(e.results, e.closest);
+      }
+      
+      const idx = entries.findIndex(x=>x.id===id);
+      if(idx!==-1){ 
+        entries.splice(idx,1); 
+        storageSet('entries',entries);
+      }
+      
+      renderHistory();
+      
+      // بستن پنجره پاپ‌آپ پس از زدن دکمه ویرایش
+      if(detailModal) {
+        detailModal.classList.add('hidden');
+        detailModal.classList.remove('center-modal');
+      }
+      // اسکرول به بالای صفحه (بخش ماشین حساب)
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+
+    function moveRecord(id){
+      const newDate = prompt('تاریخ جدید (YYYY-MM-DD) را وارد کنید:');
+      if(!newDate) return;
+      const d = new Date(newDate + 'T00:00:00'); if(isNaN(d)){ alert('تاریخ نامعتبر.'); return;
+      }
+      const entries = storageGet('entries')||[]; const e = entries.find(x=>x.id===id); if(!e) return;
+      e.dateISO = d.toISOString();
+      e.dateDisplay = formatGregorian(e.dateISO); storageSet('entries',entries); renderHistory(); 
+      if(detailModal) {
+        detailModal.classList.add('hidden');
+        detailModal.classList.remove('center-modal');
+      }
+    }
+
+    /* ---------- backup/import ---------- */
+    function showNotification(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce ${type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`;
+      toast.innerHTML = message;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      }, 3000);
+    }
+
+    if(exportBtn) exportBtn.addEventListener('click', ()=>{
+      try {
+        const payload = { 
+          pairs: storageGet('pairs')||[], 
+          entries: storageGet('entries')||[], 
+          categories: storageGet('categories')||[],
+          meta: {
+            created: new Date().toISOString(),
+            version: '4.0',
+            program: 'برنامه چهارم - محاسبه زاویه',
+            entryCount: (storageGet('entries')||[]).length,
+            pairCount: (storageGet('pairs')||[]).length,
+            categoryCount: (storageGet('categories')||[]).length,
+            backupId: uid()
+          }
+        };
+        const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json;charset=utf-8'});
+        const url = URL.createObjectURL(blob); 
+        const a = document.createElement('a'); 
+        a.href = url; 
+        a.download = 'calculator_pro_program4_angle-'+new Date().toISOString().slice(0,10)+'.json'; 
+        document.body.appendChild(a); 
+        a.click();
+        a.remove(); 
+        URL.revokeObjectURL(url);
+        showNotification('✅ فایل پشتیبان با موفقیت دانلود شد');
+      } catch (err) {
+        showNotification('❌ خطا در دانلود فایل پشتیبان: ' + err.message, 'error');
+      }
+    });
+
+    if(importBtn) importBtn.addEventListener('click', ()=> {
+      if(importFile) importFile.click();
+    });
+    if(importFile) importFile.addEventListener('change', (e)=>{ 
+      const f = e.target.files[0]; 
+      if(!f) return; 
+      const reader = new FileReader(); 
+      reader.onload = ()=>{ 
+        try{ 
+          const obj = JSON.parse(reader.result); 
+          if(!obj) throw new Error('فایل نامعتبر');
+          
+          const currentData = {
+            pairs: storageGet('pairs') || [],
+            entries: storageGet('entries') || [],
+            categories: storageGet('categories') || []
+          };
+          
+          try {
+            let pairs = [], entries = [], categories = [];
+            
+            if(obj.data) {
+              pairs = obj.data.pairs || [];
+              entries = obj.data.entries || [];
+              categories = obj.data.categories || [];
+            } else {
+              pairs = obj.pairs || [];
+              entries = obj.entries || [];
+              categories = obj.categories || [];
+            }
+            
+            storageSet('pairs', pairs);
+            storageSet('entries', entries);
+            storageSet('categories', categories);
+            
+            renderPairs(); 
+            renderHistory(); 
+            
+            showNotification('بک‌آپ با موفقیت بارگذاری شد','success');
+          } catch (error) {
+            storageSet('pairs', currentData.pairs);
+            storageSet('entries', currentData.entries);
+            storageSet('categories', currentData.categories);
+            throw error;
+          }
+          
+        } catch(err) { 
+          alert('❌ خطا در بارگذاری فایل: ' + err.message);
+        } 
+      }; 
+      reader.readAsText(f); 
+      importFile.value=''; 
+    });
+
+    /* ---------- history panel toggle & section toggles ---------- */
+    if(toggleHistoryBtn) toggleHistoryBtn.addEventListener('click', ()=>{
+      const isCurrentlyHidden = historyPanel.classList.contains('hidden');
+      if(isCurrentlyHidden){
+        historyPanel.classList.remove('hidden'); 
+        updateToggleButton(true);
+        const today = new Date().toISOString().split('T')[0];
+        if(historyDate) historyDate.value = today;
+        renderHistory();
+      } else { 
+        historyPanel.classList.add('hidden'); 
+        updateToggleButton(false);
+      }
+    });
+    if(historyDate) historyDate.addEventListener('change', renderHistory);
+    if(historyPairFilter) historyPairFilter.addEventListener('change', renderHistory);
+
+    if(togglePairsHdr) togglePairsHdr.addEventListener('click', ()=> { boxPairs.classList.toggle('hidden'); });
+    if(toggleCalcHdr) toggleCalcHdr.addEventListener('click', ()=> { boxCalc.classList.toggle('hidden'); });
+    if(toggleHistoryHdr) toggleHistoryHdr.addEventListener('click', ()=> { boxHistory.classList.toggle('hidden'); });
+
+    /* ---------- مدیریت تاریخ چندگانه ---------- */
+    if(toggleMultiDateBtn) {
+      toggleMultiDateBtn.addEventListener('click', toggleMultiDateMode);
+    }
+
+    if(addDateBtn) {
+      addDateBtn.addEventListener('click', addDateRange);
+    }
+
+    if(applyMultiDateBtn) {
+      applyMultiDateBtn.addEventListener('click', applyMultiDateFilter);
+    }
+
+    if(multiDatePairFilter) {
+      multiDatePairFilter.addEventListener('change', function() {
+        if (!multiDateSection.classList.contains('hidden')) {
+          const selectedDates = dateRanges.filter(r => r.date).map(r => r.date);
+          if (selectedDates.length > 0) {
+            applyMultiDateFilter();
+          }
+        }
+      });
+    }
+
+    // مدیریت حذف دستی (Prune)
+    if ($('manual_prune_btn')) {
+      $('manual_prune_btn').addEventListener('click', function() {
+        const days = parseInt($('manual_prune_days').value) || 365;
+        if (days < 1) {
+          alert('تعداد روز باید بیشتر از ۰ باشد');
+          return;
+        }
+        
+        if (confirm(`آیا از حذف رکوردهای قدیمی‌تر از ${days} روز مطمئن هستید؟\nاین عمل غیرقابل بازگشت است.`)) {
+          const deletedCount = manualPruneOldEntries(days);
+          if (deletedCount > 0) {
+            alert(`✅ ${deletedCount} رکورد قدیمی حذف شد.`);
+          } else {
+            alert('ℹ️ هیچ رکورد قدیمی‌ای برای حذف یافت نشد.');
+          }
+        }
+      });
+    }
+
+    window.addEventListener('click', function(event) {
+      if (event.target === $('detail_modal')) {
+        $('detail_modal').classList.add('hidden');
+        $('detail_modal').classList.remove('center-modal');
+      }
+    });
+
+    initializeBoxStates();
+
+    /* ---------- initial data ---------- */
+    if((storageGet('pairs')||[]).length === 0){ 
+      storageSet('pairs', [
+        {id:uid(), name:'EURUSD', categoryId: 'forex'},
+        {id:uid(), name:'GBPUSD', categoryId: 'forex'},
+        {id:uid(), name:'BTCUSD', categoryId: 'crypto'},
+        {id:uid(), name:'ETHUSD', categoryId: 'crypto'}
+      ]);
+    }
+
+    window.addEventListener('load', () => {
+      const today = new Date().toISOString().split('T')[0];
+      if(historyDate) historyDate.value = today;
+      if(datePicker) datePicker.value = today;
+    });
+    
+    renderPairs(); 
+    renderHistory();
+
+    setTimeout(() => {
+      console.log('✅ برنامه چهارم - محاسبه زاویه آماده است!');
+    }, 1000);
+</script>
+  
+  <div class="signature">
+      طراحی و ساخت توسط ❤️ سعید شیخ احمد صفاری
+  </div>
+  
+  <BR>
+  <BR>
+</body>
+</html>
