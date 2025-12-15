@@ -65,7 +65,6 @@
             transition: background 0.3s ease;
         }
         
-        /* پس‌زمینه ساده فقط برای موبایل‌های کوچک */
         @media (max-width: 480px) {
             body {
                 background: var(--primary-color) !important;
@@ -98,7 +97,6 @@
             transition: all 0.3s ease;
         }
         
-        /* اگر شیشه‌ای غیرفعال باشد */
         :root:not([data-glass="true"]) .login-container,
         :root:not([data-glass="true"]) .tabs-container,
         :root:not([data-glass="true"]) .setup-guide,
@@ -111,7 +109,6 @@
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
         
-        /* استایل برای موبایل */
         @media (max-width: 480px) {
             .login-container {
                 background-color: var(--glass-bg);
@@ -142,54 +139,43 @@
             position: relative;
         }
         
-        /* ==== چرخ‌دنده گوشه‌ای بدون مخفی شدن روی هیچ دستگاهی ==== */
         .settings-icon {
             position: absolute;
-            top: -25px;                /* یه کم بیرون از کادر */
-            right: -16px;              /* کاملاً گوشه گوشه */
+            top: -25px;
+            right: -16px;
             color: white;
             font-size: 1.75rem;
             cursor: pointer;
             transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-            z-index: 99999;            /* خیلی بالا – از همه چیز بالاتر! */
-
-            /* اینا باعث می‌شن هیچ‌وقت جابجا نشه */
+            z-index: 99999;
             display: flex;
             align-items: center;
             justify-content: center;
             width: 56px;
             height: 56px;
             transform-origin: center center !important;
-            /* افکت شیشه‌ای + سایه قوی */
             background: rgba(255, 255, 255, 0.15);
             border-radius: 50%;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
             padding: 10px;
-            /* این خط طلاییه: حتی اگر پدرش overflow: hidden داشته باشه، اینو نشون می‌ده! */
             transform: translateZ(0);
-            /* فعال کردن GPU acceleration */
             -webkit-transform: translateZ(0);
         }
 
-        /* هاور */
         .settings-icon:hover,
         .settings-icon:active {
             transform: rotate(0deg) translateZ(0) !important;
             background: rgba(255, 255, 255, 0.28);
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
         }
 
-        /* جلوگیری از مخفی شدن چرخ‌دنده وقتی صفحه کوچیک می‌شه */
         .header-group,
         .login-container {
             overflow: visible !important;
             position: relative !important;
         }
 
-        /* برای موبایل‌های خیلی کوچیک (زیر 380px) یه کم جمع‌ترش کن */
         @media (max-width: 380px) {
             .settings-icon {
                 top: -18px;
@@ -213,7 +199,6 @@
             text-align: right;
         }
         
-        /* استایل اینپوت - حالا هم text و هم tel را پوشش می‌دهد */
         input[type="text"], 
         input[type="tel"] {
             padding: 15px;
@@ -225,7 +210,7 @@
             transition: all 0.3s ease;
             text-align: center;
             width: 100%;
-            direction: ltr; /* جهت متن چپ‌چین برای اعداد */
+            direction: ltr;
         }
         
         input[type="text"]:focus,
@@ -410,7 +395,6 @@
             z-index: 2;
         }
         
-        /* وقتی شیشه‌ای غیرفعال، border قرمز رو نازک نگه دار */
         :root:not([data-glass="true"]) .tab.active {
             border: 2px solid #ff4444 !important;
             box-shadow: 0 0 0 1px rgba(255, 68, 68, 0.3) !important;
@@ -423,8 +407,6 @@
             opacity: 0.9;
         }
         
-        /* ========== RESPONSIVE TABS ONLY FOR DESKTOP ========== */
-        /* فقط برای دسکتاپ - حالت فشرده (فقط آیکون) در سایزهای بسیار کوچک */
         body.desktop .tabs-container.icons-only .tab {
             padding: 12px 14px;
             min-width: 55px;
@@ -453,7 +435,6 @@
             transition: all 0.3s ease;
         }
         
-        /* کاهش ارتفاع iframe فقط در موبایل */
         @media (max-width: 480px) {
             .iframe-container {
                 height: 85vh;
@@ -500,8 +481,7 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.4);
             background: var(--bg-gradient);
         }
-
-        /* ========== RESPONSIVE DESIGN ========== */
+		/* ========== RESPONSIVE DESIGN ========== */
         @media (max-width: 1024px) {
             .tab {
                 padding: 8px 14px;
@@ -636,7 +616,6 @@
         }
         
         /* ========== FIXES FOR BACKDROP-FILTER ISSUES ========== */
-        /* جلوگیری از خطوط شیشه‌ای ناخواسته */
         .login-container::before,
         .tabs-container::before,
         .setup-guide::before,
@@ -653,7 +632,6 @@
             z-index: -1;
         }
         
-        /* بهبود عملکرد backdrop-filter در مرورگرهای مختلف */
         @supports not (backdrop-filter: blur(10px)) {
             .login-container,
             .tabs-container,
@@ -694,11 +672,6 @@
             color: white;
             position: relative;
             transition: all 0.3s ease;
-        }
-		.settings-icon,
-        .settings-icon:hover,
-        .settings-icon:active {
-            box-shadow: none !important;
         }
 
         .close-settings {
@@ -800,13 +773,11 @@
             opacity: 0.6;
         }
 
-        /* موبایل: مخفی کردن گزینه‌های اضافی */
         .mobile-only { display: none; }
         body.mobile .mobile-only { display: block; }
         body.desktop .desktop-only { display: block; }
         body.mobile .desktop-only { display: none; }
 
-        /* استایل برای پیام هشدار کنتراست */
         .contrast-warning {
             color: #ff6b6b;
             background: rgba(255, 107, 107, 0.1);
@@ -817,8 +788,7 @@
             display: none;
             text-align: right;
         }
-		
-		/* ========== BEAUTIFY SETTINGS MODAL SCROLLBAR ========== */
+        
         .settings-content::-webkit-scrollbar {
             width: 8px;
         }
@@ -837,7 +807,6 @@
             background: rgba(255, 255, 255, 0.5);
         }
 
-        /* برای مرورگر Firefox */
         .settings-content {
             scrollbar-width: thin;
             scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
@@ -892,6 +861,30 @@
             font-size: 1rem;
             font-weight: 600;
         }
+
+        /* ========== IMPROVED TOOLTIP STYLES (CLOUD-SHAPED) ========== */
+        .tab-tooltip {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+            z-index: 100000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.1s ease; /* Faster transition for smoother tracking */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tab-tooltip.show {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -929,49 +922,35 @@
         <div class="tabs-container" id="tabsContainer">
             <div class="tabs-scroll-container" id="tabsScrollContainer">
                 <div class="tabs" id="tabs">
-                    
-
-
-<div class="tab active" onclick="openTab(0)">
+                    <div class="tab active" onclick="openTab(0)" data-tooltip="Calculator Pro W/D">
                         <i class="fas fa-equals"></i>
                         <span class="tab-text">Calculator Pro W/D</span>
                     </div>
-                    
-
-<div class="tab" onclick="openTab(1)">
+                    <div class="tab" onclick="openTab(1)" data-tooltip="Calculator Pro Formula 4">
                         <i class="fas fa-4"></i>
                         <span class="tab-text">Calculator Pro Formula 4</span>
                     </div>
-
-					
-<div class="tab" onclick="openTab(2)">
+                    <div class="tab" onclick="openTab(2)" data-tooltip="Calculator Pro W/D — P3">
                       <i class="fa fa-align-justify"></i>
                       <span class="tab-text">Calculator Pro W/D — P3</span>
                    </div>
-	
-
-<div class="tab" onclick="openTab(3)">
+                    <div class="tab" onclick="openTab(3)" data-tooltip="Calculator Pro Program 4">
                         <i class="fa fa-indent"></i>
                         <span class="tab-text">Calculator Pro Program 4</span>
                     </div>
-
-				
-<div class="tab" onclick="openTab(4)">
+                    <div class="tab" onclick="openTab(4)" data-tooltip="Calculator Pro Center W/D">
                         <i class="fas fa-stream"></i>
                         <span class="tab-text">Calculator Pro Center W/D</span>
                     </div>
-                    
-<div class="tab" onclick="openTab(5)">
+                    <div class="tab" onclick="openTab(5)" data-tooltip="Cst Analyzer">
                         <i class="fa fa-line-chart"></i>
                         <span class="tab-text">Cst Analyzer</span>
                     </div>
-                    
-<div class="tab" onclick="openTab(6)">
+                    <div class="tab" onclick="openTab(6)" data-tooltip="Forex Manager">
                         <i class="fa fa-exchange-alt"></i>
                         <span class="tab-text">Forex Manager</span>
                     </div>
-                    
-<div class="tab" onclick="openTab(7)">
+                    <div class="tab" onclick="openTab(7)" data-tooltip="Calculator">
                         <i class="fa fa-calculator"></i>
                         <span class="tab-text">Calculator</span>
                     </div>
@@ -980,15 +959,15 @@
         </div>
 
         <div class="iframe-container">
-    <iframe src="calculator_pro_w_d/index.html" class="active"></iframe>
-    <iframe src="calculator_pro_formula_4/index.html"></iframe>
-    <iframe src="calculator_pro_w_d_p3/index.html"></iframe>
-    <iframe src="calculator_pro_program_4/index.html"></iframe>
-    <iframe src="calculator_pro_center_w_d/index.html"></iframe>
-    <iframe src="cst_analyzer/index.html"></iframe>
-    <iframe src="forex_manager/index.html"></iframe>
-    <iframe src="calculator/index.html"></iframe>
-</div>
+            <iframe src="calculator_pro_w_d/index.html" class="active"></iframe>
+            <iframe src="calculator_pro_formula_4/index.html"></iframe>
+            <iframe src="calculator_pro_w_d_p3/index.html"></iframe>
+            <iframe src="calculator_pro_program_4/index.html"></iframe>
+            <iframe src="calculator_pro_center_w_d/index.html"></iframe>
+            <iframe src="cst_analyzer/index.html"></iframe>
+            <iframe src="forex_manager/index.html"></iframe>
+            <iframe src="calculator/index.html"></iframe>
+        </div>
     </div>
 
     <button class="pwa-install-btn" id="pwaInstallButton">📥 نصب برنامه</button>
@@ -1050,14 +1029,14 @@
         </div>
     </div>
 
-    <script>
+    <div class="tab-tooltip" id="tabTooltip"></div>
+	<script>
         // ==================== DETECT DEVICE TYPE ====================
         function isMobileDevice() {
             return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         }
 
         function detectDeviceType() {
-            // اگر موبایل یا تبلت باشد، هیچ تغییری اعمال نمی‌شود
             if (isMobileDevice()) {
                 document.body.classList.add('mobile');
                 document.body.classList.remove('desktop');
@@ -1091,11 +1070,8 @@
             const tabsContainer = document.getElementById('tabsContainer');
             const windowWidth = window.innerWidth;
             
-            // فقط برای دسکتاپ
             if (document.body.classList.contains('desktop')) {
-                // حذف کلاس قبلی
                 tabsContainer.classList.remove('icons-only');
-                // فقط در سایزهای بسیار کوچک دسکتاپ (600px و پایین‌تر) حالت آیکون فعال شود
                 if (windowWidth <= 600) {
                     tabsContainer.classList.add('icons-only');
                 }
@@ -1123,14 +1099,12 @@
             if (window.innerWidth <= 480) {
                 setThemeColor(getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim());
             } else {
-                // برای دسکتاپ، از رنگ اول گرادیان استفاده کن
                 const gradient = getComputedStyle(document.documentElement).getPropertyValue('--bg-gradient').trim();
                 setThemeColor(gradient.match(/#[\da-fA-F]{6}/)?.[0] || '#735af2');
             }
         }
 
         // ==================== CONTRAST CHECK FUNCTIONS ====================
-        // توابع پایه (لومیننس و کنتراست)
         function hexToRgb(hex) {
             const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? {
@@ -1153,29 +1127,26 @@
             return (brighter + 0.05) / (darker + 0.05);
         }
 
-        // تابع تحلیل عناصر (اسکن متن‌ها، دکمه‌ها، لینک‌ها، تب‌ها و غیره)
         function analyzeElements(bgColor, textColor) {
-            // عناصر کلیدی برای چک: متن‌ها، عنوان‌ها، دکمه‌ها، تب‌ها، لیبل‌ها
             const elements = document.querySelectorAll('h1, p, label, button, .tab, .tab-text, .signature, .login-signature, .login-btn, input[type="text"], input[type="tel"], .settings-section h3');
             const bgLum = getLuminance(bgColor);
-            const textLum = getLuminance(textColor); // فرض: متن‌ها سفید (white) هستند
+            const textLum = getLuminance(textColor);
             let hasIssue = false;
             for (let el of elements) {
-                if (el.textContent.trim().length > 0) { // فقط عناصر با متن
+                if (el.textContent.trim().length > 0) {
                     const isInteractive = el.tagName === 'BUTTON' || el.classList.contains('tab') || el.classList.contains('login-btn');
                     const minRatio = isInteractive ? 3 : 4.5;
                     const ratio = getContrastRatio(bgLum, textLum);
                     if (ratio < minRatio) {
                         hasIssue = true;
-                        break; // اگر یکی مشکل داشته باشه، کافیه
+                        break;
                     }
                 }
             }
-            return !hasIssue; // true اگر همه خوانا باشن
+            return !hasIssue;
         }
 
-        // تابع چک و آپدیت دکمه ذخیره
-        function validateAndUpdateSaveButton(bgColor, textColor = '#ffffff') { // متن پیش‌فرض سفید
+        function validateAndUpdateSaveButton(bgColor, textColor = '#ffffff') {
             const isReadable = analyzeElements(bgColor, textColor);
             const saveBtn = document.getElementById('saveThemeBtn');
             const warning = document.getElementById('contrastWarning');
@@ -1200,7 +1171,6 @@
             if (saved) {
                 const settings = JSON.parse(saved);
                 applyTheme(settings);
-                // آپدیت UI
                 document.getElementById('presetSelect').value = settings.preset || 'light';
                 document.getElementById('hexInput').value = settings.primary;
                 document.getElementById('colorInput').value = settings.primary;
@@ -1209,12 +1179,10 @@
                 }
                 document.getElementById('glassSwitch').checked = settings.glass;
             } else {
-                // پیش‌فرض روشن
                 document.getElementById('presetSelect').value = 'light';
                 document.getElementById('hexInput').value = '#735af2';
                 document.getElementById('colorInput').value = '#735af2';
             }
-            // چک اولیه کنتراست بعد از لود
             setTimeout(() => validateAndUpdateSaveButton(document.documentElement.style.getPropertyValue('--bg-gradient') || '#735af2'), 100);
         }
 
@@ -1256,7 +1224,6 @@
             let gradient = primary;
 
             if (isGradient && !isMobileDevice()) {
-                // ساده‌سازی: از primary به عنوان رنگ اول و تیره‌تر برای دوم
                 const darker = shadeColor(primary, -20);
                 gradient = `linear-gradient(135deg, ${primary} 0%, ${darker} 100%)`;
             }
@@ -1265,7 +1232,6 @@
             document.documentElement.style.setProperty('--bg-gradient', gradient);
             updateThemeColor();
 
-            // چک کنتراست بعد از پیش‌نمایش
             validateAndUpdateSaveButton(gradient);
         }
 
@@ -1301,11 +1267,10 @@
                 gradient = `linear-gradient(135deg, ${primary} 0%, ${darker} 100%)`;
             }
 
-            // چک نهایی کنتراست قبل از ذخیره
-            const isReadable = analyzeElements(gradient, '#ffffff'); // متن سفید
+            const isReadable = analyzeElements(gradient, '#ffffff');
             if (!isReadable) {
                 alert('❌ نمی‌تونم ذخیره کنم – رنگ انتخابی ناخواناست! لطفاً رنگ دیگه‌ای انتخاب کن.');
-                return; // ذخیره نکن
+                return;
             }
 
             const settings = {
@@ -1326,20 +1291,16 @@
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        // بستن modal با کلیک خارج
         document.getElementById('settingsModal').addEventListener('click', function(e) {
             if (e.target === this) toggleSettings();
         });
-        // ==================== VISUAL FIXES FOR GLASS EFFECT ====================
+
         function applyVisualFixes() {
-            // این تابع مشکلات بصری backdrop-filter را رفع می‌کند
             const elements = document.querySelectorAll('.login-container, .tabs-container, .setup-guide, .signature, .login-signature, .tab');
             elements.forEach(element => {
-                // اطمینان از اینکه border-radius به درستی اعمال شده
                 const computedStyle = window.getComputedStyle(element);
                 const borderRadius = computedStyle.borderRadius;
                 
-                // اگر border-radius مشکل دارد، آن را تنظیم کن
                 if (borderRadius === '0px' && element.classList.contains('login-container')) {
                     element.style.borderRadius = '20px';
                 }
@@ -1353,7 +1314,7 @@
         const verifyError = document.getElementById('verifyError');
         const loginPage = document.getElementById('loginPage');
         const mainContent = document.getElementById('mainContent');
-        // تبدیل Base32 به Hex
+
         function base32ToHex(base32) {
             const base32Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
             let bits = '';
@@ -1374,7 +1335,6 @@
             return hex;
         }
 
-        // تولید کد TOTP
         function generateTOTP() {
             try {
                 const time = Math.floor(Date.now() / 1000 / 30);
@@ -1394,7 +1354,6 @@
             }
         }
 
-        // بررسی کد وارد شده
         function verifyOTP(enteredOtp) {
             for (let i = -1; i <= 1; i++) {
                 const testTime = Math.floor(Date.now() / 1000 / 30) + i;
@@ -1406,7 +1365,6 @@
             return false;
         }
 
-        // تولید کد با زمان مشخص
         function generateTOTPWithTime(timeValue) {
             try {
                 const timeHex = CryptoJS.enc.Hex.parse(
@@ -1425,7 +1383,6 @@
             }
         }
 
-        // رویداد کلیک برای ورود
         verifyOtpBtn.addEventListener('click', function() {
             const enteredOtp = otpInput.value.trim();
             
@@ -1441,7 +1398,6 @@
                 sessionStorage.setItem('cst_authenticated', 'true');
                 sessionStorage.setItem('cst_login_time', new Date().getTime());
                 
-                // فعال کردن اسکرول موس برای تب‌ها بعد از لاگین
                 initMouseWheelScroll();
             } else {
                 verifyError.textContent = 'کد نامعتبر است';
@@ -1454,29 +1410,23 @@
             }
         });
 
-        // اجازه ورود با Enter
         otpInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 verifyOtpBtn.click();
             }
         });
 
-        // بررسی اگر کاربر قبلاً در این session وارد شده
         if (sessionStorage.getItem('cst_authenticated') === 'true') {
             loginPage.style.display = 'none';
             mainContent.style.display = 'flex';
-            // فعال کردن اسکرول موس برای تب‌ها
             setTimeout(initMouseWheelScroll, 100);
         } else {
             loginPage.style.display = 'block';
             mainContent.style.display = 'none';
         }
 
-        // تمرکز روی فیلد کد و جلوگیری از ورودی غیر عددی
         window.addEventListener('load', () => {
-            // اضافه کردن لیسنر برای حذف کاراکترهای غیر عددی
             otpInput.addEventListener('input', function(e) {
-                // هر چیزی غیر از اعداد 0-9 را با رشته خالی جایگزین کن
                 this.value = this.value.replace(/[^0-9]/g, '');
             });
 
@@ -1486,6 +1436,7 @@
                 }, 500);
             }
         });
+
         // ==================== TAB MANAGEMENT ====================
         function openTab(n) {
             document.querySelectorAll('.tab').forEach((t, i) => {
@@ -1496,6 +1447,85 @@
             });
         }
 
+        // ==================== OPTIMIZED SMART TOOLTIP (UPDATED) ====================
+        const tooltip = document.getElementById('tabTooltip');
+        
+        // This function checks if we are in icon mode (where text is hidden)
+        function isIconsOnlyMode() {
+            const tabsContainer = document.getElementById('tabsContainer');
+            return tabsContainer && tabsContainer.classList.contains('icons-only');
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('mousemove', function(e) {
+                // Ensure tooltip only shows when appropriate (when icons are only shown)
+                // If you want tooltips ALWAYS, remove the if condition below.
+                if (document.body.classList.contains('desktop')) {
+                     if (!document.getElementById('tabsContainer').classList.contains('icons-only')) return;
+                }
+
+                const tooltipText = this.getAttribute('data-tooltip');
+                if (!tooltipText) return;
+                
+                tooltip.textContent = tooltipText;
+                tooltip.classList.add('show');
+
+                // Get Dimensions
+                const tooltipRect = tooltip.getBoundingClientRect();
+                const winW = window.innerWidth;
+                const winH = window.innerHeight;
+                const mouseX = e.clientX;
+                const mouseY = e.clientY;
+                const gap = 15; // Distance from cursor
+
+                let posX, posY;
+
+                // --- 1. Horizontal Logic (Left/Right) ---
+                // Rule: If mouse is on Right half -> Show Left. If mouse is on Left half -> Show Right.
+                if (mouseX > winW / 2) {
+                    // Mouse is on the Right side of screen -> Position Tooltip to the LEFT
+                    posX = mouseX - tooltipRect.width - gap;
+                    
+                    // Safety: Don't go off the left edge of screen
+                    if (posX < 5) posX = 5;
+                } else {
+                    // Mouse is on the Left side of screen -> Position Tooltip to the RIGHT
+                    posX = mouseX + gap;
+                    
+                    // Safety: Don't go off the right edge of screen
+                    if (posX + tooltipRect.width > winW - 5) {
+                        posX = winW - tooltipRect.width - 5;
+                    }
+                }
+
+                // --- 2. Vertical Logic (Bottom/Top) ---
+                // Rule: Try to show below mouse. If no space, flip to top.
+                if (mouseY + tooltipRect.height + gap < winH) {
+                    // Fits below
+                    posY = mouseY + gap;
+                } else {
+                    // Doesn't fit below -> Show Above
+                    posY = mouseY - tooltipRect.height - gap;
+                    
+                    // Safety: Don't go off top edge
+                    if (posY < 5) posY = 5;
+                }
+
+                // Apply Positions
+                tooltip.style.left = posX + 'px';
+                tooltip.style.top = posY + 'px';
+                tooltip.style.transform = 'none'; // Overwrite any CSS transforms
+            });
+            
+            tab.addEventListener('mouseleave', function() {
+                tooltip.classList.remove('show');
+            });
+        });
+
+        window.addEventListener('scroll', function() {
+            tooltip.classList.remove('show');
+        });
+
         // ==================== ADVANCED SCROLL FOR TABS ====================
         function initMouseWheelScroll() {
             const tabsScrollContainer = document.getElementById('tabsScrollContainer');
@@ -1503,17 +1533,15 @@
             
             if (!tabsScrollContainer || !tabs) return;
             
-            // اسکرول با چرخ موس
             tabsScrollContainer.addEventListener('wheel', function(e) {
                 e.preventDefault();
                 this.scrollLeft += e.deltaY;
             });
-            // اسکرول با کلیک و درگ روی هر قسمتی از تب‌ها
+
             let isDragging = false;
             let startX;
             let scrollLeft;
             
-            // برای کل کانتینر تب‌ها
             tabsScrollContainer.addEventListener('mousedown', function(e) {
                 isDragging = true;
                 startX = e.pageX - this.offsetLeft;
@@ -1521,7 +1549,7 @@
                 this.style.cursor = 'grabbing';
                 this.style.userSelect = 'none';
             });
-            // برای خود تب‌ها (اگر کاربر روی تب کلیک کرد)
+
             tabs.addEventListener('mousedown', function(e) {
                 isDragging = true;
                 startX = e.pageX - tabsScrollContainer.offsetLeft;
@@ -1529,11 +1557,13 @@
                 tabsScrollContainer.style.cursor = 'grabbing';
                 tabsScrollContainer.style.userSelect = 'none';
             });
+
             document.addEventListener('mouseup', function() {
                 isDragging = false;
                 tabsScrollContainer.style.cursor = 'grab';
                 tabsScrollContainer.style.userSelect = 'auto';
             });
+
             document.addEventListener('mousemove', function(e) {
                 if (!isDragging) return;
                 e.preventDefault();
@@ -1541,17 +1571,19 @@
                 const walk = (x - startX) * 2;
                 tabsScrollContainer.scrollLeft = scrollLeft - walk;
             });
-            // برای تاچ دیوایس‌ها
+
             let touchStartX;
             let touchScrollLeft;
             tabsScrollContainer.addEventListener('touchstart', function(e) {
                 touchStartX = e.touches[0].pageX;
                 touchScrollLeft = this.scrollLeft;
             });
+
             tabs.addEventListener('touchstart', function(e) {
                 touchStartX = e.touches[0].pageX;
                 touchScrollLeft = tabsScrollContainer.scrollLeft;
             });
+
             tabsScrollContainer.addEventListener('touchmove', function(e) {
                 if (!touchStartX) return;
                 e.preventDefault();
@@ -1559,6 +1591,7 @@
                 const walk = (x - touchStartX) * 2;
                 this.scrollLeft = touchScrollLeft - walk;
             });
+
             tabsScrollContainer.addEventListener('touchend', function() {
                 touchStartX = null;
             });
@@ -1592,6 +1625,7 @@
             deferredPrompt = e;
             showInstallButton();
         });
+
         pwaInstallButton.addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
@@ -1602,11 +1636,12 @@
                 deferredPrompt = null;
             }
         });
+
         window.addEventListener('appinstalled', () => {
             hideInstallButton();
             deferredPrompt = null;
         });
-        // ثبت Service Worker
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/cst/sw.js')
@@ -1622,15 +1657,14 @@
         // ==================== INIT ====================
         document.addEventListener('DOMContentLoaded', () => {
             detectDeviceType();
-            detectSimplePopup(); // ✅ اضافه شده: نمایش پاپ‌آپ
+            detectSimplePopup();
             loadTheme();
             updateThemeColor();
             handleDesktopResponsiveTabs();
             
-            // اعمال فیکس‌های بصری برای جلوگیری از خطوط شیشه‌ای
             setTimeout(applyVisualFixes, 100);
         });
-        // اعمال در تغییر سایز صفحه
+
         window.addEventListener('resize', () => {
             updateThemeColor();
             handleDesktopResponsiveTabs();
