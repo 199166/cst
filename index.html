@@ -1458,11 +1458,11 @@
 
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('mousemove', function(e) {
-                // Ensure tooltip only shows when appropriate (when icons are only shown)
-                // If you want tooltips ALWAYS, remove the if condition below.
-                if (document.body.classList.contains('desktop')) {
-                     if (!document.getElementById('tabsContainer').classList.contains('icons-only')) return;
-                }
+                // IMPORTANT: Only show tooltip if text is hidden.
+                // In this codebase, the text is hidden when the 'icons-only' class 
+                // is applied to the container (which only happens in desktop mode on small widths).
+                // If this class is missing (e.g. mobile or wide desktop), text is visible, so NO tooltip.
+                if (!document.getElementById('tabsContainer').classList.contains('icons-only')) return;
 
                 const tooltipText = this.getAttribute('data-tooltip');
                 if (!tooltipText) return;
