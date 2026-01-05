@@ -120,7 +120,7 @@
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            justify-content: center; /* مرکزچین کردن محتوا */
+            justify-content: center;
             gap: 8px;
             font-size: 0.95rem;
             box-shadow: 
@@ -735,37 +735,33 @@
             }
         }
 
-        /* ----------------------------------------------------- */
-        /* اصلاحات بخش موبایل برای هدر و دکمه‌ها */
-        /* ----------------------------------------------------- */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
                 font-size: 15px;
             }
             .header-glass {
-                padding: 12px 15px; /* کاهش پدینگ */
-                flex-direction: row; /* تغییر از ستونی به ردیفی */
+                padding: 12px 15px;
+                flex-direction: row;
                 text-align: right;
                 gap: 10px;
-                justify-content: space-between; /* فاصله بین تیتر و دکمه‌ها */
+                justify-content: space-between;
                 border-radius: 16px;
             }
             .header-glass h1 {
-                font-size: 1.1rem; /* سایز فونت بهینه برای موبایل */
-                white-space: nowrap; /* جلوگیری از شکستن خط */
+                font-size: 1.1rem;
+                white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
             .header-controls {
-                width: auto; /* عرض خودکار به جای 100% */
+                width: auto;
                 justify-content: flex-end;
                 gap: 8px;
             }
             .glass-btn {
-                padding: 0; /* حذف پدینگ اضافی برای کنترل سایز */
+                padding: 0;
                 font-size: 1.1rem;
-                /* تنظیم سایز ثابت و مربعی برای دکمه‌ها */
                 width: 42px; 
                 height: 42px;
                 display: flex;
@@ -776,7 +772,7 @@
                 display: none;
             }
             .hamburger-menu {
-                display: flex; /* نمایش دکمه همبرگری */
+                display: flex;
                 align-items: center;
                 justify-content: center;
             }
@@ -830,7 +826,6 @@
             .header-glass h1 {
                 font-size: 1rem;
             }
-            /* دکمه‌ها در سایز خیلی کوچک هم مربعی و فیکس باقی می‌مانند */
             .glass-btn {
                 width: 38px;
                 height: 38px;
@@ -1054,7 +1049,7 @@
     border-radius: 8px;
     backdrop-filter: blur(5px);
     border: 1px solid rgba(0, 0, 0, 0.1);
-    font-size: 14px; /* دسکتاپ */
+    font-size: 14px;
     font-weight: 500;
     display: block;
     margin: 30px auto;
@@ -1062,7 +1057,6 @@
     color: var(--text-color);
 }
 
-/* موبایل */
 @media (max-width: 768px) {
     .signature {
         font-size: 12px;
@@ -1489,6 +1483,7 @@
         const mobileTabs = document.getElementById('mobileTabs');
         let selectedCurrencyHistory = "all";
         let selectedCurrencyCalculator = localStorage.getItem('selectedCurrencyCalculator') || "";
+        
         // ✅ تابع بستن منوی موبایل و بازگرداندن آیکون
         function closeMobileMenu() {
             mobileTabs.classList.remove('active');
@@ -1543,7 +1538,8 @@
                 closeMobileMenu();
             }
         });
-        // === بقیه کدها بدون تغییر ===
+        
+        // === بقیه کدها ===
         function showAlert(message, type = 'success') {
             const alert = document.getElementById('autoAlert');
             const alertMessage = document.getElementById('alertMessage');
@@ -2038,42 +2034,87 @@
             });
         }
 
+        // ✅ تابع اصلاح شده برای درگ اند دراپ
         function setupDragAndDrop() {
             const currencyCards = document.querySelectorAll('.currency-card');
             const currencyLists = document.querySelectorAll('.currency-list');
             let draggedItem = null;
             let sourceCategory = null;
+
             currencyCards.forEach(card => {
                 card.addEventListener('dragstart', function(e) {
                     draggedItem = this;
-                    sourceCategory = this.closest('.currency-list').getAttribute('data-category-id');
+                    // ✅ پیدا کردن دسته‌بندی مادر با استفاده از ساختار DOM
+                    const parentCategoryElement = this.closest('.currency-category');
+                    if (parentCategoryElement) {
+                        sourceCategory = parentCategoryElement.getAttribute('data-category-id');
+                    }
                     setTimeout(() => this.classList.add('dragging'), 0);
+                    e.dataTransfer.setData('text/plain', this.getAttribute('data-currency-id'));
                 });
+
                 card.addEventListener('dragend', function() {
                     this.classList.remove('dragging');
                     draggedItem = null;
                     sourceCategory = null;
+                    // ذخیره تغییرات پس از درگ اند دراپ
                     saveCategoryChanges();
                 });
             });
+
             currencyLists.forEach(list => {
                 list.addEventListener('dragover', function(e) {
                     e.preventDefault();
                     this.classList.add('drag-over');
                 });
+
                 list.addEventListener('dragleave', function() {
                     this.classList.remove('drag-over');
                 });
+
                 list.addEventListener('drop', function(e) {
                     e.preventDefault();
                     this.classList.remove('drag-over');
-                    if (draggedItem && this !== draggedItem.parentNode) {
-                        const targetCategory = this.getAttribute('data-category-id');
-                        moveCurrency(draggedItem.getAttribute('data-currency-id'), sourceCategory, targetCategory);
-                        this.appendChild(draggedItem);
+                    
+                    if (draggedItem) {
+                        const targetCategoryId = this.getAttribute('data-category-id');
+                        const currencyId = draggedItem.getAttribute('data-currency-id');
+                        
+                        // اگر جفت ارز در همان دسته‌بندی است، فقط مرتب‌سازی داخلی انجام شود
+                        if (sourceCategory === targetCategoryId) {
+                            // مرتب‌سازی داخلی
+                            const afterElement = getDragAfterElement(this, e.clientY);
+                            if (afterElement) {
+                                this.insertBefore(draggedItem, afterElement);
+                            } else {
+                                this.appendChild(draggedItem);
+                            }
+                        } else {
+                            // انتقال به دسته‌بندی دیگر
+                            moveCurrency(currencyId, sourceCategory, targetCategoryId);
+                            this.appendChild(draggedItem);
+                        }
+                        
+                        showAlert('جابجایی با موفقیت انجام شد');
                     }
                 });
             });
+
+            // تابع کمکی برای پیدا کردن المان بعدی در لیست
+            function getDragAfterElement(container, y) {
+                const draggableElements = [...container.querySelectorAll('.currency-card:not(.dragging)')];
+                
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+                    
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
         }
 
         function moveCurrency(currencyId, sourceCategoryId, targetCategoryId) {
@@ -2081,11 +2122,14 @@
             const sourceCategory = categories.find(c => c.id == sourceCategoryId);
             const targetCategory = categories.find(c => c.id == targetCategoryId);
             if (!sourceCategory || !targetCategory) return;
+            
             const currencyIndex = sourceCategory.currencies.findIndex(c => c.id == currencyId);
             if (currencyIndex === -1) return;
+            
             const currency = sourceCategory.currencies[currencyIndex];
             sourceCategory.currencies.splice(currencyIndex, 1);
             targetCategory.currencies.push(currency);
+            
             localStorage.setItem('categories', JSON.stringify(categories));
             showAlert(`جفت ارز ${currency.name} به دسته‌بندی ${targetCategory.name} منتقل شد`);
         }
@@ -2094,29 +2138,34 @@
             const categoriesContainer = document.getElementById('categories-management');
             const categories = [];
             const categoryElements = categoriesContainer.querySelectorAll('.currency-category');
+            
             categoryElements.forEach(categoryElement => {
                 const categoryId = categoryElement.getAttribute('data-category-id');
                 const categoryName = categoryElement.querySelector('.category-title').textContent.replace(/[\d\s]+جفت ارز/, '').trim();
                 const currencies = [];
+                
                 const currencyElements = categoryElement.querySelectorAll('.currency-card');
                 currencyElements.forEach(currencyElement => {
                     const currencyId = currencyElement.getAttribute('data-currency-id');
-                    const currencyName = currencyElement.querySelector('.currency-name').textContent.trim();
+                    const currencyNameText = currencyElement.querySelector('.currency-name').textContent.trim();
                     let currencyType = 'standard';
-                    if (currencyName.includes('JPY')) currencyType = 'jpy';
-                    const cleanName = currencyName.replace('JPY', '').replace('STD', '').trim();
+                    if (currencyNameText.includes('JPY')) currencyType = 'jpy';
+                    const cleanName = currencyNameText.replace('JPY', '').replace('STD', '').trim();
+                    
                     currencies.push({
                         id: parseInt(currencyId),
                         name: cleanName,
                         type: currencyType
                     });
                 });
+                
                 categories.push({
                     id: parseInt(categoryId),
                     name: categoryName,
                     currencies: currencies
                 });
             });
+            
             localStorage.setItem('categories', JSON.stringify(categories));
             loadCurrencyPairs();
             showAlert('تغییرات دسته‌بندی‌ها ذخیره شد');
