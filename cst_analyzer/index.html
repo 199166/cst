@@ -5,23 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>CST Geometry Analyzer</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- افزودن فونت وزیرمتن مشابه کد اول -->
 <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
 <style>
   :root {
-    /* --- پالت رنگی جدید --- */
-    --bg-primary: #071020;       /* پس‌زمینه اصلی */
-    
-    /* رنگ زمینه محتوای باکس‌ها */
-    --bg-card: #0f172a;          
-    
-    /* رنگ زمینه هدرها */
-    --bg-header: #1e293b;        
-    
-    /* رنگ ورودی‌ها */
+    --bg-primary: #071020;
+    --bg-card: #0f172a;
+    --bg-header: #1e293b;
     --bg-input: #1e293b;
-
-    --border-color: #334155;     
+    --border-color: #334155;
     --text-primary: #e6eef8;
     --text-secondary: #94a3b8;
     --accent-color: #0ea5a4;
@@ -29,34 +20,22 @@
     --success-color: #10b981;
   }
   
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
   
   body {
-    /* اعمال فونت وزیرمتن برای کل صفحه */
     font-family: 'Vazirmatn', sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     padding: 12px;
     margin: 0;
-    line-height: 1.6; /* کمی افزایش ارتفاع خط برای خوانایی بهتر */
+    line-height: 1.6;
     overscroll-behavior-y: none;
-    font-size: 16px; /* سایز پایه استاندارد */
+    font-size: 16px;
   }
   
-  .container {
-    max-width: 1150px;
-    margin: 0 auto;
-    padding-bottom: 50px;
-  }
+  .container { max-width: 1150px; margin: 0 auto; padding-bottom: 50px; }
   
-  #sectionsContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
+  #sectionsContainer { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
   
   .card {
     background: var(--bg-card);
@@ -68,132 +47,43 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
   
-  .collapsible-card {
-    max-height: 60px;
-    overflow: hidden;
-    transition: max-height 0.4s ease-out;
-  }
-  
-  .collapsible-card.open {
-    max-height: 9999px;
-    transition: max-height 0.6s ease-in;
-  }
+  .collapsible-card { max-height: 60px; overflow: hidden; transition: max-height 0.4s ease-out; }
+  .collapsible-card.open { max-height: 9999px; transition: max-height 0.6s ease-in; }
   
   .collapsible-header {
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
-    background: var(--bg-header);
-    border-bottom: 1px solid var(--border-color);
-    transition: background-color 0.2s;
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 16px;
+    background: var(--bg-header); border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;
   }
-
-  .collapsible-header:hover {
-      filter: brightness(1.1);
-  }
+  .collapsible-header:hover { filter: brightness(1.1); }
   
-  .collapsible-header h3 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600; /* کمی ضخیم‌تر برای تیترها */
-    border-bottom: none;
-    padding-bottom: 0;
-    flex: 1;
-  }
+  .collapsible-header h3 { margin: 0; font-size: 1.2rem; font-weight: 600; border-bottom: none; padding-bottom: 0; flex: 1; }
   
-  .toggle-icon {
-    font-size: 1.2rem;
-    transition: transform 0.3s;
-    color: var(--accent-color);
-  }
+  .toggle-icon { font-size: 1.2rem; transition: transform 0.3s; color: var(--accent-color); }
+  .collapsible-card.open .toggle-icon { transform: rotate(180deg); }
   
-  .collapsible-card.open .toggle-icon {
-    transform: rotate(180deg);
-  }
+  .collapsible-content { padding: 0 16px 16px; overflow: visible; background: var(--bg-card); }
   
-  .collapsible-content {
-    padding: 0 16px 16px;
-    overflow: visible;
-    background: var(--bg-card);
-  }
+  h1, h2, h3 { margin-top: 0; color: var(--text-primary); font-family: 'Vazirmatn', sans-serif; }
+  h1 { font-size: 1.5rem; text-align: center; margin-bottom: 20px; font-weight: 700; }
+  h3 { font-size: 1.2rem; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
   
-  h1, h2, h3 {
-    margin-top: 0;
-    color: var(--text-primary);
-    font-family: 'Vazirmatn', sans-serif;
-  }
+  label { display: block; margin-bottom: 6px; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; }
   
-  h1 {
-    font-size: 1.5rem;
-    text-align: center;
-    margin-bottom: 20px;
-    font-weight: 700;
-  }
-  
-  h3 {
-    font-size: 1.2rem;
-    margin-bottom: 12px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 8px;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 6px;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-  
-  input, select, textarea, button {
-    font-family: 'Vazirmatn', sans-serif; /* اطمینان از فونت در ورودی‌ها */
-    font-size: 1rem;
-  }
+  input, select, textarea, button { font-family: 'Vazirmatn', sans-serif; font-size: 1rem; }
   
   input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-input);
-    color: var(--text-primary);
-    margin-bottom: 8px;
+    width: 100%; padding: 10px; border-radius: 6px;
+    border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); margin-bottom: 8px;
   }
   
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  
-  .col {
-    flex: 1;
-    min-width: 0;
-  }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+  .col { flex: 1; min-width: 0; }
   
   button {
-    background: var(--accent-color);
-    color: #021;
-    padding: 10px 16px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-    margin-bottom: 8px;
-    white-space: nowrap;
-    width: auto;
-    min-width: 120px;
-    display: inline-block;
+    background: var(--accent-color); color: #021; padding: 10px 16px; border-radius: 8px; border: none;
+    cursor: pointer; font-weight: 600; transition: all 0.2s; margin-bottom: 8px; white-space: nowrap; width: auto; min-width: 120px; display: inline-block;
   }
-  
-  button:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-  }
+  button:hover { opacity: 0.9; transform: translateY(-1px); }
   
   .btn-full { width: 100%; }
   .btn-danger { background: var(--danger-color); color: white; }
@@ -201,196 +91,79 @@
   .btn-small { padding: 8px 12px; font-size: 0.85rem; min-width: 100px; }
   .btn-auto { width: auto; }
   
-  .btn-group {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
   
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 8px;
-    font-size: 0.9rem; /* کمی بزرگتر برای خوانایی بهتر */
-  }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.9rem; }
+  th, td { padding: 10px 8px; border-bottom: 1px solid var(--border-color); text-align: center; white-space: nowrap; user-select: text; }
+  th { background: var(--bg-header); color: var(--text-secondary); font-weight: 600; }
   
-  th, td {
-    padding: 10px 8px;
-    border-bottom: 1px solid var(--border-color);
-    text-align: center;
-    white-space: nowrap;
-    user-select: text;
-  }
-  
-  th {
-    background: var(--bg-header);
-    color: var(--text-secondary);
-    font-weight: 600;
-  }
-  
-  .small {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-  }
+  .small { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
   
   .symbols-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-    min-height: 60px;
-    padding: 12px;
-    background: var(--bg-input);
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    align-items: flex-start;
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; min-height: 60px;
+    padding: 12px; background: var(--bg-input); border-radius: 8px; border: 1px solid var(--border-color); align-items: flex-start;
   }
   
   .chip {
-    display: inline-flex;
-    padding: 10px 16px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: #9ff;
-    cursor: grab;
-    margin: 4px;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    font-weight: 500;
-    user-select: none;
-    border: 1px solid #0ea5a4;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    position: relative;
-    min-width: 80px;
-    justify-content: center;
-    align-items: center;
+    display: inline-flex; padding: 10px 16px; border-radius: 8px; background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #9ff; cursor: grab; margin: 4px; transition: all 0.3s ease; font-size: 0.9rem; font-weight: 500; user-select: none;
+    border: 1px solid #0ea5a4; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); position: relative; min-width: 80px; justify-content: center; align-items: center;
   }
-  
   .chip:hover {
-    background: linear-gradient(135deg, #0ea5a4, #0d9488);
-    color: #021;
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, #0ea5a4, #0d9488); color: #021; transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(14, 165, 164, 0.3);
   }
-  
   .chip.dragging {
-    opacity: 0.8;
-    cursor: grabbing;
-    transform: rotate(5deg) scale(1.05);
-    z-index: 1000;
-    box-shadow: 0 6px 12px rgba(14, 165, 164, 0.4);
+    opacity: 0.8; cursor: grabbing; transform: rotate(5deg) scale(1.05); z-index: 1000; box-shadow: 0 6px 12px rgba(14, 165, 164, 0.4);
   }
   
   .chip-placeholder {
-    display: inline-block;
-    padding: 10px 16px;
-    margin: 4px;
-    border: 2px dashed #0ea5a4;
-    border-radius: 8px;
-    opacity: 0.6;
-    background: rgba(14, 165, 164, 0.1);
-    min-width: 80px;
-    height: 40px;
+    display: inline-block; padding: 10px 16px; margin: 4px; border: 2px dashed #0ea5a4;
+    border-radius: 8px; opacity: 0.6; background: rgba(14, 165, 164, 0.1); min-width: 80px; height: 40px;
   }
   
   .chip-overlay {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: var(--accent-color);
-    color: #021;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    font-weight: bold;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    position: absolute; top: -5px; right: -5px; background: var(--accent-color); color: #021;
+    border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: bold; opacity: 0; transition: opacity 0.3s ease;
   }
-  
   .chip:hover .chip-overlay { opacity: 1; }
   
   .controls { display: flex; gap: 8px; flex-wrap: wrap; }
   
   pre {
-    background: #041219;
-    padding: 8px;
-    border-radius: 6px;
-    color: var(--text-secondary);
-    white-space: pre-wrap;
-    font-size: 0.8rem;
-    overflow-x: auto;
-    font-family: 'Vazirmatn', monospace;
+    background: #041219; padding: 8px; border-radius: 6px; color: var(--text-secondary); white-space: pre-wrap;
+    font-size: 0.8rem; overflow-x: auto; font-family: 'Vazirmatn', monospace;
   }
   
   .icon-btn {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    padding: 6px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    width: auto;
-    margin: 2px;
-    font-size: 0.8rem;
-    min-width: auto;
+    background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary);
+    padding: 6px 8px; border-radius: 6px; cursor: pointer; width: auto; margin: 2px; font-size: 0.8rem; min-width: auto;
   }
   
   .action-col { white-space: nowrap; user-select: none; }
   .action-col button { width: auto; display: inline-block; margin: 0 2px; min-width: auto; }
   
   #alertModal, #statsModal, #editModal, #moveModal, #guideModal {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--bg-card);
-    border: 2px solid #16424a;
-    padding: 20px;
-    border-radius: 10px;
-    z-index: 10000;
-    display: none;
-    width: 90%;
-    max-width: 420px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    background: var(--bg-card); border: 2px solid #16424a; padding: 20px; border-radius: 10px; z-index: 10000;
+    display: none; width: 90%; max-width: 420px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
   }
   
   .modal-bg {
-    position: fixed;
-    left: 0; top: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.7);
-    z-index: 9998;
-    display: none;
-    backdrop-filter: blur(2px);
+    position: fixed; left: 0; top: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7); z-index: 9998; display: none; backdrop-filter: blur(2px);
   }
   
   .date-range-toggle {
-    background: #1e3a5f;
-    color: var(--text-primary);
-    border: 1px solid #234;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    width: auto;
-    min-width: auto;
-    font-family: 'Vazirmatn', sans-serif;
+    background: #1e3a5f; color: var(--text-primary); border: 1px solid #234; padding: 8px 12px;
+    border-radius: 4px; cursor: pointer; font-size: 0.85rem; width: auto; min-width: auto; font-family: 'Vazirmatn', sans-serif;
   }
-  
   .date-range-toggle.active { background: var(--accent-color); color: #021; }
   
   .danger-zone {
-    background: rgba(127, 29, 29, 0.2);
-    border: 1px solid rgba(239,68,68,0.3);
-    padding: 16px;
-    border-radius: 8px;
-    margin-top: 16px;
+    background: rgba(127, 29, 29, 0.2); border: 1px solid rgba(239,68,68,0.3); padding: 16px;
+    border-radius: 8px; margin-top: 16px;
   }
   
   .text-center { text-align: center; }
@@ -406,163 +179,62 @@
   .form-group { margin-bottom: 12px; }
   
   .chart-wrapper {
-    position: relative;
-    width: 100%;
-    margin-top: 16px;
-    background: var(--bg-input);
-    border-radius: 8px;
-    padding: 16px;
-    border: 1px solid var(--border-color);
+    position: relative; width: 100%; margin-top: 16px; background: var(--bg-input);
+    border-radius: 8px; padding: 16px; border: 1px solid var(--border-color);
   }
   
-  .chart-container {
-    position: relative;
-    width: 100%;
-    height: 400px;
-  }
-  
-  .bar-chart-isolated {
-    position: relative;
-    z-index: 100;
-    pointer-events: auto;
-  }
+  .chart-container { position: relative; width: 100%; height: 400px; }
+  .bar-chart-isolated { position: relative; z-index: 100; pointer-events: auto; }
   
   .horizontal-line {
-    position: absolute;
-    border-top: 1px solid #9fb3c8;
-    pointer-events: none;
-    z-index: 101;
-    width: 100%;
-    left: 0;
+    position: absolute; border-top: 1px solid #9fb3c8; pointer-events: none; z-index: 101; width: 100%; left: 0;
   }
-  
   .horizontal-line:hover { border-top-color: var(--accent-color); }
   
   .horizontal-line-wrapper {
-    position: absolute;
-    width: 100%;
-    left: 0;
-    height: 20px;
-    cursor: ns-resize;
-    z-index: 102;
-    pointer-events: auto;
-    background: transparent;
+    position: absolute; width: 100%; left: 0; height: 20px; cursor: ns-resize; z-index: 102; pointer-events: auto; background: transparent;
   }
-  
   .horizontal-line-wrapper:hover { background: rgba(14, 165, 164, 0.05); }
   
   .line-guide {
-    position: absolute;
-    top: -25px;
-    left: 10px;
-    background: rgba(14, 165, 164, 0.9);
-    color: #021;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.2s;
-    z-index: 103;
-    pointer-events: none;
-    font-family: 'Vazirmatn', sans-serif;
+    position: absolute; top: -25px; left: 10px; background: rgba(14, 165, 164, 0.9);
+    color: #021; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 500;
+    white-space: nowrap; opacity: 0; transition: opacity 0.2s; z-index: 103; pointer-events: none; font-family: 'Vazirmatn', sans-serif;
   }
-  
   .horizontal-line-wrapper:hover .line-guide { opacity: 1; }
   
   .collapsible-card { touch-action: auto; }
   .card[draggable="true"] .chart-wrapper .chart-container { pointer-events: auto; }
 
   .guide-icon {
-    position: absolute !important;
-    top: 1rem !important;
-    right: 1rem !important;
-    width: 2.125rem !important;
-    height: 2.125rem !important;
-    min-width: 2.125rem !important;
-    max-width: 2.125rem !important;
-    aspect-ratio: 1/1 !important;
-    background: var(--accent-color) !important;
-    color: #021 !important;
-    font-size: 1.1rem !important;
-    font-weight: bold !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-    flex-grow: 0 !important;
-    flex-basis: auto !important;
-    z-index: 9999 !important;
-    cursor: pointer !important;
-    border: none !important;
-    padding: 0 !important;
-    margin-bottom: 2.5rem !important;
+    position: absolute !important; top: 1rem !important; right: 1rem !important;
+    width: 2.125rem !important; height: 2.125rem !important; min-width: 2.125rem !important; max-width: 2.125rem !important;
+    aspect-ratio: 1/1 !important; background: var(--accent-color) !important; color: #021 !important;
+    font-size: 1.1rem !important; font-weight: bold !important; border-radius: 50% !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    flex-shrink: 0 !important; flex-grow: 0 !important; flex-basis: auto !important;
+    z-index: 9999 !important; cursor: pointer !important; border: none !important; padding: 0 !important; margin-bottom: 2.5rem !important;
   }
-  
-  .guide-icon:hover {
-    transform: scale(1.10);
-    background: #0d9488;
-  }
+  .guide-icon:hover { transform: scale(1.10); background: #0d9488; }
 
   @media (max-width: 768px) {
-    .guide-icon {
-      width: 1.75rem !important;
-      height: 1.75rem !important;
-      min-width: 1.75rem !important;
-      max-width: 1.75rem !important;
-      font-size: 1rem !important;
-      top: 0.75rem !important;
-      right: 0.75rem !important;
-      margin-bottom: 2rem !important;
-    }
-    .chart-wrapper .small {
-      font-size: 0.75rem !important;
-      line-height: 1.4 !important;
-      word-break: break-word !important;
-      overflow-wrap: break-word !important;
-      padding-right: 3rem !important;
-    }
+    .guide-icon { width: 1.75rem !important; height: 1.75rem !important; min-width: 1.75rem !important; max-width: 1.75rem !important; font-size: 1rem !important; top: 0.75rem !important; right: 0.75rem !important; margin-bottom: 2rem !important; }
+    .chart-wrapper .small { font-size: 0.75rem !important; line-height: 1.4 !important; word-break: break-word !important; overflow-wrap: break-word !important; padding-right: 3rem !important; }
   }
   
   @media (max-width: 480px) {
-    .guide-icon {
-      width: 1.5rem !important;
-      height: 1.5rem !important;
-      min-width: 1.5rem !important;
-      max-width: 1.5rem !important;
-      font-size: 0.9rem !important;
-      top: 0.5rem !important;
-      right: 0.5rem !important;
-      margin-bottom: 1.75rem !important;
-    }
-    .chart-wrapper .small {
-      font-size: 0.7rem !important;
-      padding-right: 2.5rem !important;
-    }
+    .guide-icon { width: 1.5rem !important; height: 1.5rem !important; min-width: 1.5rem !important; max-width: 1.5rem !important; font-size: 0.9rem !important; top: 0.5rem !important; right: 0.5rem !important; margin-bottom: 1.75rem !important; }
+    .chart-wrapper .small { font-size: 0.7rem !important; padding-right: 2.5rem !important; }
   }
 
   @media (min-width: 1200px) {
-    .guide-icon {
-      width: 2.25rem !important;
-      height: 2.25rem !important;
-      min-width: 2.25rem !important;
-      max-width: 2.25rem !important;
-      font-size: 1.2rem !important;
-      margin-bottom: 3rem !important;
-    }
+    .guide-icon { width: 2.25rem !important; height: 2.25rem !important; min-width: 2.25rem !important; max-width: 2.25rem !important; font-size: 1.2rem !important; margin-bottom: 3rem !important; }
   }
 
-  .chart-wrapper .small[style*="text-align: center"] {
-    padding-right: 3rem !important;
-    margin-bottom: 1rem !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-  }
+  .chart-wrapper .small[style*="text-align: center"] { padding-right: 3rem !important; margin-bottom: 1rem !important; word-break: break-word !important; overflow-wrap: break-word !important; }
   
   @media (max-width: 768px) {
-    body { padding: 8px; font-size: 15px; } /* سایز فونت موبایل */
+    body { padding: 8px; font-size: 15px; }
     .card { margin-bottom: 0; }
     .collapsible-header { padding: 12px; }
     h1 { font-size: 1.3rem; }
@@ -584,7 +256,7 @@
   }
   
   @media (max-width: 480px) {
-    body { padding: 6px; font-size: 14px; } /* سایز فونت موبایل کوچک */
+    body { padding: 6px; font-size: 14px; }
     .card { margin-bottom: 0; }
     h1 { font-size: 1.2rem; }
     .chart-container { height: 250px; }
@@ -596,32 +268,19 @@
   }
   
   .history-table-container {
-    overflow-x: auto;
-    margin-top: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    -webkit-overflow-scrolling: touch;
-    user-select: text;
-    cursor: grab;
+    overflow-x: auto; margin-top: 12px; border: 1px solid var(--border-color);
+    border-radius: 6px; -webkit-overflow-scrolling: touch; user-select: text; cursor: grab;
   }
   
   .history-table-container table { min-width: 800px; }
   .history-table-container.dragging { cursor: grabbing; }
   
   .history-card {
-    background: var(--bg-input);
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 10px;
-    border: 1px solid var(--border-color);
+    background: var(--bg-input); border-radius: 8px; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border-color);
   }
   
   .history-card .row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 6px;
+    display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;
   }
   
   .history-card .row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -630,39 +289,17 @@
   .history-card .actions { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
   
   .footer {
-    color: white;
-    text-align: center;
-    padding: 16px;
-    font-family: 'Vazirmatn', system-ui;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 12px;
-    font-weight: 500;
-    display: block;
-    margin: 30px auto;
-    width: fit-content;
-    max-width: 90%;
+    color: white; text-align: center; padding: 16px; font-family: 'Vazirmatn', system-ui;
+    background: rgba(255, 255, 255, 0.05); border-radius: 10px; backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1); font-size: 12px; font-weight: 500;
+    display: block; margin: 30px auto; width: fit-content; max-width: 90%;
   }
 
   .toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    min-width: 250px;
-    background: var(--success-color);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    z-index: 10001;
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-    font-size: 0.9rem;
-    text-align: center;
-    font-weight: 500;
-    font-family: 'Vazirmatn', sans-serif;
+    position: fixed; top: 20px; right: 20px; min-width: 250px;
+    background: var(--success-color); color: white; padding: 12px 20px; border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10001; transform: translateX(100%);
+    transition: transform 0.3s ease; font-size: 0.9rem; text-align: center; font-weight: 500; font-family: 'Vazirmatn', sans-serif;
   }
   
   .toast.show { transform: translateX(0); }
@@ -686,8 +323,7 @@
      
       <div class="collapsible-content">
          <br>
-        <div class="small">ابتدا یک جفت را انتخاب کن.
-        سپس High و Low روز جدید را وارد کن (یا Mid).</div>
+        <div class="small">ابتدا یک جفت را انتخاب کن. سپس High و Low روز جدید را وارد کن (یا Mid).</div>
 
         <div class="row">
           <div class="col">
@@ -703,11 +339,11 @@
         <div class="row">
           <div class="col">
             <label>High روز جدید</label>
-            <input id="inputHigh" placeholder="مثال: 76500">
+            <input id="inputHigh" placeholder="مثال: 76500 یا 112.523">
           </div>
           <div class="col">
             <label>Low روز جدید</label>
-            <input id="inputLow" placeholder="مثال: 76300">
+            <input id="inputLow" placeholder="مثال: 76300 یا 91.234">
           </div>
         </div>
         
@@ -746,7 +382,7 @@
             </tr></thead><tbody></tbody></table>
           </div>
           <div class="chart-wrapper">
-            <div class="small" style="margin-bottom: 8px; text-align: center; color: var(--text-secondary);">💡 برای تنظیم سطح، خط افقی را می‌توانید جابجا کنید (بالا/پایین بکشید) — نمودار میله‌ای: هر روز یک میله بر اساس تفاوت زاویه نسبت به روز قبل (بالا=بیشتر، پایین=کمتر)</div>
+             <div class="small" style="margin-bottom: 8px; text-align: center; color: var(--text-secondary);">💡 برای تنظیم سطح، خط افقی را می‌توانید جابجا کنید (بالا/پایین بکشید) — نمودار میله‌ای: هر روز یک میله بر اساس تفاوت زاویه نسبت به روز قبل (بالا=بیشتر، پایین=کمتر)</div>
             <button class="guide-icon" onclick="openGuideModal()" title="راهنمای چارت میله‌ای">❓</button>
             <div class="chart-container bar-chart-isolated">
               <canvas id="angleBarChart"></canvas>
@@ -784,7 +420,7 @@
 
         <div id="dateRangeSection" class="hidden">
           <div class="row">
-            <div class="col">
+             <div class="col">
               <label>تاریخ شروع</label>
               <input id="startDate" type="date">
             </div>
@@ -823,7 +459,7 @@
         <div class="small">لیست جفت‌ارزها (برای انتخاب کلیک کنید / برای جابجایی کاملاً آزاد بکشید و رها کنید):</div>
         <div id="symbolsList" class="symbols-grid">
         </div>
-        
+         
         <div style="margin-top:8px" class="small">
           💡 <strong>امکان جابجایی کاملاً آزاد:</strong> هر جفت ارزی را می‌توانید در هر موقعیتی از صفحه و کنار هر جفت ارز دیگری قرار دهید
         </div>
@@ -832,7 +468,7 @@
           <button id="deleteSelectedSymbol" class="btn-danger">حذف جفت انتخاب‌شده</button>
         </div>
       </div>
-    </div>
+  </div>
 
     <div class="card collapsible-card" data-section="4">
       <div class="collapsible-header" onclick="toggleSection('4')">
@@ -861,7 +497,7 @@
         <div class="row">
             <div class="col">
                 <button id="exportBtn" class="btn-full">خروجی (Backup)</button>
-            </div>
+             </div>
             <div class="col">
                 <button id="importBtn" class="btn-full" style="background-color: #0ea5a4;">ورودی (Restore)</button>
                 <input id="importFile" type="file" accept=".json" style="display: none;">
@@ -958,25 +594,92 @@
 
 <script>
 // ---------- helpers ----------
-function parseNum(v){
-  if(v===null||v===undefined) return null;
+// تابع برای حذف تمام نقاط و کاماها (برای ذخیره‌سازی مقدار عددی خام)
+function parseNumWithFormat(v) {
+  if(v === null || v === undefined) return { original: null, numeric: null };
   v = String(v).trim();
-  if(v==="") return null;
+  if(v === "") return { original: null, numeric: null };
+  // تبدیل اعداد فارسی به انگلیسی
   v = v.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
-  v = v.replace(/,/g, '.');
-  v = v.replace(/\./g, '');
-  const n = Number(v);
-  return isNaN(n)?null:n;
+  // ذخیره فرمت اصلی
+  const original = v;
+  // حذف تمام نقطه‌ها و کاماها برای بدست آوردن عدد صحیح
+  const cleanV = v.replace(/[,.]/g, '');
+  const n = Number(cleanV);
+  return {
+    original: original,
+    numeric: isNaN(n) ? null : n
+  };
+}
+
+// تابع جدید و هوشمند برای تعیین تعداد اعشار بر اساس نام جفت‌ارز
+function getSymbolDecimalPlaces(symbolName) {
+  if(!symbolName) return null;
+  const s = symbolName.toUpperCase().trim();
+  
+  // گروه ۱: ۳ رقم اعشار (جفت‌های ین و مشابه)
+  // مثال: 106901 -> 106.901
+  // AUDJPY, CADJPY, CHFJPY, EURJPY, GBPJPY, NZDJPY (و NJDJPY که در درخواست بود)
+  const group3 = ['AUDJPY', 'CADJPY', 'CHFJPY', 'EURJPY', 'GBPJPY', 'NZDJPY', 'NJDJPY'];
+  if(group3.includes(s)) return 3;
+
+  // گروه ۲: ۵ رقم اعشار
+  // مثال: 200082 -> 2.00082
+  const group5 = ['GBPAUD', 'GBPCHF'];
+  if(group5.includes(s)) return 5;
+
+  return null;
+}
+
+// تابع اصلی فرمت‌دهی هوشمند برای نمایش (High, Low, Mid)
+function formatNumberSmart(num, symbolName, originalInput) {
+   // num عدد ذخیره شده است (عدد صحیح یا اعشاری). معمولاً عدد صحیح است (چون نقطه‌ها حذف شده‌اند)
+   if(num === null || num === undefined) return '';
+   
+   // برای اطمینان از حذف اعشارهای ناخواسته در محاسبات قبلی (مثل .50)، ورودی را Floor می‌کنیم
+   const intVal = Math.floor(num);
+
+   // ۱. بررسی قوانین خاص برای جفت‌ارز
+   const forcedDecimals = getSymbolDecimalPlaces(symbolName);
+   if (forcedDecimals !== null) {
+      // تبدیل عدد صحیح به اعشاری با تقسیم بر توان ۱۰
+      // مثال: 200082 با 5 رقم اعشار -> 2.00082
+      const factor = Math.pow(10, forcedDecimals);
+      let val = intVal / factor;
+      return val.toFixed(forcedDecimals);
+   }
+
+   // ۲. حالت پویا (بر اساس ورودی اولیه) - برای جفت‌هایی که در لیست بالا نیستند
+   if (originalInput && originalInput.includes('.')) {
+      const parts = originalInput.split('.');
+      if(parts.length > 1) {
+         const decimals = parts[1].length;
+         // اگر ورودی اصلی اعشار داشته، سعی می‌کنیم همان فرمت را بازسازی کنیم
+         const factor = Math.pow(10, decimals);
+         // اگر عدد intVal خیلی بزرگتر از factor باشد (یعنی عدد صحیح است)، تقسیم می‌کنیم
+         // اگر intVal قبلاً اعشاری بوده (که با Math.floor بالا حذف شد)، بازسازی می‌کنیم
+         let val = intVal / factor;
+         
+         // یک چک ساده: اگر تقسیم باعث شود عدد خیلی کوچک شود (کمتر از ۱) در حالی که انتظار عدد بزرگ داریم، شاید نباید تقسیم کنیم
+         // اما طبق منطق parseNumWithFormat، ما اعداد را بدون نقطه ذخیره می‌کنیم، پس همیشه باید تقسیم کنیم.
+         return val.toFixed(decimals);
+      }
+   }
+
+   // ۳. حالت پیش‌فرض (بدون اعشار اضافه)
+   // اگر قانون خاصی نبود و ورودی هم نقطه نداشت، عدد صحیح برمی‌گرداند
+   // این مشکل 91157.00 -> 91157 را حل می‌کند
+   return String(intVal);
 }
 
 const STORAGE_KEY = 'cst_data_final_v5';
 const SECTIONS_ORDER_KEY = 'cst_sections_order';
 const SECTION_OPEN_KEY = 'cst_section_open_';
 let store = { symbols: {}, symbolOrder: [] };
-let sectionsOrder = [1, 2, 3, 4]; // ترتیب پیش‌فرض
+let sectionsOrder = [1, 2, 3, 4];
 let lastAlertShownAt = 0;
 const ALERT_THROTTLE_MS = 3000;
-// متن راهنما
+
 const GUIDE_TEXT = `### راهنمای سریع چارت میله‌ای زاویه روند (CST Analyzer)
 
 **چی نشون می‌ده؟** هر میله یک "روز" رو نمایش می‌ده و ارتفاعش **تفاوت زاویه شیب قیمت (Mid)** نسبت به روز قبله.
@@ -987,6 +690,7 @@ const GUIDE_TEXT = `### راهنمای سریع چارت میله‌ای زاو�
 - **صفر/کوچک (خاکستری):** روند ثابت یا فشردگی → منتظر شکست باش.
 **نکات استفاده:** Hover کن تا "تفاوت" و "زاویه امروز" رو ببینی. خط افقی رو بکش برای مقایسه سطوح.
 اگر میله‌های قرمز/سبز بزرگ دیدی، چک کن تحلیل ۵‌روزه رو – احتمال تغییر روند زیاده! 🚀`;
+
 // ---------- Drag & Drop برای جفت‌ارزها ----------
 function refreshSymbolsList(){
   const container = document.getElementById('symbolsList');
@@ -1069,24 +773,18 @@ function setupFreeDragAndDrop(container) {
 
     chip.addEventListener('dragend', function() {
       this.classList.remove('dragging');
-      
-      
       if (placeholder && placeholder.parentNode) {
         placeholder.parentNode.removeChild(placeholder);
       }
-      
       draggedItem = null;
       placeholder = null;
-      
       updateSymbolOrderFromFreeDOM();
     });
   });
   container.addEventListener('dragover', function(e) {
     e.preventDefault();
     if (!draggedItem) return;
-    
     const afterElement = getFreeDragAfterElement(container, e.clientX, e.clientY);
-    
     if (afterElement == null) {
       container.appendChild(placeholder);
     } else {
@@ -1096,16 +794,13 @@ function setupFreeDragAndDrop(container) {
   container.addEventListener('drop', function(e) {
     e.preventDefault();
     if (!draggedItem) return;
-    
     if (placeholder && placeholder.parentNode) {
       container.insertBefore(draggedItem, placeholder);
       placeholder.parentNode.removeChild(placeholder);
     }
-    
     draggedItem.classList.remove('dragging');
     draggedItem = null;
     placeholder = null;
-    
     updateSymbolOrderFromFreeDOM();
   });
 }
@@ -1116,9 +811,7 @@ function getFreeDragAfterElement(container, x, y) {
     const box = child.getBoundingClientRect();
     const offsetX = x - box.left - box.width / 2;
     const offsetY = y - box.top - box.height / 2;
-    
     const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
-    
     if (distance < 100 && distance > closest.distance) {
       return { distance: distance, element: child };
     } else {
@@ -1134,7 +827,6 @@ function updateSymbolOrderFromFreeDOM() {
   
   store.symbolOrder = newOrder;
   saveStore();
-  
   refreshSymbolDropdown();
 }
 
@@ -1175,7 +867,11 @@ function ensureSymbol(name){
   return store.symbols[name];
 }
 
-function computeMid(high, low){ return (high + low) / 2; }
+// تابع محاسبه Mid - اصلاح شده برای استفاده از Math.floor
+function computeMid(high, low){ 
+    // استفاده از Floor برای حذف اعشار ناخواسته (مثل .5)
+    return Math.floor((high + low) / 2); 
+}
 
 function analyzeAnglesFor(midArray, windows=5){
   if(!midArray || midArray.length < 2) return {angles:[], avgAbs:0, verdict:'داده کافی نیست'};
@@ -1209,18 +905,29 @@ function analyzeAnglesFor(midArray, windows=5){
   return {angles, avgAbs, verdict};
 }
 
-function addDayToSymbol(symName, high, low, dateStr=null){
+function addDayToSymbol(symName, highInput, lowInput, dateStr=null){
   const sym = store.symbols[symName]; if(!sym) return false;
-  const h = parseFloat(high);
-  const l = parseFloat(low);
-  if(isNaN(h) || isNaN(l)) return false;
-  const mid = computeMid(h,l);
-  const rec = { date: dateStr ||
-  new Date().toISOString().slice(0,10), high:h, low:l, mid };
+  
+  const highResult = parseNumWithFormat(highInput);
+  const lowResult = parseNumWithFormat(lowInput);
+  
+  if(highResult.numeric === null || lowResult.numeric === null) return false;
+  
+  const mid = computeMid(highResult.numeric, lowResult.numeric);
+  const rec = { 
+    date: dateStr || new Date().toISOString().slice(0,10), 
+    high: highResult.numeric, 
+    low: lowResult.numeric, 
+    mid,
+    // ذخیره فرمت اصلی برای ارجاع
+    originalHigh: highResult.original || String(highResult.numeric),
+    originalLow: lowResult.original || String(lowResult.numeric)
+  };
   sym.history.push(rec);
   
   recomputeAnalysesForSymbol(sym);
-  saveStore(); return true;
+  saveStore(); 
+  return true;
 }
 
 function recomputeAnalysesForSymbol(sym){
@@ -1233,11 +940,10 @@ function recomputeAnalysesForSymbol(sym){
   const mids = sym.history.map(r=>r.mid);
   const last5 = analyzeAnglesFor(mids, Math.min(5,mids.length));
   const last30 = analyzeAnglesFor(mids, Math.min(30,mids.length));
-  sym.lastSummary = { date: (sym.history[sym.history.length-1]||{}).date ||
-  '', last5:last5.verdict, last30:last30.verdict, avgAngle5:last5.avgAbs, avgAngle30:last30.avgAbs };
+  sym.lastSummary = { date: (sym.history[sym.history.length-1]||{}).date || '', 
+    last5:last5.verdict, last30:last30.verdict, avgAngle5:last5.avgAbs, avgAngle30:last30.avgAbs };
 }
 
-// تابع بهینه‌شده برای تنظیم عرض خطوط افقی (استخراج‌شده از resize)
 function resizeHorizontalLines() {
   ['horizontalLineContainerBar', 'horizontalLineContainerLine'].forEach(id => {
     const lineContainer = document.getElementById(id);
@@ -1247,8 +953,7 @@ function resizeHorizontalLines() {
       if (chartCont) {
         const canvas = chartCont.querySelector('canvas');
         if (canvas) {
-          const rect = 
-            canvas.getBoundingClientRect();
+          const rect = canvas.getBoundingClientRect();
           wrapper.style.width = rect.width + 'px';
           const line = wrapper.querySelector('.horizontal-line');
           if (line) {
@@ -1278,12 +983,10 @@ function renderSummaryForRange(symName, isDaysRange = true, requestedDays = 5, s
 
   if (isDaysRange) {
     displayHist = hist.slice(-requestedDays);
-    // پشتیبانی از بازه‌های بزرگ (مثل 30+ روز)
     const mids = displayHist.map(h => h.mid);
     analysis = analyzeAnglesFor(mids, requestedDays);
     angles = analysis.angles;
   } else {
-    // Filter by date range
     displayHist = hist.filter(record => {
       const recordDate = new Date(record.date);
       const start = new Date(startDate);
@@ -1301,37 +1004,36 @@ function renderSummaryForRange(symName, isDaysRange = true, requestedDays = 5, s
     angles = analysis.angles;
   }
 
-  // خلاصه متن
   const rangeText = isDaysRange ? `${requestedDays} روزه` : `تاریخ ${startDate} تا ${endDate}`;
   summaryText.innerHTML = `
-    <div>نتیجه تحلیل: ${analysis.verdict ||
-    '-'} <br>
+    <div>نتیجه تحلیل: ${analysis.verdict || '-'} <br>
     زاویه میانگین: ${analysis.avgAbs.toFixed(2)}° <br>
     (تعداد داده‌ها: ${displayHist.length})</div>
   `;
-  // باکس نمایش اطلاعات بصورت اعداد (جدول)
+  
   tableBody.innerHTML = '';
   for (let i = displayHist.length - 1; i >= 0; i--) {
     const r = displayHist[i];
     const rowIndex = displayHist.length - i;
-    // Find angle for this interval (between i and i+1)
     const angleIndex = displayHist.length - 1 - i;
-    // Reverse index for angles
     const angle = angleIndex < angles.length ? angles[angleIndex] : null;
-    // Find original index for operations
     const originalIdx = hist.findIndex(origRec => origRec.date === r.date && origRec.high === r.high && origRec.low === r.low);
+    
+    // استفاده از تابع فرمت‌دهی هوشمند جدید
+    const displayHigh = formatNumberSmart(r.high, symName, r.originalHigh);
+    const displayLow = formatNumberSmart(r.low, symName, r.originalLow);
+    const displayMid = formatNumberSmart(r.mid, symName, r.originalHigh); // استفاده از فرمت High برای Mid
+    
     const row = document.createElement('tr');
     row.dataset.idx = originalIdx;
     row.innerHTML = `
       <td>${rowIndex}</td>
       <td>${r.date}</td>
-      <td>${r.high}</td>
-      <td>${r.low}</td>
-      <td>${r.mid.toFixed(2)}</td>
-      <td>${angle ?
-      angle.toFixed(2) + '°' : '-'}</td>
-      <td>${r.analysis5 ||
-      ''}</td>
+      <td>${displayHigh}</td>
+      <td>${displayLow}</td>
+      <td>${displayMid}</td>
+      <td>${angle ? angle.toFixed(2) + '°' : '-'}</td>
+      <td>${r.analysis5 || ''}</td>
       <td class="action-col">
         <button class="icon-btn edit-btn" data-idx="${originalIdx}">✏️</button>
         <button class="icon-btn del-btn" data-idx="${originalIdx}">❌</button>
@@ -1341,7 +1043,6 @@ function renderSummaryForRange(symName, isDaysRange = true, requestedDays = 5, s
     tableBody.appendChild(row);
   }
 
-  // Event listeners for table
   tableBody.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', () => openEditModal(symName, parseInt(btn.dataset.idx))));
   tableBody.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', () => {
     if (!confirm('آیا می‌خواهی این رکورد حذف شود؟')) return;
@@ -1353,18 +1054,13 @@ function renderSummaryForRange(symName, isDaysRange = true, requestedDays = 5, s
   }));
   tableBody.querySelectorAll('.move-btn').forEach(btn => btn.addEventListener('click', () => openMoveModal(symName, parseInt(btn.dataset.idx))));
 
-  // باکس نمودار میله‌ای: هر روز یک میله بر اساس تفاوت زاویه نسبت به روز قبل (خام، بدون scaling - مثبت/منفی)
   const displayDates = displayHist.map(h => h.date).slice(1);
-  // از دومین تاریخ (تعداد میله‌ها = تعداد زاویه‌ها)
   
-  // محاسبه diffAngles: تفاوت هر زاویه با قبلی (برای هر روز جز اولین)
   const diffAngles = [];
-  const absoluteAnglesForTooltip = []; // زاویه مطلق برای tooltip
+  const absoluteAnglesForTooltip = [];
   if (angles.length > 0) {
-    // اولین میله: زاویه مطلق (base)
     diffAngles.push(angles[0]);
     absoluteAnglesForTooltip.push(angles[0]);
-    // بقیه: تفاوت
     for (let i = 1; i < angles.length; i++) {
       const diff = angles[i] - angles[i - 1];
       diffAngles.push(diff);
@@ -1375,10 +1071,7 @@ function renderSummaryForRange(symName, isDaysRange = true, requestedDays = 5, s
     absoluteAnglesForTooltip.push(0);
   }
 
-  // محاسبه maxAbs برای symmetric scale (از -maxAbs تا +maxAbs)
   const maxAbsDiff = Math.max(...diffAngles.map(Math.abs), 1);
-  // حداقل 1 برای جلوگیری از صفر
-
   const ctxBar = document.getElementById('angleBarChart').getContext('2d');
   if (window._barChart) window._barChart.destroy();
   window._barChart = new Chart(ctxBar, {
@@ -1389,8 +1082,7 @@ function renderSummaryForRange(symName, isDaysRange = true, requestedDays = 5, s
         label: 'تفاوت زاویه نسبت به روز قبل (درجه)',
         data: diffAngles,
         backgroundColor: diffAngles.map(diff => diff > 0 ? 'rgba(16, 185, 129, 0.6)' : (diff < 0 ? 'rgba(239, 68, 68, 0.6)' : 'rgba(156, 163, 175, 0.6)')),
-        borderColor: diffAngles.map(diff => diff > 0 ? '#10b981' 
-          : (diff < 0 ? '#ef4444' : '#9ca3af')),
+        borderColor: diffAngles.map(diff => diff > 0 ? '#10b981' : (diff < 0 ? '#ef4444' : '#9ca3af')),
         borderWidth: 1
       }]
     },
@@ -1407,20 +1099,19 @@ function renderSummaryForRange(symName, isDaysRange = true, requestedDays = 5, s
               const absAngle = absoluteAnglesForTooltip[idx];
               return `تفاوت: ${diff.toFixed(2)}° | زاویه امروز: ${absAngle.toFixed(2)}°`;
             }
-           }
+          }
         }
       },
       scales: {
         y: {
-          beginAtZero: true, // از 0 برای مقایسه آسان
-          min: -maxAbsDiff * 1.1, // symmetric: پایین تا -1.1 * max
-          max: maxAbsDiff * 1.1, // بالا تا +1.1 * max
+          beginAtZero: true,
+          min: -maxAbsDiff * 1.1,
+          max: maxAbsDiff * 1.1,
            ticks: { 
             color: '#9fb3c8',
-            stepSize: Math.max(0.5, maxAbsDiff / 10), // گام کوچک برای دیدن تفاوت‌های ریز
+            stepSize: Math.max(0.5, maxAbsDiff / 10),
             callback: function(value) {
               return value.toFixed(1);
-              // 1 رقم اعشار برای دقت
             }
           },
           grid: { color: 'rgba(159, 179, 200, 0.1)' }
@@ -1432,9 +1123,8 @@ function renderSummaryForRange(symName, isDaysRange = true, requestedDays = 5, s
       }
     }
   });
-  // Force resize after creation
   window._barChart.resize();
-  // باکس نمودار هندسی (Line Chart برای Mid)
+  
   const chartLabels = displayHist.map(h => h.date);
   const chartMids = displayHist.map(h => h.mid);
   const ctx = document.getElementById('midChart').getContext('2d');
@@ -1459,23 +1149,19 @@ function renderSummaryForRange(symName, isDaysRange = true, requestedDays = 5, s
       } 
     }
   });
-  // Force resize after creation
   window._chart.resize();
-  // Cleanup و ایجاد خط افقی برای چارت میله‌ای
+  
   cleanupLineHandlers('horizontalLineContainerBar');
   createDraggableHorizontalLine('horizontalLineContainerBar', '.bar-chart-isolated canvas', true);
-  // Cleanup و ایجاد خط افقی برای چارت خطی (mid)
   cleanupLineHandlers('horizontalLineContainerLine');
   createDraggableHorizontalLine('horizontalLineContainerLine', '#midChart', false);
-  // Force initial resize for lines after creation
+  
   setTimeout(resizeHorizontalLines, 50);
 
   summaryDiv.style.display = 'block';
   setupTableDragScroll();
-  // تنظیم اسکرول drag
 }
 
-// تابع باز کردن modal راهنما
 function openGuideModal() {
   document.getElementById('guideContent').innerHTML = GUIDE_TEXT;
   document.getElementById('modalBg').style.display = 'block';
@@ -1487,7 +1173,6 @@ function closeGuideModal() {
   document.getElementById('modalBg').style.display = 'none';
 }
 
-// تابع cleanup handlerهای قبلی
 function cleanupLineHandlers(containerId) {
   const container = document.getElementById(containerId);
   if (container && container.children.length > 0 && container.children[0]._localHandlers) {
@@ -1497,22 +1182,18 @@ function cleanupLineHandlers(containerId) {
   }
 }
 
-// تابع ایجاد خط افقی draggable (بهینه‌شده برای موبایل: تنظیم اولیه عرض با timeout)
 function createDraggableHorizontalLine(containerId, canvasSelector, isBarChart) {
   const container = document.getElementById(containerId);
   if (!container) return;
   const canvas = document.querySelector(canvasSelector);
   if (!canvas) return;
   const chartCont = canvas.parentElement;
-  // parent container
-  container.innerHTML = ''; // پاک کردن قبلی
+  container.innerHTML = '';
 
-  // wrapper برای hit area (20px ارتفاع، نامرئی) - unique per chart
   const wrapper = document.createElement('div');
   wrapper.className = 'horizontal-line-wrapper'; wrapper.style.pointerEvents = 'auto';
-  wrapper.style.top = '50%'; // موقعیت اولیه وسط چارت
+  wrapper.style.top = '50%';
   wrapper.style.transform = 'translateY(-50%)';
-  // خط اصلی داخل wrapper (1px نازک)
   const line = document.createElement('div');
   line.className = 'horizontal-line';
   line.style.position = 'absolute';
@@ -1522,20 +1203,17 @@ function createDraggableHorizontalLine(containerId, canvasSelector, isBarChart) 
 
   const guide = document.createElement('div');
   guide.className = 'line-guide';
-  guide.textContent = isBarChart ?
-  'خط میله‌ای: برای تنظیم سطح زاویه' : 'خط Mid: برای مقایسه قیمت';
+  guide.textContent = isBarChart ? 'خط میله‌ای: برای تنظیم سطح زاویه' : 'خط Mid: برای مقایسه قیمت';
   line.appendChild(guide);
 
   wrapper.appendChild(line);
   container.appendChild(wrapper);
-  // Set initial width (optimized for mobile: check rect, fallback to timeout)
   const setInitialWidth = () => {
     const rect = canvas.getBoundingClientRect();
     if (rect.width > 0) {
       wrapper.style.width = rect.width + 'px';
       line.style.width = rect.width + 'px';
     } else {
-      // Fallback for initial render on mobile (width=0)
       setTimeout(() => {
         const rect2 = canvas.getBoundingClientRect();
         if (rect2.width > 0) {
@@ -1547,7 +1225,6 @@ function createDraggableHorizontalLine(containerId, canvasSelector, isBarChart) 
   };
   setInitialWidth();
 
-  // observe resizes to keep width in sync (use ResizeObserver if available)
   if (typeof ResizeObserver !== 'undefined') {
     const ro = new ResizeObserver(() => {
       setInitialWidth();
@@ -1557,7 +1234,6 @@ function createDraggableHorizontalLine(containerId, canvasSelector, isBarChart) 
     window.addEventListener('resize', setInitialWidth);
   }
 
-  // Local drag state
   let isDragging = false;
   let startY = 0;
   let startTop = 50;
@@ -1568,7 +1244,6 @@ function createDraggableHorizontalLine(containerId, canvasSelector, isBarChart) 
     return e.clientY;
   };
 
-  // pointer start (mouse)
   const onPointerDown = (e) => {
     if (e.type === 'mousedown' && e.button !== 0) return;
     e.stopPropagation();
@@ -1596,20 +1271,16 @@ function createDraggableHorizontalLine(containerId, canvasSelector, isBarChart) 
     document.body.style.userSelect = '';
   };
 
-  // Mouse events
   wrapper.addEventListener('mousedown', onPointerDown, { passive: false });
   document.addEventListener('mousemove', onPointerMove, { passive: false });
   document.addEventListener('mouseup', onPointerUp, { passive: false });
-  // Touch events
   wrapper.addEventListener('touchstart', onPointerDown, { passive: false });
   document.addEventListener('touchmove', onPointerMove, { passive: false });
   document.addEventListener('touchend', onPointerUp, { passive: false });
 
-  // Store handlers for cleanup if needed
   wrapper._localHandlers = { onPointerMove, onPointerUp, onPointerDown };
 }
 
-// ---------- اسکرول drag برای جدول ----------
 function setupTableDragScroll() {
   const container = document.getElementById('tableContainer');
   let isDragging = false;
@@ -1633,8 +1304,7 @@ function setupTableDragScroll() {
 
     isDragging = true;
     startX = e.pageX - container.offsetLeft;
-    scrollLeft = 
-      container.scrollLeft;
+    scrollLeft = container.scrollLeft;
     container.classList.add('dragging');
     e.preventDefault();
   });
@@ -1682,7 +1352,7 @@ document.getElementById('deleteSelectedSymbol').addEventListener('click', ()=>{
   if(window._barChart) window._barChart.destroy();
   if (window._chart) window._chart.destroy();
 });
-  document.getElementById('addSymbolBtn').addEventListener('click', ()=>{
+document.getElementById('addSymbolBtn').addEventListener('click', ()=>{
   const name = document.getElementById('newSymbol').value.trim().toUpperCase();
   if(!name){ showToast('نام معتبر وارد کنید'); return; }
   const sym = ensureSymbol(name);
@@ -1692,39 +1362,59 @@ document.getElementById('deleteSelectedSymbol').addEventListener('click', ()=>{
     renderSummaryForRange(name, true, 5);
   }
 });
-  document.getElementById('useMidBtn').addEventListener('click', ()=>{
-  const h = parseNum(document.getElementById('inputHigh').value);
-  const l = parseNum(document.getElementById('inputLow').value);
-  if(h===null && l===null){ showToast('ابتدا مقدار Mid یا High/Low را وارد کنید'); return; }
-  if(h===null) document.getElementById('inputHigh').value = String(l);
-  if(l===null) document.getElementById('inputLow').value = String(h);
+document.getElementById('useMidBtn').addEventListener('click', ()=>{
+  const highInput = document.getElementById('inputHigh').value;
+  const lowInput = document.getElementById('inputLow').value;
+  
+  const hResult = parseNumWithFormat(highInput);
+  const lResult = parseNumWithFormat(lowInput);
+  
+  if(hResult.numeric === null && lResult.numeric === null){ 
+    showToast('ابتدا مقدار Mid یا High/Low را وارد کنید'); 
+    return; 
+  }
+  
+  if(hResult.numeric === null && lResult.numeric !== null) {
+    document.getElementById('inputHigh').value = lResult.original || String(lResult.numeric);
+  }
+  
+  if(lResult.numeric === null && hResult.numeric !== null) {
+    document.getElementById('inputLow').value = hResult.original || String(hResult.numeric);
+  }
 });
-  document.getElementById('addDayBtn').addEventListener('click', ()=>{
+document.getElementById('addDayBtn').addEventListener('click', ()=>{
   const symName = document.getElementById('selectedSymbol').value;
   if(!symName){ showToast('ابتدا یک جفت را انتخاب کنید'); return; }
-  const high = parseNum(document.getElementById('inputHigh').value);
-  const low = parseNum(document.getElementById('inputLow').value);
+  const high = document.getElementById('inputHigh').value;
+  const low = document.getElementById('inputLow').value;
   const date = document.getElementById('inputDate').value || null;
-  if(high===null || low===null){ showToast('High و Low معتبر وارد کنید'); return; }
+  
+  if(!high || !low){ showToast('High و Low معتبر وارد کنید'); return; }
+  
   const ok = addDayToSymbol(symName, high, low, date);
-  if(ok){ showToast('ثبت شد'); renderSummaryForRange(symName, true, 5); document.getElementById('inputHigh').value = ''; document.getElementById('inputLow').value = ''; 
-      // حرکت خودکار به جفت‌ارز بعدی
-      const idx = store.symbolOrder.indexOf(symName);
-      if(idx !== -1 && idx + 1 < store.symbolOrder.length){
-          const next = store.symbolOrder[idx + 1];
-          document.getElementById('selectedSymbol').value = next;
-          document.getElementById('selectedSymbol3').value = next;
-      }
-}
+  if(ok){ 
+    showToast('ثبت شد'); 
+    renderSummaryForRange(symName, true, 5); 
+    document.getElementById('inputHigh').value = ''; 
+    document.getElementById('inputLow').value = ''; 
+    
+    const idx = store.symbolOrder.indexOf(symName);
+    if(idx !== -1 && idx + 1 < store.symbolOrder.length){
+      const next = store.symbolOrder[idx + 1];
+      document.getElementById('selectedSymbol').value = next;
+      document.getElementById('selectedSymbol3').value = next;
+    }
+  }
   else showToast('خطا در ثبت');
 });
-  document.getElementById('daysRangeToggle').addEventListener('click', () => {
+
+document.getElementById('daysRangeToggle').addEventListener('click', () => {
   document.getElementById('daysRangeSection').style.display = 'block';
   document.getElementById('dateRangeSection').style.display = 'none';
   document.getElementById('daysRangeToggle').classList.add('active');
   document.getElementById('dateRangeToggle').classList.remove('active');
 });
-  document.getElementById('dateRangeToggle').addEventListener('click', () => {
+document.getElementById('dateRangeToggle').addEventListener('click', () => {
   document.getElementById('daysRangeSection').style.display = 'none';
   document.getElementById('dateRangeSection').style.display = 'block';
   document.getElementById('dateRangeToggle').classList.add('active');
@@ -1737,7 +1427,7 @@ document.getElementById('deleteSelectedSymbol').addEventListener('click', ()=>{
   document.getElementById('endDate').value = endDate.toISOString().slice(0,10);
   document.getElementById('startDate').value = startDate.toISOString().slice(0,10);
 });
-  document.getElementById('showDateRangeBtn').addEventListener('click', ()=>{
+document.getElementById('showDateRangeBtn').addEventListener('click', ()=>{
   const symName = document.getElementById('selectedSymbol3').value;
   if(!symName){ showToast('یک جفت انتخاب کنید'); return; }
   const startDate = document.getElementById('startDate').value;
@@ -1748,13 +1438,13 @@ document.getElementById('deleteSelectedSymbol').addEventListener('click', ()=>{
   
   renderSummaryForRange(symName, false, null, startDate, endDate);
 });
-  document.getElementById('showHistoryBtn').addEventListener('click', ()=>{
+document.getElementById('showHistoryBtn').addEventListener('click', ()=>{
   const symName = document.getElementById('selectedSymbol3').value;
   if(!symName){ showToast('یک جفت انتخاب کنید'); return; }
   const requestedDays = parseInt(document.getElementById('analysisDays').value) || 5;
   renderSummaryForRange(symName, true, requestedDays);
 });
-  document.getElementById('selectedSymbol3').addEventListener('change', () => {
+document.getElementById('selectedSymbol3').addEventListener('change', () => {
   const symName = document.getElementById('selectedSymbol3').value;
   const isDaysRange = document.getElementById('daysRangeToggle').classList.contains('active');
   if (isDaysRange) {
@@ -1768,14 +1458,14 @@ document.getElementById('deleteSelectedSymbol').addEventListener('click', ()=>{
     }
   }
 });
-  document.getElementById('analysisDays').addEventListener('change', () => {
+document.getElementById('analysisDays').addEventListener('change', () => {
   const symName = document.getElementById('selectedSymbol3').value;
   if (symName && document.getElementById('daysRangeToggle').classList.contains('active')) {
     const requestedDays = parseInt(document.getElementById('analysisDays').value) || 5;
     renderSummaryForRange(symName, true, requestedDays);
   }
 });
-  document.getElementById('manualPruneBtn').addEventListener('click', function() {
+document.getElementById('manualPruneBtn').addEventListener('click', function() {
   const days = parseInt(document.getElementById('manualPruneDays').value) || 365;
   if (days < 1) {
     showToast('تعداد روز باید بیشتر از ۰ باشد');
@@ -1788,7 +1478,6 @@ document.getElementById('deleteSelectedSymbol').addEventListener('click', ()=>{
       showToast(`✅ ${result.totalDeleted} رکورد قدیمی حذف شد.\nجفت‌ارزهای affected: ${result.affectedSymbols.join(', ')}`);
       const currentSymbol = document.getElementById('selectedSymbol3').value;
       if (currentSymbol) {
-    
         const isDaysRange = document.getElementById('daysRangeToggle').classList.contains('active');
         if (isDaysRange) {
           const requestedDays = parseInt(document.getElementById('analysisDays').value) || 5;
@@ -1812,7 +1501,6 @@ document.getElementById('closeStatsBtn').addEventListener('click', function() {
   document.getElementById('statsModal').style.display = 'none';
   document.getElementById('modalBg').style.display = 'none';
 });
-// تابع اعلان زیبا (toast) برای دانلود
 function showToast(message, type = 'success') {
   let toast = document.getElementById('toast');
   if (!toast) {
@@ -1845,104 +1533,129 @@ document.getElementById('exportBtn').addEventListener('click', ()=>{
     showToast('❌ خطا در دانلود فایل پشتیبان: ' + e.message, 'error');
   }
 });
-// اضافه کردن لیسنر برای دکمه جدید ورودی
 document.getElementById('importBtn').addEventListener('click', () => {
-    document.getElementById('importFile').click();
+  document.getElementById('importFile').click();
 });
-  document.getElementById('importFile').addEventListener('change', (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-        try {
-            let importedObj = JSON.parse(reader.result);
-            if (!importedObj || !importedObj.symbols) {
-                showToast('فایل بک‌آپ معتبر نیست یا ساختار اشتباهی دارد.');
-     
-           return;
-            }
 
-            importedObj = sanitizeAndMigrateStore(importedObj);
+document.getElementById('importFile').addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      let importedObj = JSON.parse(reader.result);
+      if (!importedObj || !importedObj.symbols) {
+        showToast('فایل بک‌آپ معتبر نیست یا ساختار اشتباهی دارد.');
+        return;
+      }
 
-            if (confirm('می‌خواهی داده‌های فایل جایگزین کل داده‌ها شوند (OK) یا به داده‌های فعلی اضافه شوند (Cancel)؟')) {
-                store = importedObj;
-            } else {
-   
-              Object.keys(importedObj.symbols || {}).forEach(k => {
-                    store.symbols[k] = importedObj.symbols[k];
-                });
-                importedObj.symbolOrder.forEach(s => {
-                    if (!store.symbolOrder.includes(s)) {
-     
-                   store.symbolOrder.push(s);
-                    }
-                });
-             }
+      importedObj = sanitizeAndMigrateStore(importedObj);
 
-            saveStore();
-            refreshSymbolsList();
-            
-            const sel = document.getElementById('selectedSymbol');
-            const sel3 = document.getElementById('selectedSymbol3');
-            if (sel.options.length > 0 && sel.options[0].value) {
-                sel.value = sel.options[0].value;
-                sel3.value = sel.options[0].value;
-                const isDaysRange = document.getElementById('daysRangeToggle').classList.contains('active');
-                if (isDaysRange) {
-                  const requestedDays = parseInt(document.getElementById('analysisDays').value) ||
-                  5;
-                  renderSummaryForRange(sel.value, true, requestedDays);
-                } else {
-                  const startDate = document.getElementById('startDate').value;
-                  const endDate = document.getElementById('endDate').value;
-                  if (startDate && endDate) {
-                    renderSummaryForRange(sel.value, false, null, startDate, endDate);
-                  }
-                }
-            } else {
-                document.getElementById('summarySection').style.display = 'none';
-                if(window._barChart) window._barChart.destroy();
-                if (window._chart) window._chart.destroy();
-            }
+      if (confirm('می‌خواهی داده‌های فایل جایگزین کل داده‌ها شوند (OK) یا به داده‌های فعلی اضافه شوند (Cancel)؟')) {
+        store = importedObj;
+      } else {
+        Object.keys(importedObj.symbols || {}).forEach(k => {
+          store.symbols[k] = importedObj.symbols[k];
+        });
+        importedObj.symbolOrder.forEach(s => {
+          if (!store.symbolOrder.includes(s)) {
+            store.symbolOrder.push(s);
+          }
+        });
+      }
 
-            showToast('بازیابی اطلاعات با موفقیت انجام شد.');
-            e.target.value = '';
-
-        } catch (err) {
-            showToast('خطا در خواندن فایل: ' + err);
+      saveStore();
+      refreshSymbolsList();
+      
+      const sel = document.getElementById('selectedSymbol');
+      const sel3 = document.getElementById('selectedSymbol3');
+      if (sel.options.length > 0 && sel.options[0].value) {
+        sel.value = sel.options[0].value;
+        sel3.value = sel.options[0].value;
+        const isDaysRange = document.getElementById('daysRangeToggle').classList.contains('active');
+        if (isDaysRange) {
+          const requestedDays = parseInt(document.getElementById('analysisDays').value) || 5;
+          renderSummaryForRange(sel.value, true, requestedDays);
+        } else {
+          const startDate = document.getElementById('startDate').value;
+          const endDate = document.getElementById('endDate').value;
+          if (startDate && endDate) {
+            renderSummaryForRange(sel.value, false, null, startDate, endDate);
+          }
         }
-    };
-    reader.readAsText(f);
+      } else {
+        document.getElementById('summarySection').style.display = 'none';
+        if(window._barChart) window._barChart.destroy();
+        if (window._chart) window._chart.destroy();
+      }
+
+      showToast('بازیابی اطلاعات با موفقیت انجام شد.');
+      e.target.value = '';
+    } catch (err) {
+      showToast('خطا در خواندن فایل: ' + err);
+    }
+  };
+  reader.readAsText(f);
 });
 
-// بقیه event listeners بدون تغییر...
 let currentEdit = null;
-  function openEditModal(symName, idx){
+function openEditModal(symName, idx){
   const sym = store.symbols[symName]; if(!sym) return;
-  const rec = sym.history[idx]; if(!rec) return;
+  const rec = sym.history[idx];
+  if(!rec) return;
   currentEdit = { symName, idx };
+  
+  // نمایش با فرمت هوشمند در مودال ویرایش
+  const displayHigh = formatNumberSmart(rec.high, symName, rec.originalHigh);
+  const displayLow = formatNumberSmart(rec.low, symName, rec.originalLow);
+  
   document.getElementById('editDate').value = rec.date;
-  document.getElementById('editHigh').value = String(rec.high);
-  document.getElementById('editLow').value = String(rec.low);
+  document.getElementById('editHigh').value = displayHigh;
+  document.getElementById('editLow').value = displayLow;
   document.getElementById('modalBg').style.display = 'block';
   document.getElementById('editModal').style.display = 'block';
 }
-document.getElementById('cancelEditBtn').addEventListener('click', ()=>{ currentEdit = null; document.getElementById('editModal').style.display='none'; document.getElementById('modalBg').style.display='none'; });
-  document.getElementById('saveEditBtn').addEventListener('click', ()=>{
+
+document.getElementById('cancelEditBtn').addEventListener('click', ()=>{ 
+  currentEdit = null; 
+  document.getElementById('editModal').style.display='none'; 
+  document.getElementById('modalBg').style.display='none'; 
+});
+document.getElementById('saveEditBtn').addEventListener('click', ()=>{
   if(!currentEdit) return;
   const { symName, idx } = currentEdit;
   const sym = store.symbols[symName]; if(!sym) return;
+  
   const d = document.getElementById('editDate').value || new Date().toISOString().slice(0,10);
-  const h = parseNum(document.getElementById('editHigh').value);
-  const l = parseNum(document.getElementById('editLow').value);
-  if(h===null || l===null){ showToast('High و Low معتبر وارد کنید'); return; }
-  sym.history[idx].date = d; sym.history[idx].high = h; sym.history[idx].low = l; sym.history[idx].mid = computeMid(h,l);
-  recomputeAnalysesForSymbol(sym); saveStore();
-  currentEdit = null; document.getElementById('editModal').style.display='none'; document.getElementById('modalBg').style.display='none';
+  const highInput = document.getElementById('editHigh').value;
+  const lowInput = document.getElementById('editLow').value;
+  
+  const highResult = parseNumWithFormat(highInput);
+  const lowResult = parseNumWithFormat(lowInput);
+  
+  if(highResult.numeric === null || lowResult.numeric === null){ 
+    showToast('High و Low معتبر وارد کنید'); 
+    return; 
+  }
+  
+  sym.history[idx].date = d; 
+  sym.history[idx].high = highResult.numeric; 
+  sym.history[idx].low = lowResult.numeric; 
+  sym.history[idx].mid = computeMid(highResult.numeric, lowResult.numeric);
+  // ذخیره فرمت اصلی
+  sym.history[idx].originalHigh = highResult.original || String(highResult.numeric);
+  sym.history[idx].originalLow = lowResult.original || String(lowResult.numeric);
+  
+  recomputeAnalysesForSymbol(sym);
+  saveStore();
+  
+  currentEdit = null; 
+  document.getElementById('editModal').style.display='none'; 
+  document.getElementById('modalBg').style.display='none';
+  
   const isDaysRange = document.getElementById('daysRangeToggle').classList.contains('active');
   if (isDaysRange) {
-    const requestedDays = parseInt(document.getElementById('analysisDays').value) ||
-    5;
+    const requestedDays = parseInt(document.getElementById('analysisDays').value) || 5;
     renderSummaryForRange(symName, true, requestedDays);
   } else {
     const startDate = document.getElementById('startDate').value;
@@ -1962,7 +1675,12 @@ function openMoveModal(symName, idx){
   document.getElementById('modalBg').style.display = 'block';
   document.getElementById('moveModal').style.display = 'block';
 }
-document.getElementById('cancelMoveBtn').addEventListener('click', ()=>{ currentMove = null; document.getElementById('moveModal').style.display='none'; document.getElementById('modalBg').style.display='none'; });
+
+document.getElementById('cancelMoveBtn').addEventListener('click', ()=>{ 
+  currentMove = null; 
+  document.getElementById('moveModal').style.display='none'; 
+  document.getElementById('modalBg').style.display='none'; 
+});
 document.getElementById('doMoveBtn').addEventListener('click', ()=>{
   if(!currentMove) return;
   const { symName, idx } = currentMove;
@@ -1978,9 +1696,9 @@ document.getElementById('doMoveBtn').addEventListener('click', ()=>{
   const isDaysRange = document.getElementById('daysRangeToggle').classList.contains('active');
   if (isDaysRange) {
     const requestedDays = parseInt(document.getElementById('analysisDays').value) || 5;
-    renderSummaryForRange(symName, true, 
-    requestedDays);
+    renderSummaryForRange(symName, true, requestedDays);
   } else {
+    
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
     if (startDate && endDate) {
@@ -1992,9 +1710,11 @@ document.getElementById('doMoveBtn').addEventListener('click', ()=>{
 
 function speakTTS(text){
   if(!('speechSynthesis' in window)) return;
-  const ut = new SpeechSynthesisUtterance(text); ut.lang = 'fa-IR';
+  const ut = new SpeechSynthesisUtterance(text);
+  ut.lang = 'fa-IR';
   speechSynthesis.cancel(); speechSynthesis.speak(ut);
 }
+
 function playBeep(){
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2006,6 +1726,7 @@ function playBeep(){
     setTimeout(() => o.stop(), 400);
   } catch(e){}
 }
+
 function showAlertModal(title, body){
   const now = Date.now();
   if(now - lastAlertShownAt < ALERT_THROTTLE_MS) return;
@@ -2018,10 +1739,18 @@ function showAlertModal(title, body){
   if(mode === 'tts' || mode === 'both') speakTTS('احتمال تغییر روند');
   if(mode === 'beep' || mode === 'both') playBeep();
 }
-document.getElementById('closeAlert').addEventListener('click', ()=>{ document.getElementById('alertModal').style.display = 'none'; document.getElementById('modalBg').style.display='none'; });
-document.getElementById('testAlertBtn').addEventListener('click', ()=>{ showAlertModal('هشدار آزمایشی','این یک هشدار آزمایشی است'); });
-  function checkAndAlertIfChange(symName){
-  const sym = store.symbols[symName]; if(!sym || !sym.lastSummary) return;
+
+document.getElementById('closeAlert').addEventListener('click', ()=>{ 
+  document.getElementById('alertModal').style.display = 'none'; 
+  document.getElementById('modalBg').style.display='none'; 
+});
+document.getElementById('testAlertBtn').addEventListener('click', ()=>{ 
+  showAlertModal('هشدار آزمایشی','این یک هشدار آزمایشی است'); 
+});
+
+function checkAndAlertIfChange(symName){
+  const sym = store.symbols[symName];
+  if(!sym || !sym.lastSummary) return;
   const keyword = 'احتمال تغییر';
   const v5 = sym.lastSummary.last5 || ''; const v30 = sym.lastSummary.last30 || '';
   if((v5.includes(keyword)) || (v30.includes(keyword))){
@@ -2077,10 +1806,8 @@ function showSystemStats() {
       <div><strong>📊 آمار کلی سیستم:</strong></div>
       <div>• تعداد جفت‌ارزها: ${totalSymbols}</div>
       <div>• تعداد کل رکوردها: ${totalRecords}</div>
-      <div>• قدیمی‌ترین رکورد: ${oldestRecord ?
-      oldestRecord.toLocaleDateString('fa-IR') : '---'}</div>
-      <div>• جدیدترین رکورد: ${newestRecord ?
-      newestRecord.toLocaleDateString('fa-IR') : '---'}</div>
+      <div>• قدیمی‌ترین رکورد: ${oldestRecord ? oldestRecord.toLocaleDateString('fa-IR') : '---'}</div>
+      <div>• جدیدترین رکورد: ${newestRecord ? newestRecord.toLocaleDateString('fa-IR') : '---'}</div>
     </div>
     <div style="background:#071826;padding:10px;border-radius:6px;">
       <div><strong>🔧 وضعیت سیستم:</strong></div>
@@ -2094,7 +1821,6 @@ function showSystemStats() {
   document.getElementById('statsModal').style.display = 'block';
 }
 
-// اضافه کردن event listener برای تغییر سایز پنجره (بهینه‌شده)
 window.addEventListener('resize', function() {
   if (window._barChart) {
     window._barChart.resize();
@@ -2102,9 +1828,8 @@ window.addEventListener('resize', function() {
   if (window._chart) {
     window._chart.resize();
   }
-  resizeHorizontalLines(); // استفاده از تابع استخراج‌شده
+  resizeHorizontalLines();
 });
-// تابع toggle برای collapsible sections با ذخیره state (بهینه‌شده برای بخش ۲)
 function toggleSection(sectionId) {
   const card = document.querySelector(`[data-section="${sectionId}"]`);
   const content = card.querySelector('.collapsible-content');
@@ -2112,14 +1837,14 @@ function toggleSection(sectionId) {
   card.classList.toggle('open');
   content.style.display = isOpen ? 'none' : 'block';
   saveSectionOpenState(sectionId, !isOpen);
-  // بهینه‌سازی خاص برای بخش ۲: اگر باز می‌شود و summary نمایش داده شده، چارت‌ها و خطوط را بازسازی کن
-  if (sectionId === '2' && !isOpen) { // اگر قبلاً بسته بود و حالا باز می‌شود
+  
+  if (sectionId === '2' && !isOpen) {
     const symName = document.getElementById('selectedSymbol3').value;
     if (symName) {
       const isDaysRange = document.getElementById('daysRangeToggle').classList.contains('active');
       if (isDaysRange) {
         const requestedDays = parseInt(document.getElementById('analysisDays').value) || 5;
-        setTimeout(() => renderSummaryForRange(symName, true, requestedDays), 100); // timeout برای اطمینان از کامل شدن animation
+        setTimeout(() => renderSummaryForRange(symName, true, requestedDays), 100);
       } else {
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
@@ -2147,8 +1872,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const startDate = document.getElementById('startDate').value;
       const endDate = document.getElementById('endDate').value;
       
+ 
       if (startDate && endDate) {
-        
         renderSummaryForRange(sel.value, false, null, startDate, endDate);
       }
     }
@@ -2168,10 +1893,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
-  if('speechSynthesis' in window){ window.speechSynthesis.onvoiceschanged = () => {};
+  
+  if('speechSynthesis' in window){ 
+    window.speechSynthesis.onvoiceschanged = () => {};
   }
 
-  // لود state باز/بسته بخش‌ها از localStorage (پیش‌فرض بسته)
   document.querySelectorAll('.collapsible-card').forEach(card => {
     const sectionId = card.dataset.section;
     const isOpen = loadSectionOpenState(sectionId);
@@ -2185,21 +1911,35 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Functions for store and sections (unchanged)
 function sanitizeAndMigrateStore(data) {
-    if (!data.symbols) data.symbols = {};
-    if (!data.symbolOrder || !Array.isArray(data.symbolOrder)) {
-        data.symbolOrder = Object.keys(data.symbols);
-    } else {
-        const symbolKeys = new Set(Object.keys(data.symbols));
-        data.symbolOrder = data.symbolOrder.filter(s => symbolKeys.has(s));
-        symbolKeys.forEach(s => {
-            if (!data.symbolOrder.includes(s)) {
-                data.symbolOrder.push(s);
-            }
-        });
+  if (!data.symbols) data.symbols = {};
+  if (!data.symbolOrder || !Array.isArray(data.symbolOrder)) {
+    data.symbolOrder = Object.keys(data.symbols);
+  } else {
+    const symbolKeys = new Set(Object.keys(data.symbols));
+    data.symbolOrder = data.symbolOrder.filter(s => symbolKeys.has(s));
+    symbolKeys.forEach(s => {
+      if (!data.symbolOrder.includes(s)) {
+        data.symbolOrder.push(s);
+      }
+    });
+  }
+  
+  // مهاجرت: اگر رکوردهای قدیمی فیلد original ندارند، آنها را ایجاد کن
+  Object.values(data.symbols).forEach(symbol => {
+    if (symbol.history) {
+      symbol.history.forEach(record => {
+        if (!record.originalHigh) {
+          record.originalHigh = String(record.high);
+        }
+        if (!record.originalLow) {
+          record.originalLow = String(record.low);
+        }
+      });
     }
-    return data;
+  });
+  
+  return data;
 }
 
 function loadStore(){
@@ -2215,7 +1955,8 @@ function loadStore(){
   store = sanitizeAndMigrateStore(s);
 }
 
-function saveStore(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+function saveStore(){ 
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
 }
 
 function loadSectionsOrder() {
