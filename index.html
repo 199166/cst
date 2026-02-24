@@ -407,17 +407,18 @@
             opacity: 0.9;
         }
         
-        body.desktop .tabs-container.icons-only .tab {
+        /* Updated Manual Toggle for Icons Only */
+        .tabs-container.icons-only .tab {
             padding: 12px 14px;
             min-width: 55px;
             justify-content: center;
         }
         
-        body.desktop .tabs-container.icons-only .tab-text {
+        .tabs-container.icons-only .tab-text {
             display: none !important;
         }
         
-        body.desktop .tabs-container.icons-only .tab i {
+        .tabs-container.icons-only .tab i {
             font-size: 1.4rem;
             margin: 0;
         }
@@ -1005,6 +1006,13 @@
                     <input type="checkbox" id="glassSwitch" checked> فعال
                 </label>
             </div>
+            
+            <div class="settings-section">
+                <h3>نمایش فقط آیکون تب‌ها</h3>
+                <label class="glass-switch">
+                    <input type="checkbox" id="iconOnlySwitch"> فعال
+                </label>
+            </div>
 
             <div class="settings-section mobile-only">
                 <h3>رنگ تک‌رنگ (موبایل)</h3>
@@ -1065,16 +1073,24 @@
             document.getElementById("popupOverlay").style.display = "none";
         }
 
-        // ==================== RESPONSIVE TABS FOR DESKTOP ONLY ====================
+        // ==================== RESPONSIVE TABS ====================
         function handleDesktopResponsiveTabs() {
             const tabsContainer = document.getElementById('tabsContainer');
             const windowWidth = window.innerWidth;
+            
+            // اگر کاربر حالت دستی آیکون را فعال کرده باشد
+            if (document.body.classList.contains('force-icons-only')) {
+                tabsContainer.classList.add('icons-only');
+                return;
+            }
             
             if (document.body.classList.contains('desktop')) {
                 tabsContainer.classList.remove('icons-only');
                 if (windowWidth <= 600) {
                     tabsContainer.classList.add('icons-only');
                 }
+            } else {
+                tabsContainer.classList.remove('icons-only');
             }
         }
 
@@ -1177,11 +1193,13 @@
                 if (settings.colorType) {
                     document.querySelector(`input[name="colorType"][value="${settings.colorType}"]`).checked = true;
                 }
-                document.getElementById('glassSwitch').checked = settings.glass;
+                document.getElementById('glassSwitch').checked = settings.glass !== false;
+                document.getElementById('iconOnlySwitch').checked = settings.iconOnly === true;
             } else {
                 document.getElementById('presetSelect').value = 'light';
                 document.getElementById('hexInput').value = '#735af2';
                 document.getElementById('colorInput').value = '#735af2';
+                document.getElementById('iconOnlySwitch').checked = false;
             }
             setTimeout(() => validateAndUpdateSaveButton(document.documentElement.style.getPropertyValue('--bg-gradient') || '#735af2'), 100);
         }
@@ -1198,6 +1216,14 @@
             }
             root.style.setProperty('--glass-border', settings.glass ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)');
             root.setAttribute('data-glass', settings.glass ? 'true' : 'false');
+
+            if (settings.iconOnly) {
+                document.body.classList.add('force-icons-only');
+                document.getElementById('tabsContainer').classList.add('icons-only');
+            } else {
+                document.body.classList.remove('force-icons-only');
+                handleDesktopResponsiveTabs();
+            }
 
             updateThemeColor();
         }
@@ -1260,6 +1286,7 @@
             const primary = hex.startsWith('#') ? hex : '#' + hex;
             const colorType = document.querySelector('input[name="colorType"]:checked').value;
             const glass = document.getElementById('glassSwitch').checked;
+            const iconOnly = document.getElementById('iconOnlySwitch').checked;
             let gradient = primary;
 
             if (colorType === 'gradient' && !isMobileDevice()) {
@@ -1278,7 +1305,8 @@
                 primary,
                 gradient,
                 colorType,
-                glass
+                glass,
+                iconOnly
             };
             localStorage.setItem('themeSettings', JSON.stringify(settings));
             applyTheme(settings);
@@ -1450,7 +1478,6 @@
         // ==================== OPTIMIZED SMART TOOLTIP (UPDATED) ====================
         const tooltip = document.getElementById('tabTooltip');
         
-        // This function checks if we are in icon mode (where text is hidden)
         function isIconsOnlyMode() {
             const tabsContainer = document.getElementById('tabsContainer');
             return tabsContainer && tabsContainer.classList.contains('icons-only');
@@ -1458,10 +1485,6 @@
 
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('mousemove', function(e) {
-                // IMPORTANT: Only show tooltip if text is hidden.
-                // In this codebase, the text is hidden when the 'icons-only' class 
-                // is applied to the container (which only happens in desktop mode on small widths).
-                // If this class is missing (e.g. mobile or wide desktop), text is visible, so NO tooltip.
                 if (!document.getElementById('tabsContainer').classList.contains('icons-only')) return;
 
                 const tooltipText = this.getAttribute('data-tooltip');
@@ -1470,51 +1493,35 @@
                 tooltip.textContent = tooltipText;
                 tooltip.classList.add('show');
 
-                // Get Dimensions
                 const tooltipRect = tooltip.getBoundingClientRect();
                 const winW = window.innerWidth;
                 const winH = window.innerHeight;
                 const mouseX = e.clientX;
                 const mouseY = e.clientY;
-                const gap = 15; // Distance from cursor
+                const gap = 15; 
 
                 let posX, posY;
 
-                // --- 1. Horizontal Logic (Left/Right) ---
-                // Rule: If mouse is on Right half -> Show Left. If mouse is on Left half -> Show Right.
                 if (mouseX > winW / 2) {
-                    // Mouse is on the Right side of screen -> Position Tooltip to the LEFT
                     posX = mouseX - tooltipRect.width - gap;
-                    
-                    // Safety: Don't go off the left edge of screen
                     if (posX < 5) posX = 5;
                 } else {
-                    // Mouse is on the Left side of screen -> Position Tooltip to the RIGHT
                     posX = mouseX + gap;
-                    
-                    // Safety: Don't go off the right edge of screen
                     if (posX + tooltipRect.width > winW - 5) {
                         posX = winW - tooltipRect.width - 5;
                     }
                 }
 
-                // --- 2. Vertical Logic (Bottom/Top) ---
-                // Rule: Try to show below mouse. If no space, flip to top.
                 if (mouseY + tooltipRect.height + gap < winH) {
-                    // Fits below
                     posY = mouseY + gap;
                 } else {
-                    // Doesn't fit below -> Show Above
                     posY = mouseY - tooltipRect.height - gap;
-                    
-                    // Safety: Don't go off top edge
                     if (posY < 5) posY = 5;
                 }
 
-                // Apply Positions
                 tooltip.style.left = posX + 'px';
                 tooltip.style.top = posY + 'px';
-                tooltip.style.transform = 'none'; // Overwrite any CSS transforms
+                tooltip.style.transform = 'none'; 
             });
             
             tab.addEventListener('mouseleave', function() {
