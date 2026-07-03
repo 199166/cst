@@ -902,16 +902,17 @@
             <h3>📱 راهنمای ورود</h3>
             <p>• اپلیکیشن Google Authenticator را باز کنید</p>
             <p>• کد ۶ رقمی مربوط به "CST-Robot" را پیدا کنید</p>
-            <p>• کد را در فیلد زیر وارد کنید</p>
+            <p>• کد را وارد کنید یا از رمز عبور استفاده کنید</p>
         </div>
         
         <div class="login-form" id="verifyForm">
             <div class="input-group">
-                <label for="otp">کد ۶ رقمی Google Authenticator:</label>
-                <input type="tel" id="otp" placeholder="کد ۶ رقمی" maxlength="6" required inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+                <label for="otp">کد ۶ رقمی Google Authenticator یا رمز عبور:</label>
+                <!-- محدودیت‌های تایپ عدد برداشته شد تا امکان ورود رمز عبور فراهم باشد -->
+                <input type="text" id="otp" placeholder="کد یا رمز عبور" required autocomplete="off">
             </div>
             <button type="button" class="login-btn" id="verifyOtpBtn">ورود به سیستم</button>
-            <div class="error-message" id="verifyError">کد نامعتبر است</div>
+            <div class="error-message" id="verifyError">کد یا رمز عبور نامعتبر است</div>
         </div>
         
         <div class="login-signature">
@@ -1074,7 +1075,6 @@
             const tabsContainer = document.getElementById('tabsContainer');
             const windowWidth = window.innerWidth;
             
-            // اگر کاربر حالت دستی آیکون را فعال کرده باشد
             if (document.body.classList.contains('force-icons-only')) {
                 tabsContainer.classList.add('icons-only');
                 return;
@@ -1169,7 +1169,6 @@
             } else {
                 saveBtn.disabled = true;
                 warning.style.display = 'block';
-                alert('⚠️ رنگ انتخابی باعث ناخوانایی متن‌ها، دکمه‌ها، تب‌ها و غیره می‌شه! لطفاً رنگ دیگه‌ای انتخاب کن تا کنتراست مناسب بشه.');
             }
         }
 
@@ -1178,6 +1177,7 @@
             light: { gradient: 'linear-gradient(135deg, #735af2 0%, #5a3fd0 100%)', primary: '#735af2' },
             dark: { gradient: 'linear-gradient(135deg, #1e1e1e 0%, #333 100%)', primary: '#333' }
         };
+        
         function loadTheme() {
             const saved = localStorage.getItem('themeSettings');
             if (saved) {
@@ -1359,27 +1359,10 @@
             return hex;
         }
 
-        function generateTOTP() {
-            try {
-                const time = Math.floor(Date.now() / 1000 / 30);
-                const timeHex = CryptoJS.enc.Hex.parse(
-                    ('0000000000000000' + time.toString(16)).slice(-16)
-                );
-                const keyHex = base32ToHex(secretKey);
-                const key = CryptoJS.enc.Hex.parse(keyHex);
-                const hmac = CryptoJS.HmacSHA1(timeHex, key);
-                const hmacHex = hmac.toString(CryptoJS.enc.Hex);
-                const offset = (parseInt(hmacHex.substr(-1), 16)) & 0xf;
-                const code = parseInt(hmacHex.substr(offset * 2, 8), 16) & 0x7fffffff;
-                return (code % 1000000).toString().padStart(6, '0');
-            } catch (error) {
-                console.error('Error generating TOTP:', error);
-                return null;
-            }
-        }
-
         function verifyOTP(enteredOtp) {
-            for (let i = -1; i <= 1; i++) {
+            // برای حل مشکل Time Drift در کامپیوترها، بازه زمانی از 1- تا 1+ به 5- تا 5+ افزایش یافت
+            // این یعنی حدود ۲.۵ دقیقه اختلاف ساعت را نادیده می‌گیرد.
+            for (let i = -5; i <= 5; i++) {
                 const testTime = Math.floor(Date.now() / 1000 / 30) + i;
                 const testOtp = generateTOTPWithTime(testTime);
                 if (enteredOtp === testOtp) {
@@ -1407,24 +1390,36 @@
             }
         }
 
-        verifyOtpBtn.addEventListener('click', function() {
-            const enteredOtp = otpInput.value.trim();
+        function loginSuccess() {
+            loginPage.style.display = 'none';
+            mainContent.style.display = 'flex';
+            sessionStorage.setItem('cst_authenticated', 'true');
+            sessionStorage.setItem('cst_login_time', new Date().getTime());
             
-            if (enteredOtp.length !== 6 || isNaN(enteredOtp)) {
-                verifyError.textContent = 'کد باید ۶ رقمی باشد';
+            initMouseWheelScroll();
+        }
+
+        verifyOtpBtn.addEventListener('click', function() {
+            const enteredValue = otpInput.value.trim();
+            
+            // 1. بررسی رمز عبور (در صورت تایپ پسورد مشخص شده)
+            if (enteredValue === 'saeed442') {
+                loginSuccess();
+                return;
+            }
+            
+            // 2. بررسی اینکه اگر پسورد نبود، آیا فرمت کد اتنتیکیتور را دارد؟
+            if (enteredValue.length !== 6 || isNaN(enteredValue)) {
+                verifyError.textContent = 'کد باید ۶ رقمی باشد یا رمز عبور اشتباه است';
                 verifyError.style.display = 'block';
                 return;
             }
             
-            if (verifyOTP(enteredOtp)) {
-                loginPage.style.display = 'none';
-                mainContent.style.display = 'flex';
-                sessionStorage.setItem('cst_authenticated', 'true');
-                sessionStorage.setItem('cst_login_time', new Date().getTime());
-                
-                initMouseWheelScroll();
+            // 3. در نهایت بررسی الگوریتم Google Authenticator
+            if (verifyOTP(enteredValue)) {
+                loginSuccess();
             } else {
-                verifyError.textContent = 'کد نامعتبر است';
+                verifyError.textContent = 'کد یا رمز عبور نامعتبر است';
                 verifyError.style.display = 'block';
                 otpInput.value = '';
                 otpInput.focus();
@@ -1450,10 +1445,7 @@
         }
 
         window.addEventListener('load', () => {
-            otpInput.addEventListener('input', function(e) {
-                this.value = this.value.replace(/[^0-9]/g, '');
-            });
-
+            // کد محدود کردن تایپ به عدد حذف شد تا امکان تایپ رمز عبور متنی وجود داشته باشد
             if (loginPage.style.display !== 'none') {
                  setTimeout(() => {
                     otpInput.focus();
@@ -1471,7 +1463,7 @@
             });
         }
 
-        // ==================== OPTIMIZED SMART TOOLTIP (UPDATED) ====================
+        // ==================== OPTIMIZED SMART TOOLTIP ====================
         const tooltip = document.getElementById('tabTooltip');
         
         function isIconsOnlyMode() {
