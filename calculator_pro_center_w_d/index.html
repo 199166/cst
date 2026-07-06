@@ -1489,10 +1489,133 @@
       alert(resultMessage);
     }
 
-    /* ---------- مدیریت دسته‌بندی‌ها ---------- */
+    /* ===== راه‌حل اصلی: اضافه کردن sortOrder به جفت‌ارزها ===== */
+    
+    // تابع برای به‌روزرسانی جفت‌ارزهای قدیمی و اضافه کردن sortOrder
+    function upgradePairsWithSortOrder() {
+      const pairs = storageGet('pairs') || [];
+      let changed = false;
+      pairs.forEach((p, index) => {
+        if (p.sortOrder === undefined) {
+          p.sortOrder = index;
+          changed = true;
+        }
+      });
+      if (changed) {
+        storageSet('pairs', pairs);
+      }
+    }
+
+    // تابع برای تولید sortOrder جدید
+    function getNextSortOrder() {
+      const pairs = storageGet('pairs') || [];
+      if (pairs.length === 0) return 0;
+      const maxOrder = Math.max(...pairs.map(p => p.sortOrder !== undefined ? p.sortOrder : 0));
+      return maxOrder + 1;
+    }
+
+    // تابع برای مرتب‌سازی جفت‌ارزها بر اساس sortOrder
+    function sortPairsByOrder(pairs) {
+      return pairs.slice().sort((a, b) => {
+        const orderA = a.sortOrder !== undefined ? a.sortOrder : 0;
+        const orderB = b.sortOrder !== undefined ? b.sortOrder : 0;
+        return orderA - orderB;
+      });
+    }
+
+    // ===== بازنویسی تابع addPair با sortOrder =====
+    function addPair(name){
+      if(!name || !name.trim()) return;
+      const pairs = storageGet('pairs')||[];
+      const selectedCategory = categorySelect ? categorySelect.value : null;
+      const newOrder = getNextSortOrder();
+      
+      pairs.push({
+        id: uid(), 
+        name: name.trim(),
+        categoryId: selectedCategory || null,
+        sortOrder: newOrder  // <--- اضافه شد
+      });
+      
+      storageSet('pairs', pairs);
+      renderPairs();
+    }
+
+    // ===== بازنویسی تابع swapPairs با sortOrder =====
+    function swapPairs(i, j){
+      const pairs = storageGet('pairs')||[];
+      if(!pairs[i] || !pairs[j]) return;
+      
+      // دریافت sortOrder فعلی
+      const orderI = pairs[i].sortOrder !== undefined ? pairs[i].sortOrder : i;
+      const orderJ = pairs[j].sortOrder !== undefined ? pairs[j].sortOrder : j;
+      
+      // تعویض sortOrder‌ها
+      pairs[i].sortOrder = orderJ;
+      pairs[j].sortOrder = orderI;
+      
+      // تعویض موقعیت در آرایه
+      [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+      
+      storageSet('pairs', pairs);
+      renderPairs();
+    }
+
+    // ===== بازنویسی تابع renderPairs با مرتب‌سازی بر اساس sortOrder =====
+    function renderPairs(){
+      const pairs = storageGet('pairs') || [];
+      // مرتب‌سازی بر اساس sortOrder
+      const sortedPairs = sortPairsByOrder(pairs);
+      
+      // رندر selectها
+      if(pairSelect) pairSelect.innerHTML = '';
+      if(historyPairFilter) {
+        historyPairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
+      }
+      if(multiDatePairFilter) {
+        multiDatePairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
+      }
+      
+      sortedPairs.forEach(p => {
+        if(pairSelect){
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = p.name;
+          pairSelect.appendChild(opt);
+        }
+        if(historyPairFilter){
+          const opt2 = document.createElement('option');
+          opt2.value = p.id;
+          opt2.textContent = p.name;
+          historyPairFilter.appendChild(opt2);
+        }
+        if(multiDatePairFilter){
+          const opt3 = document.createElement('option');
+          opt3.value = p.id;
+          opt3.textContent = p.name;
+          multiDatePairFilter.appendChild(opt3);
+        }
+      });
+      
+      if(sortedPairs.length === 0){
+        if(pairSelect){
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.textContent = 'ابتدا یک جفت‌ارز اضافه کنید';
+          pairSelect.appendChild(opt);
+        }
+      }
+      
+      // رندر دسته‌بندی‌ها
+      renderCategories();
+    }
+
+    // ===== بازنویسی تابع renderCategories با مرتب‌سازی بر اساس sortOrder =====
     function renderCategories(){
       const categories = storageGet('categories') || [];
       const pairs = storageGet('pairs') || [];
+      // مرتب‌سازی بر اساس sortOrder
+      const sortedPairs = sortPairsByOrder(pairs);
       
       // رندر select دسته‌بندی‌ها
       if(categorySelect){
@@ -1516,7 +1639,7 @@
             div.className = 'flex justify-between items-center p-1 px-2 rounded category-item';
             div.innerHTML = `
               <span class="text-xs">${cat.name}</span>
-              <span class="text-xs muted">${pairs.filter(p => p.categoryId === cat.id).length} جفت‌ارز</span>
+              <span class="text-xs muted">${sortedPairs.filter(p => p.categoryId === cat.id).length} جفت‌ارز</span>
             `;
             categoriesList.appendChild(div);
           });
@@ -1528,14 +1651,14 @@
         categoriesContainer.innerHTML = '';
         
         // دسته‌بندی "بدون دسته‌بندی"
-        const uncategorizedPairs = pairs.filter(p => !p.categoryId);
+        const uncategorizedPairs = sortedPairs.filter(p => !p.categoryId);
         if(uncategorizedPairs.length > 0){
           renderCategorySection(null, 'بدون دسته‌بندی', uncategorizedPairs);
         }
         
         // دسته‌بندی‌های تعریف شده
         categories.forEach(category => {
-          const categoryPairs = pairs.filter(p => p.categoryId === category.id);
+          const categoryPairs = sortedPairs.filter(p => p.categoryId === category.id);
           if(categoryPairs.length > 0){
             renderCategorySection(category.id, category.name, categoryPairs);
           }
@@ -1543,6 +1666,7 @@
       }
     }
 
+    // تابع renderCategorySection بدون تغییر (فقط برای نمایش)
     function renderCategorySection(categoryId, categoryName, pairs){
       const section = document.createElement('div');
       section.className = 'category-section';
@@ -1645,83 +1769,6 @@
       renderPairs();
     }
 
-    /* ---------- pairs management ---------- */
-    function renderPairs(){
-      const pairs = storageGet('pairs') || [];
-      
-      // رندر selectها
-      if(pairSelect) pairSelect.innerHTML = '';
-      if(historyPairFilter) {
-        historyPairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
-      }
-      if(multiDatePairFilter) {
-        multiDatePairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
-      }
-      
-      pairs.forEach(p => {
-        if(pairSelect){
-          const opt = document.createElement('option');
-          opt.value = p.id;
-          opt.textContent = p.name;
-          pairSelect.appendChild(opt);
-        }
-        if(historyPairFilter){
-          const opt2 = document.createElement('option');
-          opt2.value = p.id;
-          opt2.textContent = p.name;
-          historyPairFilter.appendChild(opt2);
-        }
-        if(multiDatePairFilter){
-          const opt3 = document.createElement('option');
-          opt3.value = p.id;
-          opt3.textContent = p.name;
-          multiDatePairFilter.appendChild(opt3);
-        }
-      });
-      
-      if(pairs.length === 0){
-        if(pairSelect){
-          const opt = document.createElement('option');
-          opt.value = '';
-          opt.textContent = 'ابتدا یک جفت‌ارز اضافه کنید';
-          pairSelect.appendChild(opt);
-        }
-      }
-      
-      // رندر دسته‌بندی‌ها
-      renderCategories();
-    }
-
-    function addPair(name){
-      if(!name || !name.trim()) return;
-      const pairs = storageGet('pairs')||[];
-      const selectedCategory = categorySelect ? categorySelect.value : null;
-      
-      pairs.push({
-        id: uid(), 
-        name: name.trim(),
-        categoryId: selectedCategory || null
-      });
-      
-      storageSet('pairs', pairs);
-      renderPairs();
-    }
-
-    // ===== اصلاح مهم در swapPairs =====
-    // تابع swapPairs با ذخیره‌سازی همگام اصلاح شده
-    function swapPairs(i, j){
-      const pairs = storageGet('pairs')||[];
-      if(!pairs[i] || !pairs[j]) return;
-      // جابجایی دو عنصر
-      const temp = pairs[i];
-      pairs[i] = pairs[j];
-      pairs[j] = temp;
-      // ذخیره‌سازی با استفاده از storageSet که حالا async است
-      storageSet('pairs', pairs);
-      // بازسازی کامل UI
-      renderPairs();
-    }
-
     function movePairToCategory(pairId, newCategoryId){
       const pairs = storageGet('pairs')||[];
       const pair = pairs.find(p => p.id === pairId);
@@ -1732,6 +1779,12 @@
       }
     }
 
+    if(addPairBtn) addPairBtn.addEventListener('click', ()=>{ addPair(newPairName ? newPairName.value : ''); if(newPairName) newPairName.value=''; });
+    if(clearPairsBtn) clearPairsBtn.addEventListener('click', ()=>{ if(confirm('آیا همه جفت‌ارزها حذف شوند؟')){ storageSet('pairs', []); renderPairs(); } });
+    if(addCategoryBtn) addCategoryBtn.addEventListener('click', () => { addCategory(newCategoryName ? newCategoryName.value : ''); if(newCategoryName) newCategoryName.value = ''; });
+    if(deleteCategoryBtn) deleteCategoryBtn.addEventListener('click', deleteCategory);
+
+    // Event listener برای دکمه‌های داخل categoriesContainer
     if(categoriesContainer){
       categoriesContainer.addEventListener('click', (e)=>{
         const btn = e.target.closest('button'); if(!btn) return;
@@ -1767,11 +1820,6 @@
         }
       });
     }
-
-    if(addPairBtn) addPairBtn.addEventListener('click', ()=>{ addPair(newPairName ? newPairName.value : ''); if(newPairName) newPairName.value=''; });
-    if(clearPairsBtn) clearPairsBtn.addEventListener('click', ()=>{ if(confirm('آیا همه جفت‌ارزها حذف شوند؟')){ storageSet('pairs', []); renderPairs(); } });
-    if(addCategoryBtn) addCategoryBtn.addEventListener('click', () => { addCategory(newCategoryName ? newCategoryName.value : ''); if(newCategoryName) newCategoryName.value = ''; });
-    if(deleteCategoryBtn) deleteCategoryBtn.addEventListener('click', deleteCategory);
 
     /* ---------- فرمول‌های کد 02 ---------- */
 
@@ -2784,10 +2832,10 @@ if(exportBtn) exportBtn.addEventListener('click', ()=>{
     /* ---------- initial data ---------- */
     if((storageGet('pairs')||[]).length === 0){ 
       storageSet('pairs', [
-        {id:uid(), name:'EURUSD', categoryId: 'forex'},
-        {id:uid(), name:'GBPUSD', categoryId: 'forex'},
-        {id:uid(), name:'BTCUSD', categoryId: 'crypto'},
-        {id:uid(), name:'ETHUSD', categoryId: 'crypto'}
+        {id:uid(), name:'EURUSD', categoryId: 'forex', sortOrder: 0},
+        {id:uid(), name:'GBPUSD', categoryId: 'forex', sortOrder: 1},
+        {id:uid(), name:'BTCUSD', categoryId: 'crypto', sortOrder: 2},
+        {id:uid(), name:'ETHUSD', categoryId: 'crypto', sortOrder: 3}
       ]); 
     }
 
@@ -2802,17 +2850,19 @@ if(exportBtn) exportBtn.addEventListener('click', ()=>{
         await openDB();
         await loadAllData();
         ensureDefaults();
+        // به‌روزرسانی جفت‌ارزهای قدیمی برای اضافه کردن sortOrder
+        upgradePairsWithSortOrder();
         if((storageGet('pairs')||[]).length === 0){ 
           storageSet('pairs', [
-            {id:uid(), name:'EURUSD', categoryId: 'forex'},
-            {id:uid(), name:'GBPUSD', categoryId: 'forex'},
-            {id:uid(), name:'BTCUSD', categoryId: 'crypto'},
-            {id:uid(), name:'ETHUSD', categoryId: 'crypto'}
+            {id:uid(), name:'EURUSD', categoryId: 'forex', sortOrder: 0},
+            {id:uid(), name:'GBPUSD', categoryId: 'forex', sortOrder: 1},
+            {id:uid(), name:'BTCUSD', categoryId: 'crypto', sortOrder: 2},
+            {id:uid(), name:'ETHUSD', categoryId: 'crypto', sortOrder: 3}
           ]); 
         }
         renderPairs(); 
         renderHistory();
-        console.log('✅ سیستم Calculator PRO - برنامه دوم با IndexedDB آماده است!');
+        console.log('✅ سیستم Calculator PRO - برنامه دوم با IndexedDB و sortOrder آماده است!');
       } catch (e) {
         console.error('Error initializing app:', e);
         alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
