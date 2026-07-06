@@ -852,37 +852,7 @@
       });
     }
 
-    // Async wrappers for synchronous-like usage (maintaining the original function signatures)
-    // We will use a queue or direct async/await in the code, but we need to keep the same
-    // function names as before: storageGet, storageSet, etc.
-    // Since the original code uses synchronous localStorage, we need to adapt using async/await.
-    // To minimize changes, we'll make storageGet/set async and use them with await.
-    // However, we need to ensure the rest of the code can handle async.
-    // Most of the code is inside event listeners, so we can make them async.
-    // We'll redefine storageGet and storageSet as async functions.
-
-    // Original: storageGet(k) => JSON.parse(localStorage.getItem('calc_pro_3_' + k) || 'null');
-    // We'll store data in IndexedDB with the same keys (without prefix) inside each store.
-    // We'll map: 'pairs' -> store 'pairs', 'entries' -> store 'entries', 'categories' -> store 'categories', 'backups' -> store 'backups'
-    // We'll also keep a cache for quick access? But better to just fetch from DB.
-
-    // We'll wrap everything in async/await. We also need to make sure we don't break the load order.
-    // The original code calls ensureDefaults() and expects data to be there.
-    // We'll define storageGetAsync and storageSetAsync.
-
-    // To keep the same variable names, we'll reassign storageGet and storageSet to async functions.
-    // But they are used in many places. We'll make them async and await them.
-    // However, the original code expects them to be synchronous. We'll use a pattern:
-    // Instead of changing all calls, we'll make storageGet and storageSet as async functions
-    // and use them with await. But that requires changes in every call.
-    // Alternatively, we can keep the same function names and use an in-memory cache that syncs with IndexedDB.
-    // That way, we can keep the code synchronous and just load/save from IndexedDB on init and changes.
-    // This is the simplest way to avoid massive changes.
-
-    // We'll implement an in-memory cache for each store and sync with IndexedDB.
-    // On load, we fetch all data from IndexedDB into memory.
-    // On save, we update memory and IndexedDB.
-
+    // In-memory cache
     let memoryCache = {
       pairs: [],
       entries: [],
@@ -959,9 +929,6 @@
         console.error('Error syncing store to IndexedDB:', e);
       }
     }
-
-    // Also, we need to handle the case where we call storageGet in the original code
-    // and expect it to return an array. We'll make sure memoryCache is populated.
 
     // ---------- rest of the code (unchanged, but using storageGet/Set with memory cache) ----------
     function ensureDefaults() { 
