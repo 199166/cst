@@ -1,4 +1,3 @@
-<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8"/>
@@ -641,10 +640,6 @@ async function loadAllData() {
   }
 }
 
-// ============================================================
-// ===== اصلاح اصلی: تبدیل storageSet به async با await =====
-// ============================================================
-
 // ---- Synchronous storage functions (using memory cache) ----
 function storageGet(k) {
   if (k === 'pairs') return memoryCache.pairs;
@@ -653,17 +648,16 @@ function storageGet(k) {
   return [];
 }
 
-// ===== اصلاح: storageSet به async تبدیل شد =====
-async function storageSet(k, v) {
+function storageSet(k, v) {
   if (k === 'pairs') {
     memoryCache.pairs = v;
-    await syncStoreToDB('pairs', v);
+    syncStoreToDB('pairs', v);
   } else if (k === 'entries') {
     memoryCache.entries = v;
-    await syncStoreToDB('entries', v);
+    syncStoreToDB('entries', v);
   } else if (k === 'categories') {
     memoryCache.categories = v;
-    await syncStoreToDB('categories', v);
+    syncStoreToDB('categories', v);
   }
 }
 
@@ -696,6 +690,256 @@ function ensureDefaults(){
   ]);
 }
 ensureDefaults();
+
+// ============================================================
+// === راه‌حل اصلی: اضافه کردن sortOrder به جفت‌ارزها ===
+// ============================================================
+
+// این تابع برای زمانی که جفت‌ارز جدید اضافه می‌شود،
+// sortOrder را به صورت خودکار تنظیم می‌کند
+function getNextSortOrder() {
+  const pairs = storageGet('pairs') || [];
+  if (pairs.length === 0) return 0;
+  const maxOrder = Math.max(...pairs.map(p => p.sortOrder !== undefined ? p.sortOrder : 0));
+  return maxOrder + 1;
+}
+
+// تابع کمکی برای مرتب‌سازی جفت‌ارزها بر اساس sortOrder
+function sortPairsByOrder(pairs) {
+  return pairs.slice().sort((a, b) => {
+    const orderA = a.sortOrder !== undefined ? a.sortOrder : 0;
+    const orderB = b.sortOrder !== undefined ? b.sortOrder : 0;
+    return orderA - orderB;
+  });
+}
+
+// بازنویسی تابع addPair با اضافه کردن sortOrder
+function addPair(name){
+  if(!name || !name.trim()) return;
+  const pairs = storageGet('pairs')||[];
+  const selectedCategory = categorySelect ? categorySelect.value : null;
+  const newOrder = getNextSortOrder();
+  pairs.push({
+    id: uid(), 
+    name: name.trim(),
+    categoryId: selectedCategory || null,
+    sortOrder: newOrder  // <--- اضافه شد
+  });
+  storageSet('pairs', pairs);
+  renderPairs();
+}
+
+// بازنویسی تابع swapPairs برای به‌روزرسانی sortOrder
+function swapPairs(i,j){
+  const pairs = storageGet('pairs')||[];
+  if(!pairs[i] || !pairs[j]) return;
+  
+  // دریافت sortOrder فعلی
+  const orderI = pairs[i].sortOrder !== undefined ? pairs[i].sortOrder : i;
+  const orderJ = pairs[j].sortOrder !== undefined ? pairs[j].sortOrder : j;
+  
+  // تعویض sortOrder‌ها
+  pairs[i].sortOrder = orderJ;
+  pairs[j].sortOrder = orderI;
+  
+  // تعویض موقعیت در آرایه
+  [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+  
+  storageSet('pairs', pairs);
+  renderPairs();
+}
+
+// بازنویسی تابع renderPairs برای مرتب‌سازی بر اساس sortOrder
+function renderPairs(){
+  const pairs = storageGet('pairs') || [];
+  // مرتب‌سازی بر اساس sortOrder
+  const sortedPairs = sortPairsByOrder(pairs);
+  
+  if(pairSelect) pairSelect.innerHTML = '';
+  if(historyPairFilter) historyPairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
+  if(multiDatePairFilter) multiDatePairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
+  
+  sortedPairs.forEach(p => {
+    if(pairSelect){
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.name;
+      pairSelect.appendChild(opt);
+    }
+    if(historyPairFilter){
+      const opt2 = document.createElement('option');
+      opt2.value = p.id;
+      opt2.textContent = p.name;
+      historyPairFilter.appendChild(opt2);
+    }
+    if(multiDatePairFilter){
+      const opt3 = document.createElement('option');
+      opt3.value = p.id;
+      opt3.textContent = p.name;
+      multiDatePairFilter.appendChild(opt3);
+    }
+  });
+  if(sortedPairs.length === 0 && pairSelect){
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = 'ابتدا یک جفت‌ارز اضافه کنید';
+    pairSelect.appendChild(opt);
+  }
+  renderCategories();
+}
+
+// بازنویسی تابع renderCategories برای مرتب‌سازی بر اساس sortOrder
+function renderCategories(){
+  const categories = storageGet('categories') || [];
+  const pairs = storageGet('pairs') || [];
+  // مرتب‌سازی بر اساس sortOrder
+  const sortedPairs = sortPairsByOrder(pairs);
+  
+  if(categorySelect){
+    categorySelect.innerHTML = '<option value="">بدون دسته‌بندی</option>';
+    categories.forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat.id;
+      opt.textContent = cat.name;
+      categorySelect.appendChild(opt);
+    });
+  }
+  if(categoriesList){
+    categoriesList.innerHTML = '';
+    if(categories.length === 0){
+      categoriesList.innerHTML = '<div class="text-xs muted text-center py-1">دسته‌بندی‌ای وجود ندارد</div>';
+    } else {
+      categories.forEach(cat => {
+        const div = document.createElement('div');
+        div.className = 'flex justify-between items-center p-1 px-2 rounded category-item';
+        div.innerHTML = `
+          <span class="text-xs">${cat.name}</span>
+          <span class="text-xs muted">${sortedPairs.filter(p => p.categoryId === cat.id).length} جفت‌ارز</span>
+        `;
+        categoriesList.appendChild(div);
+      });
+    }
+  }
+  if(categoriesContainer){
+    categoriesContainer.innerHTML = '';
+    const uncategorizedPairs = sortedPairs.filter(p => !p.categoryId);
+    if(uncategorizedPairs.length > 0){
+      renderCategorySection(null, 'بدون دسته‌بندی', uncategorizedPairs);
+    }
+    categories.forEach(category => {
+      const categoryPairs = sortedPairs.filter(p => p.categoryId === category.id);
+      if(categoryPairs.length > 0){
+        renderCategorySection(category.id, category.name, categoryPairs);
+      }
+    });
+  }
+}
+
+// تابع renderCategorySection بدون تغییر (فقط برای نمایش)
+function renderCategorySection(categoryId, categoryName, pairs){
+  const section = document.createElement('div');
+  section.className = 'category-section';
+  section.innerHTML = `
+    <div class="category-header flex justify-between items-center" data-category="${categoryId || ''}">
+      <div class="font-semibold text-sm">${categoryName} (${pairs.length})</div>
+      <div class="muted text-xs">▼</div>
+    </div>
+    <div class="category-content">
+      <ul class="space-y-2 pairs-list-${categoryId || 'uncategorized'}"></ul>
+    </div>
+  `;
+  categoriesContainer.appendChild(section);
+  const pairsList = section.querySelector(`.pairs-list-${categoryId || 'uncategorized'}`);
+  pairs.forEach(p => {
+    const li = document.createElement('li');
+    li.className = 'flex items-center justify-between gap-2 p-2 rounded bg-white/5';
+    const categories = storageGet('categories') || [];
+    const categoryOptions = categories.map(cat => 
+      `<option value="${cat.id}" ${p.categoryId === cat.id ? 'selected' : ''}>${cat.name}</option>`
+    ).join('');
+    li.innerHTML = `
+      <div class="flex-1 text-sm">${p.name}</div>
+      <div class="flex gap-1">
+        <select class="small-btn bg-slate-600 text-xs move-category" data-id="${p.id}">
+          <option value="">انتقال به...</option>
+          ${categoryOptions}
+          <option value="" ${!p.categoryId ? 'selected' : ''}>بدون دسته‌بندی</option>
+        </select>
+        <button data-action="up" data-id="${p.id}" class="small-btn bg-slate-600">▲</button>
+        <button data-action="down" data-id="${p.id}" class="small-btn bg-slate-600">▼</button>
+        <button data-action="edit" data-id="${p.id}" class="small-btn bg-yellow-600">✎</button>
+        <button data-action="delete" data-id="${p.id}" class="small-btn bg-rose-600">🗑</button>
+      </div>
+    `;
+    pairsList.appendChild(li);
+  });
+  const header = section.querySelector('.category-header');
+  header.addEventListener('click', () => {
+    const content = section.querySelector('.category-content');
+    content.classList.toggle('hidden');
+  });
+}
+
+// تابع addCategory بدون تغییر
+function addCategory(name){
+  if(!name || !name.trim()) return;
+  const categories = storageGet('categories') || [];
+  if(categories.some(cat => cat.name === name.trim())){
+    alert('این نام دسته‌بندی قبلاً وجود دارد!');
+    return;
+  }
+  categories.push({id: uid(), name: name.trim()});
+  storageSet('categories', categories);
+  renderCategories();
+}
+
+// تابع deleteCategory بدون تغییر
+function deleteCategory(){
+  const selectedCategoryId = categorySelect ? categorySelect.value : null;
+  if(!selectedCategoryId){
+    alert('لطفاً یک دسته‌بندی را انتخاب کنید!');
+    return;
+  }
+  const categories = storageGet('categories') || [];
+  const category = categories.find(cat => cat.id === selectedCategoryId);
+  if(!category) return;
+  const pairs = storageGet('pairs') || [];
+  const pairsInCategory = pairs.filter(p => p.categoryId === selectedCategoryId);
+  if(pairsInCategory.length > 0){
+    if(!confirm(`دسته‌بندی "${category.name}" دارای ${pairsInCategory.length} جفت‌ارز است. آیا می‌خواهید این دسته‌بندی حذف شود و جفت‌ارزهای آن به "بدون دسته‌بندی" منتقل شوند؟`)){
+      return;
+    }
+    pairsInCategory.forEach(p => { p.categoryId = null; });
+    storageSet('pairs', pairs);
+  } else {
+    if(!confirm(`آیا از حذف دسته‌بندی "${category.name}" مطمئن هستید؟`)) return;
+  }
+  const updatedCategories = categories.filter(cat => cat.id !== selectedCategoryId);
+  storageSet('categories', updatedCategories);
+  renderCategories();
+  renderPairs();
+}
+
+// اضافه کردن تابع برای به‌روزرسانی sortOrder همه جفت‌ارزها
+// (برای جفت‌ارزهایی که قبلاً sortOrder ندارند)
+function upgradePairsWithSortOrder() {
+  const pairs = storageGet('pairs') || [];
+  let changed = false;
+  pairs.forEach((p, index) => {
+    if (p.sortOrder === undefined) {
+      p.sortOrder = index;
+      changed = true;
+    }
+  });
+  if (changed) {
+    storageSet('pairs', pairs);
+  }
+}
+
+// ============================================================
+// === ادامه کد اصلی (بدون تغییر) ===
+// ============================================================
+
 function upgradeClosestInfoForAllEntries() {
   const entries = storageGet('entries') || [];
   let changed = false;
@@ -1134,241 +1378,26 @@ if(resetButton) resetButton.addEventListener('click', ()=>{
 });
 
 // ---------- مدیریت جفت‌ارزها ----------
-function renderPairs(){
-  const pairs = storageGet('pairs') || [];
-  if(pairSelect) pairSelect.innerHTML = '';
-  if(historyPairFilter) historyPairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
-  if(multiDatePairFilter) multiDatePairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
-  pairs.forEach(p => {
-    if(pairSelect){
-      const opt = document.createElement('option');
-      opt.value = p.id;
-      opt.textContent = p.name;
-      pairSelect.appendChild(opt);
-    }
-    if(historyPairFilter){
-      const opt2 = document.createElement('option');
-      opt2.value = p.id;
-      opt2.textContent = p.name;
-      historyPairFilter.appendChild(opt2);
-    }
-    if(multiDatePairFilter){
-      const opt3 = document.createElement('option');
-      opt3.value = p.id;
-      opt3.textContent = p.name;
-      multiDatePairFilter.appendChild(opt3);
-    }
-  });
-  if(pairs.length === 0 && pairSelect){
-    const opt = document.createElement('option');
-    opt.value = '';
-    opt.textContent = 'ابتدا یک جفت‌ارز اضافه کنید';
-    pairSelect.appendChild(opt);
-  }
-  renderCategories();
-}
+// (توابع addPair و swapPairs و renderPairs و renderCategories قبلاً بازنویسی شده‌اند)
 
-// ===== اصلاح: addPair به async تبدیل شد =====
-async function addPair(name){
-  if(!name || !name.trim()) return;
-  const pairs = storageGet('pairs')||[];
-  const selectedCategory = categorySelect ? categorySelect.value : null;
-  pairs.push({
-    id: uid(), 
-    name: name.trim(),
-    categoryId: selectedCategory || null
-  });
-  await storageSet('pairs', pairs);
-  renderPairs();
-}
-
-// ===== اصلاح: swapPairs به async تبدیل شد =====
-async function swapPairs(i,j){
-  const pairs = storageGet('pairs')||[];
-  if(!pairs[i] || !pairs[j]) return;
-  [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
-  await storageSet('pairs', pairs);
-  renderPairs();
-}
-
-function movePairToCategory(pairId, newCategoryId){
-  const pairs = storageGet('pairs')||[];
-  const pair = pairs.find(p => p.id === pairId);
-  if(pair){
-    pair.categoryId = newCategoryId || null;
-    storageSet('pairs', pairs);
-    renderPairs();
-  }
-}
-
-// ===== اصلاح: رویدادهای addPairBtn و clearPairsBtn به async تبدیل شدند =====
-if(addPairBtn) addPairBtn.addEventListener('click', async ()=>{ 
-  await addPair(newPairName ? newPairName.value : ''); 
-  if(newPairName) newPairName.value=''; 
-});
-
-if(clearPairsBtn) clearPairsBtn.addEventListener('click', async ()=>{ 
-  if(confirm('آیا همه جفت‌ارزها حذف شوند؟')){ 
-    await storageSet('pairs', []); 
-    renderPairs(); 
-  } 
-});
+if(addPairBtn) addPairBtn.addEventListener('click', ()=>{ addPair(newPairName ? newPairName.value : ''); if(newPairName) newPairName.value=''; });
+if(clearPairsBtn) clearPairsBtn.addEventListener('click', ()=>{ if(confirm('آیا همه جفت‌ارزها حذف شوند؟')){ storageSet('pairs', []); renderPairs(); } });
 
 // ---------- مدیریت دسته‌بندی‌ها ----------
-function renderCategories(){
-  const categories = storageGet('categories') || [];
-  const pairs = storageGet('pairs') || [];
-  if(categorySelect){
-    categorySelect.innerHTML = '<option value="">بدون دسته‌بندی</option>';
-    categories.forEach(cat => {
-      const opt = document.createElement('option');
-      opt.value = cat.id;
-      opt.textContent = cat.name;
-      categorySelect.appendChild(opt);
-    });
-  }
-  if(categoriesList){
-    categoriesList.innerHTML = '';
-    if(categories.length === 0){
-      categoriesList.innerHTML = '<div class="text-xs muted text-center py-1">دسته‌بندی‌ای وجود ندارد</div>';
-    } else {
-      categories.forEach(cat => {
-        const div = document.createElement('div');
-        div.className = 'flex justify-between items-center p-1 px-2 rounded category-item';
-        div.innerHTML = `
-          <span class="text-xs">${cat.name}</span>
-          <span class="text-xs muted">${pairs.filter(p => p.categoryId === cat.id).length} جفت‌ارز</span>
-        `;
-        categoriesList.appendChild(div);
-      });
-    }
-  }
-  if(categoriesContainer){
-    categoriesContainer.innerHTML = '';
-    const uncategorizedPairs = pairs.filter(p => !p.categoryId);
-    if(uncategorizedPairs.length > 0){
-      renderCategorySection(null, 'بدون دسته‌بندی', uncategorizedPairs);
-    }
-    categories.forEach(category => {
-      const categoryPairs = pairs.filter(p => p.categoryId === category.id);
-      if(categoryPairs.length > 0){
-        renderCategorySection(category.id, category.name, categoryPairs);
-      }
-    });
-  }
-}
-
-function renderCategorySection(categoryId, categoryName, pairs){
-  const section = document.createElement('div');
-  section.className = 'category-section';
-  section.innerHTML = `
-    <div class="category-header flex justify-between items-center" data-category="${categoryId || ''}">
-      <div class="font-semibold text-sm">${categoryName} (${pairs.length})</div>
-      <div class="muted text-xs">▼</div>
-    </div>
-    <div class="category-content">
-      <ul class="space-y-2 pairs-list-${categoryId || 'uncategorized'}"></ul>
-    </div>
-  `;
-  categoriesContainer.appendChild(section);
-  const pairsList = section.querySelector(`.pairs-list-${categoryId || 'uncategorized'}`);
-  pairs.forEach(p => {
-    const li = document.createElement('li');
-    li.className = 'flex items-center justify-between gap-2 p-2 rounded bg-white/5';
-    const categories = storageGet('categories') || [];
-    const categoryOptions = categories.map(cat => 
-      `<option value="${cat.id}" ${p.categoryId === cat.id ? 'selected' : ''}>${cat.name}</option>`
-    ).join('');
-    li.innerHTML = `
-      <div class="flex-1 text-sm">${p.name}</div>
-      <div class="flex gap-1">
-        <select class="small-btn bg-slate-600 text-xs move-category" data-id="${p.id}">
-          <option value="">انتقال به...</option>
-          ${categoryOptions}
-          <option value="" ${!p.categoryId ? 'selected' : ''}>بدون دسته‌بندی</option>
-        </select>
-        <button data-action="up" data-id="${p.id}" class="small-btn bg-slate-600">▲</button>
-        <button data-action="down" data-id="${p.id}" class="small-btn bg-slate-600">▼</button>
-        <button data-action="edit" data-id="${p.id}" class="small-btn bg-yellow-600">✎</button>
-        <button data-action="delete" data-id="${p.id}" class="small-btn bg-rose-600">🗑</button>
-      </div>
-    `;
-    pairsList.appendChild(li);
-  });
-  const header = section.querySelector('.category-header');
-  header.addEventListener('click', () => {
-    const content = section.querySelector('.category-content');
-    content.classList.toggle('hidden');
-  });
-}
-
-function addCategory(name){
-  if(!name || !name.trim()) return;
-  const categories = storageGet('categories') || [];
-  if(categories.some(cat => cat.name === name.trim())){
-    alert('این نام دسته‌بندی قبلاً وجود دارد!');
-    return;
-  }
-  categories.push({id: uid(), name: name.trim()});
-  storageSet('categories', categories);
-  renderCategories();
-}
-
-function deleteCategory(){
-  const selectedCategoryId = categorySelect ? categorySelect.value : null;
-  if(!selectedCategoryId){
-    alert('لطفاً یک دسته‌بندی را انتخاب کنید!');
-    return;
-  }
-  const categories = storageGet('categories') || [];
-  const category = categories.find(cat => cat.id === selectedCategoryId);
-  if(!category) return;
-  const pairs = storageGet('pairs') || [];
-  const pairsInCategory = pairs.filter(p => p.categoryId === selectedCategoryId);
-  if(pairsInCategory.length > 0){
-    if(!confirm(`دسته‌بندی "${category.name}" دارای ${pairsInCategory.length} جفت‌ارز است. آیا می‌خواهید این دسته‌بندی حذف شود و جفت‌ارزهای آن به "بدون دسته‌بندی" منتقل شوند؟`)){
-      return;
-    }
-    pairsInCategory.forEach(p => { p.categoryId = null; });
-    storageSet('pairs', pairs);
-  } else {
-    if(!confirm(`آیا از حذف دسته‌بندی "${category.name}" مطمئن هستید؟`)) return;
-  }
-  const updatedCategories = categories.filter(cat => cat.id !== selectedCategoryId);
-  storageSet('categories', updatedCategories);
-  renderCategories();
-  renderPairs();
-}
+// (توابع addCategory و deleteCategory قبلاً بازنویسی شده‌اند)
 
 if(addCategoryBtn) addCategoryBtn.addEventListener('click', () => { addCategory(newCategoryName ? newCategoryName.value : ''); if(newCategoryName) newCategoryName.value = ''; });
 if(deleteCategoryBtn) deleteCategoryBtn.addEventListener('click', deleteCategory);
 
-// ===== اصلاح: رویداد کلیک categoriesContainer به async تبدیل شد =====
 if(categoriesContainer){
-  categoriesContainer.addEventListener('click', async (e)=>{
+  categoriesContainer.addEventListener('click', (e)=>{
     const btn = e.target.closest('button'); if(!btn) return;
     const action = btn.dataset.action; const id = btn.dataset.id;
     const pairs = storageGet('pairs')||[]; const idx = pairs.findIndex(p => p.id === id);
-    if(action === 'up' && idx > 0) {
-      await swapPairs(idx, idx-1);
-    }
-    if(action === 'down' && idx < pairs.length-1) {
-      await swapPairs(idx, idx+1);
-    }
-    if(action === 'delete'){ 
-      if(!confirm('آیا حذف شود؟')) return; 
-      pairs.splice(idx,1); 
-      await storageSet('pairs', pairs); 
-      renderPairs(); 
-    }
-    if(action === 'edit'){ 
-      const newName = prompt('نام جدید:', pairs[idx].name); 
-      if(newName && newName.trim()){ 
-        pairs[idx].name = newName.trim(); 
-        await storageSet('pairs', pairs); 
-        renderPairs(); 
-      } 
-    }
+    if(action === 'up' && idx > 0) swapPairs(idx, idx-1);
+    if(action === 'down' && idx < pairs.length-1) swapPairs(idx, idx+1);
+    if(action === 'delete'){ if(!confirm('آیا حذف شود؟')) return; pairs.splice(idx,1); storageSet('pairs', pairs); renderPairs(); }
+    if(action === 'edit'){ const newName = prompt('نام جدید:', pairs[idx].name); if(newName && newName.trim()){ pairs[idx].name = newName.trim(); storageSet('pairs', pairs); renderPairs(); } }
   });
   categoriesContainer.addEventListener('change', (e) => {
     if(e.target.classList.contains('move-category')){
@@ -1377,6 +1406,17 @@ if(categoriesContainer){
       movePairToCategory(pairId, newCategoryId);
     }
   });
+}
+
+// تابع movePairToCategory با حفظ sortOrder
+function movePairToCategory(pairId, newCategoryId){
+  const pairs = storageGet('pairs')||[];
+  const pair = pairs.find(p => p.id === pairId);
+  if(pair){
+    pair.categoryId = newCategoryId || null;
+    storageSet('pairs', pairs);
+    renderPairs();
+  }
 }
 
 // ---------- تاریخچه ----------
@@ -1474,7 +1514,6 @@ function renderHistory(){
     historyList.appendChild(wrapper);
   });
 }
-
 function showDetail(entryId){
   const entries = storageGet('entries')||[]; 
   const e = entries.find(x=>x.id===entryId); 
@@ -1572,14 +1611,12 @@ function showDetail(entryId){
   if(deleteRecordBtn) deleteRecordBtn.onclick = ()=> deleteRecord(e.id);
   if(moveRecordBtn) moveRecordBtn.onclick = ()=> moveRecord(e.id);
 }
-
 if(closeDetail) closeDetail.addEventListener('click', ()=> { 
   if(detailModal) {
     detailModal.classList.add('hidden');
     detailModal.classList.remove('center-modal');
   }
 });
-
 function deleteRecord(id){ 
   if(!confirm('آیا از حذف این رکورد مطمئن هستید؟')) return; 
   const entries = storageGet('entries')||[]; 
@@ -1593,7 +1630,6 @@ function deleteRecord(id){
     detailModal.classList.remove('center-modal');
   }
 }
-
 function editRecord(id){
   const entries = storageGet('entries')||[]; const e = entries.find(x=>x.id===id); if(!e) return;
   if(!confirm('مقادیر رکورد در فرم بارگذاری خواهد شد. پس از ویرایش دکمهٔ محاسبه را بزنید تا رکورد جدید ذخیره شود. رکورد قدیمی حذف می‌شود. ادامه می‌دهید؟')) return;
@@ -1614,7 +1650,6 @@ function editRecord(id){
   }
   window.scrollTo({top:0, behavior:'smooth'});
 }
-
 function moveRecord(id){
   const newDate = prompt('تاریخ جدید (YYYY-MM-DD) را وارد کنید:'); if(!newDate) return;
   const d = new Date(newDate + 'T00:00:00'); if(isNaN(d)){ alert('تاریخ نامعتبر.'); return; }
@@ -1625,7 +1660,6 @@ function moveRecord(id){
     detailModal.classList.remove('center-modal');
   }
 }
-
 // ---------- backup/import ----------
 function showNotification(message, type = 'success') {
   const toast = document.createElement('div');
@@ -1638,7 +1672,6 @@ function showNotification(message, type = 'success') {
     }
   }, 4000);
 }
-
 if(exportBtn) exportBtn.addEventListener('click', ()=>{
   try {
     const payload = { 
@@ -1669,15 +1702,12 @@ if(exportBtn) exportBtn.addEventListener('click', ()=>{
     showNotification('❌ خطا در دانلود فایل پشتیبان: ' + err.message, 'error');
   }
 });
-
 if(importBtn) importBtn.addEventListener('click', ()=> importFile && importFile.click());
-
-// ===== اصلاح: importFile به async تبدیل شد =====
-if(importFile) importFile.addEventListener('change', async (e)=>{ 
+if(importFile) importFile.addEventListener('change', (e)=>{ 
   const f = e.target.files[0]; 
   if(!f) return; 
   const reader = new FileReader(); 
-  reader.onload = async ()=>{ 
+  reader.onload = ()=>{ 
     try{ 
       const obj = JSON.parse(reader.result); 
       if(!obj) throw new Error('فایل نامعتبر');
@@ -1687,12 +1717,12 @@ if(importFile) importFile.addEventListener('change', async (e)=>{
         categories: storageGet('categories') || []
       };
       try {
-        if(Array.isArray(obj.pairs)) await storageSet('pairs', obj.pairs);
-        else await storageSet('pairs', []);
-        if(Array.isArray(obj.entries)) await storageSet('entries', obj.entries);
-        else await storageSet('entries', []);
-        if(Array.isArray(obj.categories)) await storageSet('categories', obj.categories);
-        else await storageSet('categories', []);
+        if(Array.isArray(obj.pairs)) storageSet('pairs', obj.pairs);
+        else storageSet('pairs', []);
+        if(Array.isArray(obj.entries)) storageSet('entries', obj.entries);
+        else storageSet('entries', []);
+        if(Array.isArray(obj.categories)) storageSet('categories', obj.categories);
+        else storageSet('categories', []);
         showNotification('بک‌آپ با موفقیت بارگذاری شد','success');
         renderPairs(); 
         renderHistory(); 
@@ -1703,9 +1733,9 @@ if(importFile) importFile.addEventListener('change', async (e)=>{
         message += `• ${obj.categories?.length || 0} دسته‌بندی\n`;
         alert(message);
       } catch (error) {
-        await storageSet('pairs', currentData.pairs);
-        await storageSet('entries', currentData.entries);
-        await storageSet('categories', currentData.categories);
+        storageSet('pairs', currentData.pairs);
+        storageSet('entries', currentData.entries);
+        storageSet('categories', currentData.categories);
         throw error;
       }
     } catch(err) { 
@@ -1715,7 +1745,6 @@ if(importFile) importFile.addEventListener('change', async (e)=>{
   reader.readAsText(f); 
   importFile.value=''; 
 });
-
 // ---------- UI controls ----------
 function updateToggleButton(isOpen) {
   const toggleIcon = document.getElementById('toggle_icon');
@@ -1735,7 +1764,6 @@ function updateToggleButton(isOpen) {
     toggleBtn.classList.add('closed');
   }
 }
-
 if(toggleHistoryBtn) toggleHistoryBtn.addEventListener('click', ()=>{
   const isCurrentlyHidden = historyPanel.classList.contains('hidden');
   if(isCurrentlyHidden){
@@ -1749,20 +1777,17 @@ if(toggleHistoryBtn) toggleHistoryBtn.addEventListener('click', ()=>{
     updateToggleButton(false);
   }
 });
-
 if(historyDate) historyDate.addEventListener('change', renderHistory);
 if(historyPairFilter) historyPairFilter.addEventListener('change', renderHistory);
 if(togglePairsHdr) togglePairsHdr.addEventListener('click', ()=> { boxPairs.classList.toggle('hidden'); });
 if(toggleCalcHdr) toggleCalcHdr.addEventListener('click', ()=> { boxCalc.classList.toggle('hidden'); });
 if(toggleHistoryHdr) toggleHistoryHdr.addEventListener('click', ()=> { boxHistory.classList.toggle('hidden'); });
-
 // ---------- صوت ----------
 let recognition = null;
 let isRecording = false;
 let isVoiceActive = false;
 let currentField = null;
 const numericFields = [inputY1, inputCurrentHigh, inputY2, inputCurrentLow, inputDailyHigh, inputDailyLow];
-
 function parseNumberFromTranscript(transcript){
   if(!transcript) return null;
   const persianDigits = {'۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9'};
@@ -1771,7 +1796,6 @@ function parseNumberFromTranscript(transcript){
   const match = normalized.match(/-?\d*\.?\d+/);
   return match ? match[0] : null;
 }
-
 function startVoiceRecognition(){
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SpeechRecognition){ 
@@ -1836,7 +1860,6 @@ function startVoiceRecognition(){
     console.log('خطا در شروع ضبط:', e);
   }
 }
-
 function stopVoiceRecognition(){
   isVoiceActive = false;
   try{
@@ -1850,7 +1873,6 @@ function stopVoiceRecognition(){
   }
   if(voiceStatus) voiceStatus.textContent = 'اتصال صوتی قطع شد';
 }
-
 function getFieldName(field){
   const names = {
     [inputY1]: 'عدد سقف',
@@ -1862,7 +1884,6 @@ function getFieldName(field){
   };
   return names[field] || 'این فیلد';
 }
-
 safeForEach(numericFields, (field) => {
   if(!field) return;
   field.addEventListener('focus', () => {
@@ -1875,7 +1896,6 @@ safeForEach(numericFields, (field) => {
     }
   });
 });
-
 if(microToggle){
   microToggle.addEventListener('click', ()=>{
     if(isVoiceActive){
@@ -1896,10 +1916,8 @@ if(microToggle){
     }
   });
 }
-
 // ---------- تاریخ چندگانه ----------
 let dateRanges = [];
-
 function toggleMultiDateMode() {
   const isMultiDateActive = multiDateSection.classList.contains('hidden');
   if (isMultiDateActive) {
@@ -1918,13 +1936,11 @@ function toggleMultiDateMode() {
     renderHistory();
   }
 }
-
 function addDateRange() {
   const dateId = uid();
   dateRanges.push({ id: dateId, date: '' });
   renderDateRanges();
 }
-
 function renderDateRanges() {
   if (!dateRangesContainer) return;
   dateRangesContainer.innerHTML = '';
@@ -1941,17 +1957,14 @@ function renderDateRanges() {
     dateRangesContainer.appendChild(dateItem);
   });
 }
-
 function updateDateRange(dateId, newDate) {
   const range = dateRanges.find(r => r.id === dateId);
   if (range) range.date = newDate;
 }
-
 function removeDateRange(dateId) {
   dateRanges = dateRanges.filter(r => r.id !== dateId);
   renderDateRanges();
 }
-
 function applyMultiDateFilter() {
   const selectedPair = multiDatePairFilter ? multiDatePairFilter.value : null;
   const selectedDates = dateRanges.filter(r => r.date).map(r => r.date);
@@ -1961,7 +1974,6 @@ function applyMultiDateFilter() {
   }
   renderMultiDateHistory(selectedPair, selectedDates);
 }
-
 function renderMultiDateHistory(pairFilter = null, dates = []) {
   const entries = (storageGet('entries')||[]).slice();
   entries.sort((a,b)=> new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
@@ -2038,13 +2050,11 @@ function renderMultiDateHistory(pairFilter = null, dates = []) {
       viewBtn.textContent = 'جزئیات'; 
       viewBtn.addEventListener('click', ()=> showDetail(e.id));
       bottom.appendChild(viewBtn);
-      wrapper.appendChild(bottom);
       groupWrapper.appendChild(wrapper);
     });
     historyList.appendChild(groupWrapper);
   });
 }
-
 if(toggleMultiDateBtn) toggleMultiDateBtn.addEventListener('click', toggleMultiDateMode);
 if(addDateBtn) addDateBtn.addEventListener('click', addDateRange);
 if(applyMultiDateBtn) applyMultiDateBtn.addEventListener('click', applyMultiDateFilter);
@@ -2054,7 +2064,6 @@ if(multiDatePairFilter) multiDatePairFilter.addEventListener('change', function(
     if (selectedDates.length > 0) applyMultiDateFilter();
   }
 });
-
 // ---------- مدیریت پیشرفته ----------
 function manualPruneOldEntries(days = 365) {
   const entries = storageGet('entries') || [];
@@ -2068,7 +2077,6 @@ function manualPruneOldEntries(days = 365) {
   }
   return 0;
 }
-
 function showSystemStats() {
   const entries = storageGet('entries') || [];
   const pairs = storageGet('pairs') || [];
@@ -2119,7 +2127,6 @@ function showSystemStats() {
     $('stats_modal').classList.add('center-modal');
   }
 }
-
 function manageBackups() {
   const entries = storageGet('entries') || [];
   const pairs = storageGet('pairs') || [];
@@ -2163,7 +2170,6 @@ function manageBackups() {
     $('backups_modal').classList.add('center-modal');
   }
 }
-
 function createBackup() {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const entries = storageGet('entries') || [];
@@ -2186,9 +2192,7 @@ function createBackup() {
   URL.revokeObjectURL(url);
   alert(`✅ بک‌آپ با موفقیت ایجاد و دانلود شد!\n📁 فایل: calc-pro-1-backup-${timestamp}.json\n📊 حجم: ${(blob.size / 1024).toFixed(2)} KB`);
 }
-
-// ===== اصلاح: manual_prune_btn به async تبدیل شد =====
-if ($('manual_prune_btn')) $('manual_prune_btn').addEventListener('click', async function() {
+if ($('manual_prune_btn')) $('manual_prune_btn').addEventListener('click', function() {
   const days = parseInt($('manual_prune_days').value) || 365;
   if (days < 1) { alert('تعداد روز باید بیشتر از ۰ باشد'); return; }
   if (confirm(`آیا از حذف رکوردهای قدیمی‌تر از ${days} روز مطمئن هستید؟\nاین عمل غیرقابل بازگشت است.`)) {
@@ -2197,26 +2201,21 @@ if ($('manual_prune_btn')) $('manual_prune_btn').addEventListener('click', async
     else alert('ℹ️ هیچ رکورد قدیمی‌ای برای حذف یافت نشد.');
   }
 });
-
 if ($('show_stats_btn')) $('show_stats_btn').addEventListener('click', showSystemStats);
 if ($('manage_backups_btn')) $('manage_backups_btn').addEventListener('click', manageBackups);
-
 if ($('close_stats')) $('close_stats').addEventListener('click', function() {
   $('stats_modal').classList.add('hidden');
   $('stats_modal').classList.remove('center-modal');
 });
-
 if ($('close_backups')) $('close_backups').addEventListener('click', function() {
   $('backups_modal').classList.add('hidden');
   $('backups_modal').classList.remove('center-modal');
 });
-
 window.addEventListener('click', function(event) {
   if (event.target === $('stats_modal')) $('stats_modal').classList.add('hidden');
   if (event.target === $('backups_modal')) $('backups_modal').classList.add('hidden');
   if (event.target === $('detail_modal')) $('detail_modal').classList.add('hidden');
 });
-
 window.addEventListener('keydown', function(event) {
   if (event.key === 'Escape') {
     if ($('stats_modal') && !$('stats_modal').classList.contains('hidden')) $('stats_modal').classList.add('hidden');
@@ -2224,17 +2223,15 @@ window.addEventListener('keydown', function(event) {
     if ($('detail_modal') && !$('detail_modal').classList.contains('hidden')) $('detail_modal').classList.add('hidden');
   }
 });
-
 // ---------- شروع اولیه ----------
 if((storageGet('pairs')||[]).length === 0){ 
   storageSet('pairs', [
-    {id:uid(), name:'EURUSD', categoryId: 'forex'},
-    {id:uid(), name:'GBPUSD', categoryId: 'forex'},
-    {id:uid(), name:'BTCUSD', categoryId: 'crypto'},
-    {id:uid(), name:'ETHUSD', categoryId: 'crypto'}
+    {id:uid(), name:'EURUSD', categoryId: 'forex', sortOrder: 0},
+    {id:uid(), name:'GBPUSD', categoryId: 'forex', sortOrder: 1},
+    {id:uid(), name:'BTCUSD', categoryId: 'crypto', sortOrder: 2},
+    {id:uid(), name:'ETHUSD', categoryId: 'crypto', sortOrder: 3}
   ]); 
 }
-
 window.addEventListener('load', () => {
   const today = new Date().toISOString().split('T')[0];
   if(historyDate) historyDate.value = today;
@@ -2247,17 +2244,19 @@ async function initApp() {
     await openDB();
     await loadAllData();
     ensureDefaults();
+    // به‌روزرسانی جفت‌ارزهای قدیمی برای اضافه کردن sortOrder
+    upgradePairsWithSortOrder();
     if((storageGet('pairs')||[]).length === 0){ 
       storageSet('pairs', [
-        {id:uid(), name:'EURUSD', categoryId: 'forex'},
-        {id:uid(), name:'GBPUSD', categoryId: 'forex'},
-        {id:uid(), name:'BTCUSD', categoryId: 'crypto'},
-        {id:uid(), name:'ETHUSD', categoryId: 'crypto'}
+        {id:uid(), name:'EURUSD', categoryId: 'forex', sortOrder: 0},
+        {id:uid(), name:'GBPUSD', categoryId: 'forex', sortOrder: 1},
+        {id:uid(), name:'BTCUSD', categoryId: 'crypto', sortOrder: 2},
+        {id:uid(), name:'ETHUSD', categoryId: 'crypto', sortOrder: 3}
       ]);
     }
     renderPairs(); 
     renderHistory();
-    console.log('✅ سیستم Calculator PRO - برنامه اول با IndexedDB آماده است!');
+    console.log('✅ سیستم Calculator PRO - برنامه اول با IndexedDB و sortOrder آماده است!');
   } catch (e) {
     console.error('Error initializing app:', e);
     alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
