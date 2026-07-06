@@ -780,10 +780,123 @@
     /* ---------- helpers ---------- */
     const uid = ()=> Date.now().toString(36)+Math.random().toString(36).slice(2,6);
     
-    // تغییر کلیدهای localStorage برای جلوگیری از تداخل با برنامه اول
-    const storageGet = k => JSON.parse(localStorage.getItem('calc_pro_2_' + k) || '[]');
-    const storageSet = (k,v) => localStorage.setItem('calc_pro_2_' + k, JSON.stringify(v));
-    
+    // ---- IndexedDB wrapper ----
+    const DB_NAME = 'CalcProDB_v2';
+    const DB_VERSION = 1;
+    let db = null;
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('pairs')) {
+            db.createObjectStore('pairs', { keyPath: 'id' });
+          }
+          if (!db.objectStoreNames.contains('entries')) {
+            db.createObjectStore('entries', { keyPath: 'id' });
+          }
+          if (!db.objectStoreNames.contains('categories')) {
+            db.createObjectStore('categories', { keyPath: 'id' });
+          }
+        };
+        request.onsuccess = (e) => {
+          db = e.target.result;
+          resolve(db);
+        };
+        request.onerror = (e) => {
+          reject(e.target.error);
+        };
+      });
+    }
+
+    function dbGetAll(storeName) {
+      return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('Database not open')); return; }
+        const tx = db.transaction(storeName, 'readonly');
+        const store = tx.objectStore(storeName);
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function dbClear(storeName) {
+      return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('Database not open')); return; }
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const request = store.clear();
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function dbPut(storeName, data) {
+      return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('Database not open')); return; }
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const request = store.put(data);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    // ---- In-memory cache ----
+    let memoryCache = {
+      pairs: [],
+      entries: [],
+      categories: []
+    };
+
+    async function loadAllData() {
+      try {
+        const [pairs, entries, categories] = await Promise.all([
+          dbGetAll('pairs'),
+          dbGetAll('entries'),
+          dbGetAll('categories')
+        ]);
+        memoryCache.pairs = pairs || [];
+        memoryCache.entries = entries || [];
+        memoryCache.categories = categories || [];
+      } catch (e) {
+        console.error('Error loading data from IndexedDB:', e);
+      }
+    }
+
+    // ---- Synchronous storage functions (using memory cache) ----
+    function storageGet(k) {
+      if (k === 'pairs') return memoryCache.pairs;
+      if (k === 'entries') return memoryCache.entries;
+      if (k === 'categories') return memoryCache.categories;
+      return [];
+    }
+
+    function storageSet(k, v) {
+      if (k === 'pairs') {
+        memoryCache.pairs = v;
+        syncStoreToDB('pairs', v);
+      } else if (k === 'entries') {
+        memoryCache.entries = v;
+        syncStoreToDB('entries', v);
+      } else if (k === 'categories') {
+        memoryCache.categories = v;
+        syncStoreToDB('categories', v);
+      }
+    }
+
+    async function syncStoreToDB(storeName, data) {
+      try {
+        await dbClear(storeName);
+        for (const item of data) {
+          await dbPut(storeName, item);
+        }
+      } catch (e) {
+        console.error('Error syncing store to IndexedDB:', e);
+      }
+    }
+
     // غیرفعال کردن حذف خودکار 30 روزه
     const AUTO_PRUNE_ENABLED = false;
     const MAX_DAYS = 3650; // 10 سال - عملاً غیرفعال
@@ -1102,7 +1215,6 @@
           <div class="text-xs muted mb-2">💾 فضای ذخیره‌سازی:</div>
           <div class="text-sm space-y-1">
             <div>حجم داده‌ها: <span class="font-bold text-cyan-400">${(dataSize / 1024).toFixed(2)} KB</span></div>
-            <div>کل localStorage: <span class="font-mono">${(JSON.stringify(localStorage).length / 1024).toFixed(2)} KB</span></div>
           </div>
         </div>
         
@@ -2660,21 +2772,29 @@ if(exportBtn) exportBtn.addEventListener('click', ()=>{
       if(historyDate) historyDate.value = today;
     });
 
-    renderPairs(); 
-    renderHistory();
-
-    // نمایش پیام راهنمای سیستم
-    setTimeout(() => {
-      console.log('✅ سیستم Calculator PRO - برنامه دوم آماده است! ویژگی‌های فعال:');
-      console.log('• حذف خودکار 30 روزه: غیرفعال');
-      console.log('• ذخیره کامل تاریخچه: فعال');
-      console.log('• مدیریت دستی حذف: فعال');
-      console.log('• بک‌آپ کامل داده‌ها: فعال');
-      console.log('• نمایش اعداد بر اساس ساختار نقطه ورودی: فعال');
-      console.log('• عدم تداخل با برنامه اول: فعال');
-      console.log('• حالت چندتاریخی: فعال');
-      console.log('• مدیریت پیشرفته دکمه تاگل: فعال');
-    }, 1000);
+    // ---- Initialize app with IndexedDB ----
+    async function initApp() {
+      try {
+        await openDB();
+        await loadAllData();
+        ensureDefaults();
+        if((storageGet('pairs')||[]).length === 0){ 
+          storageSet('pairs', [
+            {id:uid(), name:'EURUSD', categoryId: 'forex'},
+            {id:uid(), name:'GBPUSD', categoryId: 'forex'},
+            {id:uid(), name:'BTCUSD', categoryId: 'crypto'},
+            {id:uid(), name:'ETHUSD', categoryId: 'crypto'}
+          ]); 
+        }
+        renderPairs(); 
+        renderHistory();
+        console.log('✅ سیستم Calculator PRO - برنامه دوم با IndexedDB آماده است!');
+      } catch (e) {
+        console.error('Error initializing app:', e);
+        alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
+      }
+    }
+    initApp();
   </script>
   
   <!-- این کد را در انتهای body، قبل از بسته شدن </body> قرار دهید -->
