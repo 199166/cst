@@ -1,4 +1,3 @@
-<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8"/>
@@ -16,13 +15,11 @@
       --text-light:#f1f5f9;
     }
     body{
-      /* اعمال فونت وزیرمتن روی کل بدنه */
       font-family: 'Vazirmatn', sans-serif; 
       background:var(--bg); 
       color:var(--text-light); 
       min-height:100vh; 
       padding:20px;
-      /* جلوگیری از کشش بیش از حد در موبایل */
       -webkit-text-size-adjust: 100%;
     }
     .card{
@@ -59,7 +56,7 @@
       width:100%; 
       outline: none;
       transition: all 0.2s ease;
-      font-family: 'Vazirmatn', sans-serif; /* اطمینان از فونت در اینپوت‌ها */
+      font-family: 'Vazirmatn', sans-serif;
     }
     input[type="text"]:focus, input[type="date"]:focus, input[type="number"]:focus, select:focus, textarea:focus { 
       border-color: rgba(59, 130, 246, 0.5);
@@ -108,7 +105,6 @@
       margin-left:.45rem; 
       opacity:.95; 
     }
-    /* استایل کامل و اصلاح شده برای دکمه‌ها */
     .small-btn{ 
       padding:0.5rem 0.75rem; 
       border-radius:0.5rem; 
@@ -129,7 +125,6 @@
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       font-family: 'Vazirmatn', sans-serif;
     }
-    /* استایل‌های hover و focus برای دکمه‌ها */
     .small-btn:hover {
       background: rgba(255, 255, 255, 0.15);
       border-color: rgba(255, 255, 255, 0.4);
@@ -145,7 +140,6 @@
       transform: translateY(0);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
-    /* رنگ دکمه‌ها */
     .small-btn.bg-slate-600 { background: #475569; border-color: #64748b; color: #fff; }
     .small-btn.bg-slate-600:hover { background: #64748b; border-color: #94a3b8; }
     .small-btn.bg-emerald-600 { background: #059669; border-color: #10b981; color: #fff; }
@@ -162,11 +156,9 @@
     .small-btn.bg-purple-600:hover { background: #8b5cf6; border-color: #a78bfa; }
     .small-btn.bg-green-600 { background: #059669; border-color: #10b981; color: #fff; }
     .small-btn.bg-green-600:hover { background: #10b981; border-color: #34d399; }
-
     .small-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .small-btn:disabled:hover { background: inherit; border-color: inherit; transform: none; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
     
-    /* استایل لیست‌ها - اصلاح شده و منظم */
     #categories_container .small-btn {
       padding: 0.2rem 0.4rem !important;
       font-size: 0.7rem !important;
@@ -240,8 +232,7 @@
     .comparison-group { border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; margin-bottom: 12px; transition: all 0.2s ease; }
     .comparison-group:hover { border-color: rgba(255,255,255,0.2); }
     
-    /* امضای اصلاح‌شده */
-.signature {
+    .signature {
   color: white;
   text-align: center;
   padding: 16px;
@@ -249,7 +240,7 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 14px;      /* دسکتاپ */
+  font-size: 14px;
   font-weight: 500;
   margin: 30px auto;
   width: fit-content;
@@ -257,25 +248,22 @@
 
   @media (max-width: 768px) {
   .signature {
-    font-size: 12px;   /* موبایل */
+    font-size: 12px;
   }
 }
-    /* تنظیمات مخصوص موبایل - بهینه سازی شده برای خوانایی */
     @media only screen and (max-width: 768px) {
       body {
-        padding: 10px; /* کاهش پدینگ بدنه در موبایل */
+        padding: 10px;
       }
       .small-btn {
-        min-height: 44px; /* ارتفاع مناسب برای تاچ */
+        min-height: 44px;
         padding: 0.75rem 1rem;
-        font-size: 0.95rem; /* کمی بزرگتر برای خوانایی بهتر */
+        font-size: 0.95rem;
         border-width: 2px;
       }
-      /* جلوگیری از زوم شدن ناخواسته در اینپوت‌ها در iOS */
       input[type="text"], input[type="date"], input[type="number"], select, textarea {
         font-size: 16px !important; 
       }
-      /* تنظیمات لیست‌ها در موبایل */
       #categories_container .small-btn {
         padding: 0.2rem 0.4rem !important;
         font-size: 0.75rem !important;
@@ -319,7 +307,6 @@
       .small-btn { padding: 0.75rem; font-size: 0.9rem; }
     }
 
-    /* استایل دکمه تاگل */
     #toggle_icon { transition: all 0.3s ease; font-weight: bold; display: inline-block; }
     #toggle_history_btn:hover #toggle_icon { transform: scale(1.2); }
     #toggle_history_btn.open { background: #374151 !important; border-color: #6b7280 !important; }
@@ -708,7 +695,6 @@ function upgradeClosestInfoForAllEntries() {
   let changed = false;
   entries.forEach(e => {
     if (!e.outputsDisplay || !Array.isArray(e.outputsDisplay) || e.outputsDisplay.length < 2) return;
-    // از خروجی‌های ذخیره‌شده، دوباره لیست اعداد را می‌سازیم
     const resultsForClosest = e.outputsDisplay
       .map(it => ({ label: it.label, value: it.raw }))
       .filter(x => typeof x.value === 'number' && !isNaN(x.value));
@@ -728,9 +714,6 @@ function upgradeClosestInfoForAllEntries() {
     storageSet('entries', entries);
   }
 }
-// (تابع findClosestNumbers تعریف می‌شود، اما باید قبل از فراخوانی تعریف شود)
-// برای رفع وابستگی، تابع findClosestNumbers را بعد از تعریف، دوباره اجرا می‌کنیم
-// ولی فعلاً ارسال می‌شود.
 
 // ---------- تشخیص دستگاه موبایل/تبلت ----------
 function isMobileOrTablet() {
@@ -873,12 +856,10 @@ function findClosestNumbers(numbers) {
       const distance = Math.abs(numbers[i].value - numbers[j].value);
 
       if (distance < minDistance) {
-        // قبلی‌ها می‌شوند فاصلهٔ دوم
         secondDistance = minDistance;
         secondPairs.length = 0;
         Array.prototype.push.apply(secondPairs, closestPairs);
 
-        // مقدار جدید می‌شود نزدیک‌ترین
         minDistance = distance;
         closestPairs.length = 0;
         closestPairs.push([numbers[i], numbers[j]]);
@@ -908,7 +889,6 @@ function findClosestNumbers(numbers) {
   };
 }
 
-// اجرای ارتقا پس از تعریف تابع
 upgradeClosestInfoForAllEntries();
 
 function renderClosestInfo(closestPairs, minDistance, inputFormat, secondPairs = [], secondDistance = null) {
@@ -1147,7 +1127,6 @@ if(resetButton) resetButton.addEventListener('click', ()=>{
   }
 });
 
-// سایر بخش‌های مدیریت جفت‌ارز، تاریخچه، بک‌آپ، صوت و غیره بدون تغییر باقی مانده‌اند
 // ---------- مدیریت جفت‌ارزها ----------
 function renderPairs(){
   const pairs = storageGet('pairs') || [];
