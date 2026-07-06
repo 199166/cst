@@ -1459,6 +1459,164 @@
         طراحی و ساخت توسط ❤️ سعید شیخ احمد صفاری
     </div>
     <script>
+        // ---- IndexedDB wrapper ----
+        const DB_NAME = 'ForexManagerDB';
+        const DB_VERSION = 1;
+        let db = null;
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('mainStore')) {
+                        db.createObjectStore('mainStore', { keyPath: 'id' });
+                    }
+                };
+                request.onsuccess = (e) => {
+                    db = e.target.result;
+                    resolve(db);
+                };
+                request.onerror = (e) => {
+                    reject(e.target.error);
+                };
+            });
+        }
+
+        function dbGet(id) {
+            return new Promise((resolve, reject) => {
+                if (!db) { reject(new Error('Database not open')); return; }
+                const tx = db.transaction('mainStore', 'readonly');
+                const store = tx.objectStore('mainStore');
+                const request = store.get(id);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function dbPut(data) {
+            return new Promise((resolve, reject) => {
+                if (!db) { reject(new Error('Database not open')); return; }
+                const tx = db.transaction('mainStore', 'readwrite');
+                const store = tx.objectStore('mainStore');
+                const request = store.put(data);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // ---- In-memory store ----
+        let store = {
+            categories: [],
+            history: [],
+            settings: {
+                darkMode: 'disabled',
+                selectedCurrencyCalculator: ''
+            }
+        };
+
+        // ---- Helper functions ----
+        function getStore() {
+            return store;
+        }
+
+        function saveStore() {
+            dbPut({ id: 'mainStore', data: store }).catch(e => console.error('Error saving to IndexedDB:', e));
+        }
+
+        // ---- Load from IndexedDB ----
+        async function loadStoreFromDB() {
+            try {
+                const result = await dbGet('mainStore');
+                if (result && result.data) {
+                    store = result.data;
+                    // Ensure categories and history exist
+                    if (!store.categories) store.categories = [];
+                    if (!store.history) store.history = [];
+                    if (!store.settings) store.settings = { darkMode: 'disabled', selectedCurrencyCalculator: '' };
+                }
+            } catch (e) {
+                console.error('Error loading from IndexedDB:', e);
+            }
+        }
+
+        // ---- Replace localStorage get/set with in-memory ----
+        function getItem(key) {
+            if (key === 'categories') return JSON.stringify(store.categories);
+            if (key === 'history') return JSON.stringify(store.history);
+            if (key === 'darkMode') return store.settings.darkMode;
+            if (key === 'selectedCurrencyCalculator') return store.settings.selectedCurrencyCalculator;
+            return null;
+        }
+
+        function setItem(key, value) {
+            if (key === 'categories') {
+                store.categories = JSON.parse(value);
+            } else if (key === 'history') {
+                store.history = JSON.parse(value);
+            } else if (key === 'darkMode') {
+                store.settings.darkMode = value;
+            } else if (key === 'selectedCurrencyCalculator') {
+                store.settings.selectedCurrencyCalculator = value;
+            }
+            saveStore();
+        }
+
+        function removeItem(key) {
+            if (key === 'categories') store.categories = [];
+            else if (key === 'history') store.history = [];
+            else if (key === 'darkMode') store.settings.darkMode = 'disabled';
+            else if (key === 'selectedCurrencyCalculator') store.settings.selectedCurrencyCalculator = '';
+            saveStore();
+        }
+
+        function clearItems() {
+            store.categories = [];
+            store.history = [];
+            store.settings = { darkMode: 'disabled', selectedCurrencyCalculator: '' };
+            saveStore();
+        }
+
+        // ---- Replace all localStorage calls ----
+        // We'll use wrapper functions that call our in-memory store
+        // But to keep the code unchanged, we'll override localStorage methods
+        const originalLocalStorage = {
+            getItem: localStorage.getItem.bind(localStorage),
+            setItem: localStorage.setItem.bind(localStorage),
+            removeItem: localStorage.removeItem.bind(localStorage),
+            clear: localStorage.clear.bind(localStorage)
+        };
+
+        // Override localStorage with our in-memory implementation
+        localStorage.getItem = function(key) {
+            if (key === 'categories' || key === 'history' || key === 'darkMode' || key === 'selectedCurrencyCalculator') {
+                return getItem(key);
+            }
+            return originalLocalStorage.getItem(key);
+        };
+
+        localStorage.setItem = function(key, value) {
+            if (key === 'categories' || key === 'history' || key === 'darkMode' || key === 'selectedCurrencyCalculator') {
+                setItem(key, value);
+                return;
+            }
+            originalLocalStorage.setItem(key, value);
+        };
+
+        localStorage.removeItem = function(key) {
+            if (key === 'categories' || key === 'history' || key === 'darkMode' || key === 'selectedCurrencyCalculator') {
+                removeItem(key);
+                return;
+            }
+            originalLocalStorage.removeItem(key);
+        };
+
+        localStorage.clear = function() {
+            clearItems();
+            originalLocalStorage.clear();
+        };
+
+        // ---- Rest of the code (unchanged) ----
         // مدیریت حالت تاریک
         const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
@@ -1905,14 +2063,40 @@
             loadHistory();
             showAlert('فیلترها حذف شدند', 'info');
         });
-        document.addEventListener('DOMContentLoaded', function() {
-            loadCurrencyPairs();
-            loadHistory();
-            loadCategories();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('trade-date').value = today;
-            switchTab('calculator');
-        });
+        
+        // ---- Init function ----
+        async function initApp() {
+            try {
+                await openDB();
+                await loadStoreFromDB();
+                
+                // Ensure categories and history are arrays
+                if (!store.categories) store.categories = [];
+                if (!store.history) store.history = [];
+                if (!store.settings) store.settings = { darkMode: 'disabled', selectedCurrencyCalculator: '' };
+                
+                // Apply dark mode from store
+                if (store.settings.darkMode === 'enabled') {
+                    body.classList.add('dark-mode');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i> ';
+                }
+                
+                // Set selected currency
+                selectedCurrencyCalculator = store.settings.selectedCurrencyCalculator || '';
+                
+                loadCurrencyPairs();
+                loadHistory();
+                loadCategories();
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('trade-date').value = today;
+                switchTab('calculator');
+            } catch (e) {
+                console.error('Error initializing app:', e);
+                alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
+            }
+        }
+
+        // ---- Load categories and other functions (unchanged) ----
         function loadCategories() {
             const categoriesContainer = document.getElementById('categories-management');
             const currencyCategorySelect = document.getElementById('currency-category');
@@ -2044,7 +2228,6 @@
             currencyCards.forEach(card => {
                 card.addEventListener('dragstart', function(e) {
                     draggedItem = this;
-                    // ✅ پیدا کردن دسته‌بندی مادر با استفاده از ساختار DOM
                     const parentCategoryElement = this.closest('.currency-category');
                     if (parentCategoryElement) {
                         sourceCategory = parentCategoryElement.getAttribute('data-category-id');
@@ -2057,7 +2240,6 @@
                     this.classList.remove('dragging');
                     draggedItem = null;
                     sourceCategory = null;
-                    // ذخیره تغییرات پس از درگ اند دراپ
                     saveCategoryChanges();
                 });
             });
@@ -2080,9 +2262,7 @@
                         const targetCategoryId = this.getAttribute('data-category-id');
                         const currencyId = draggedItem.getAttribute('data-currency-id');
                         
-                        // اگر جفت ارز در همان دسته‌بندی است، فقط مرتب‌سازی داخلی انجام شود
                         if (sourceCategory === targetCategoryId) {
-                            // مرتب‌سازی داخلی
                             const afterElement = getDragAfterElement(this, e.clientY);
                             if (afterElement) {
                                 this.insertBefore(draggedItem, afterElement);
@@ -2090,7 +2270,6 @@
                                 this.appendChild(draggedItem);
                             }
                         } else {
-                            // انتقال به دسته‌بندی دیگر
                             moveCurrency(currencyId, sourceCategory, targetCategoryId);
                             this.appendChild(draggedItem);
                         }
@@ -2100,7 +2279,6 @@
                 });
             });
 
-            // تابع کمکی برای پیدا کردن المان بعدی در لیست
             function getDragAfterElement(container, y) {
                 const draggableElements = [...container.querySelectorAll('.currency-card:not(.dragging)')];
                 
@@ -2537,6 +2715,9 @@
                 if (e.target === modal) modal.style.display = 'none';
             });
         });
+
+        // ---- Start app ----
+        initApp();
     </script>
     <br>
     <br>
