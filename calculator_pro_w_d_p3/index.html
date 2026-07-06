@@ -762,8 +762,6 @@
   <script>
     // ---------- helpers ----------
     const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    const storageGet = k => JSON.parse(localStorage.getItem('calc_pro_3_' + k) || 'null');
-    const storageSet = (k, v) => localStorage.setItem('calc_pro_3_' + k, JSON.stringify(v));
     const AUTO_PRUNE_ENABLED = false;
     const MAX_DAYS = 3650;
     function nowISO() { 
@@ -774,16 +772,214 @@
       const pad = n => n.toString().padStart(2, '0');
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
-    function ensureDefaults() { 
-      if (!storageGet('pairs')) storageSet('pairs', []); 
-      if (!storageGet('entries')) storageSet('entries', []);
-      if (!storageGet('categories')) storageSet('categories', [
-        {id: 'default', name: 'اصلی'},
-        {id: 'forex', name: 'فارکس'},
-        {id: 'crypto', name: 'ارز دیجیتال'}
-      ]);
+
+    // ---------- IndexedDB Wrapper (replaces localStorage) ----------
+    const DB_NAME = 'CalcProDB_v3';
+    const DB_VERSION = 1;
+    let db = null;
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          // Object stores
+          if (!db.objectStoreNames.contains('pairs')) {
+            db.createObjectStore('pairs', { keyPath: 'id' });
+          }
+          if (!db.objectStoreNames.contains('entries')) {
+            db.createObjectStore('entries', { keyPath: 'id' });
+          }
+          if (!db.objectStoreNames.contains('categories')) {
+            db.createObjectStore('categories', { keyPath: 'id' });
+          }
+          if (!db.objectStoreNames.contains('backups')) {
+            db.createObjectStore('backups', { keyPath: 'id' });
+          }
+        };
+        request.onsuccess = (e) => {
+          db = e.target.result;
+          resolve(db);
+        };
+        request.onerror = (e) => {
+          reject(e.target.error);
+        };
+      });
     }
-    ensureDefaults();
+
+    // Generic CRUD functions
+    function dbGetAll(storeName) {
+      return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('Database not open')); return; }
+        const tx = db.transaction(storeName, 'readonly');
+        const store = tx.objectStore(storeName);
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function dbPut(storeName, data) {
+      return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('Database not open')); return; }
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const request = store.put(data);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function dbDelete(storeName, id) {
+      return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('Database not open')); return; }
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const request = store.delete(id);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function dbClear(storeName) {
+      return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('Database not open')); return; }
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const request = store.clear();
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    // Async wrappers for synchronous-like usage (maintaining the original function signatures)
+    // We will use a queue or direct async/await in the code, but we need to keep the same
+    // function names as before: storageGet, storageSet, etc.
+    // Since the original code uses synchronous localStorage, we need to adapt using async/await.
+    // To minimize changes, we'll make storageGet/set async and use them with await.
+    // However, we need to ensure the rest of the code can handle async.
+    // Most of the code is inside event listeners, so we can make them async.
+    // We'll redefine storageGet and storageSet as async functions.
+
+    // Original: storageGet(k) => JSON.parse(localStorage.getItem('calc_pro_3_' + k) || 'null');
+    // We'll store data in IndexedDB with the same keys (without prefix) inside each store.
+    // We'll map: 'pairs' -> store 'pairs', 'entries' -> store 'entries', 'categories' -> store 'categories', 'backups' -> store 'backups'
+    // We'll also keep a cache for quick access? But better to just fetch from DB.
+
+    // We'll wrap everything in async/await. We also need to make sure we don't break the load order.
+    // The original code calls ensureDefaults() and expects data to be there.
+    // We'll define storageGetAsync and storageSetAsync.
+
+    // To keep the same variable names, we'll reassign storageGet and storageSet to async functions.
+    // But they are used in many places. We'll make them async and await them.
+    // However, the original code expects them to be synchronous. We'll use a pattern:
+    // Instead of changing all calls, we'll make storageGet and storageSet as async functions
+    // and use them with await. But that requires changes in every call.
+    // Alternatively, we can keep the same function names and use an in-memory cache that syncs with IndexedDB.
+    // That way, we can keep the code synchronous and just load/save from IndexedDB on init and changes.
+    // This is the simplest way to avoid massive changes.
+
+    // We'll implement an in-memory cache for each store and sync with IndexedDB.
+    // On load, we fetch all data from IndexedDB into memory.
+    // On save, we update memory and IndexedDB.
+
+    let memoryCache = {
+      pairs: [],
+      entries: [],
+      categories: [],
+      backups: []
+    };
+
+    // Load all data from IndexedDB into memory on startup
+    async function loadAllData() {
+      try {
+        const [pairs, entries, categories, backups] = await Promise.all([
+          dbGetAll('pairs'),
+          dbGetAll('entries'),
+          dbGetAll('categories'),
+          dbGetAll('backups')
+        ]);
+        memoryCache.pairs = pairs || [];
+        memoryCache.entries = entries || [];
+        memoryCache.categories = categories || [];
+        memoryCache.backups = backups || [];
+      } catch (e) {
+        console.error('Error loading data from IndexedDB:', e);
+        // If DB fails, fallback to empty arrays (but we already have defaults)
+      }
+    }
+
+    // Synchronous storageGet (reads from memory)
+    function storageGet(k) {
+      if (k === 'pairs') return memoryCache.pairs;
+      if (k === 'entries') return memoryCache.entries;
+      if (k === 'categories') return memoryCache.categories;
+      if (k === 'backups') return memoryCache.backups;
+      return null;
+    }
+
+    // Synchronous storageSet (updates memory and syncs to IndexedDB asynchronously)
+    function storageSet(k, v) {
+      if (k === 'pairs') {
+        memoryCache.pairs = v;
+        // sync to DB in background
+        syncStoreToDB('pairs', v);
+      } else if (k === 'entries') {
+        memoryCache.entries = v;
+        syncStoreToDB('entries', v);
+      } else if (k === 'categories') {
+        memoryCache.categories = v;
+        syncStoreToDB('categories', v);
+      } else if (k === 'backups') {
+        memoryCache.backups = v;
+        syncStoreToDB('backups', v);
+      }
+    }
+
+    // Async sync function to update IndexedDB
+    async function syncStoreToDB(storeName, data) {
+      try {
+        // Clear the store and put all items
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        await new Promise((resolve, reject) => {
+          const req = store.clear();
+          req.onsuccess = () => resolve();
+          req.onerror = () => reject(req.error);
+        });
+        // Put all items one by one
+        for (const item of data) {
+          await new Promise((resolve, reject) => {
+            const req = store.put(item);
+            req.onsuccess = () => resolve();
+            req.onerror = () => reject(req.error);
+          });
+        }
+      } catch (e) {
+        console.error('Error syncing store to IndexedDB:', e);
+      }
+    }
+
+    // Also, we need to handle the case where we call storageGet in the original code
+    // and expect it to return an array. We'll make sure memoryCache is populated.
+
+    // ---------- rest of the code (unchanged, but using storageGet/Set with memory cache) ----------
+    function ensureDefaults() { 
+      if (!storageGet('pairs') || storageGet('pairs').length === 0) {
+        storageSet('pairs', []); 
+      }
+      if (!storageGet('entries') || storageGet('entries').length === 0) {
+        storageSet('entries', []);
+      }
+      if (!storageGet('categories') || storageGet('categories').length === 0) {
+        storageSet('categories', [
+          {id: 'default', name: 'اصلی'},
+          {id: 'forex', name: 'فارکس'},
+          {id: 'crypto', name: 'ارز دیجیتال'}
+        ]);
+      }
+    }
+
     // ---------- تشخیص دستگاه موبایل/تبلت ----------
     function isMobileOrTablet() {
       return window.innerWidth <= 1024;
@@ -1093,7 +1289,7 @@
       });
     }
     // ---------- مدیریت داده‌ها ----------
-    function saveEntry(pairId, inputs, outputsDisplay, note = '', dateISO = null, inputFormat = null, closestInfo = null) {
+    function saveEntry(pairId, inputs, outputsDisplay, note = '', dateISO = null, inputFormat = null, closestInfoData = null) {
       const entries = storageGet('entries') || [];
       const si = dateISO || nowISO();
       const entry = { 
@@ -1105,7 +1301,7 @@
         outputsDisplay, 
         note,
         inputFormat: inputFormat,
-        closestInfo: closestInfo || null
+        closestInfo: closestInfoData || null
       };
       entries.push(entry); 
       storageSet('entries', entries);
@@ -2598,24 +2794,37 @@
       });
     }
     // ---------- شروع اولیه ----------
-    if ((storageGet('pairs') || []).length === 0) {
-      storageSet('pairs', [
-        {id: uid(), name: 'EURUSD', categoryId: 'forex'},
-        {id: uid(), name: 'GBPUSD', categoryId: 'forex'},
-        {id: uid(), name: 'BTCUSD', categoryId: 'crypto'},
-        {id: uid(), name: 'ETHUSD', categoryId: 'crypto'}
-      ]);
+    // We need to initialize data after DB is loaded
+    async function initApp() {
+      try {
+        await openDB();
+        await loadAllData();
+        // Ensure defaults
+        ensureDefaults();
+        if ((storageGet('pairs') || []).length === 0) {
+          storageSet('pairs', [
+            {id: uid(), name: 'EURUSD', categoryId: 'forex'},
+            {id: uid(), name: 'GBPUSD', categoryId: 'forex'},
+            {id: uid(), name: 'BTCUSD', categoryId: 'crypto'},
+            {id: uid(), name: 'ETHUSD', categoryId: 'crypto'}
+          ]);
+        }
+        window.addEventListener('load', () => {
+          const today = new Date().toISOString().split('T')[0];
+          if (historyDate) historyDate.value = today;
+          setTimeout(() => { if (inputY1) inputY1.focus(); }, 1000);
+        });
+        renderPairs(); 
+        renderHistory();
+        setTimeout(() => {
+          console.log('✅ سیستم Calculator PRO - برنامه سوم با IndexedDB آماده است!');
+        }, 1000);
+      } catch (e) {
+        console.error('Error initializing app:', e);
+        alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
+      }
     }
-    window.addEventListener('load', () => {
-      const today = new Date().toISOString().split('T')[0];
-      if (historyDate) historyDate.value = today;
-      setTimeout(() => { if (inputY1) inputY1.focus(); }, 1000);
-    });
-    renderPairs(); 
-    renderHistory();
-    setTimeout(() => {
-      console.log('✅ سیستم Calculator PRO - برنامه سوم آماده است!');
-    }, 1000);
+    initApp();
   </script>
   <div class="signature">
     طراحی و ساخت توسط ❤️ سعید شیخ احمد صفاری
