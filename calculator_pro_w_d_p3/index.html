@@ -1352,12 +1352,32 @@
       });
     }
     // ---------- مدیریت جفت‌ارزها ----------
+    // ***** اصلاح: اضافه کردن sortOrder برای ماندگاری ترتیب *****
+    function getNextSortOrder() {
+      const pairs = storageGet('pairs') || [];
+      if (pairs.length === 0) return 0;
+      const maxOrder = Math.max(...pairs.map(p => p.sortOrder !== undefined ? p.sortOrder : 0));
+      return maxOrder + 1;
+    }
+
+    function sortPairsByOrder(pairs) {
+      return pairs.slice().sort((a, b) => {
+        const orderA = a.sortOrder !== undefined ? a.sortOrder : 0;
+        const orderB = b.sortOrder !== undefined ? b.sortOrder : 0;
+        return orderA - orderB;
+      });
+    }
+
     function renderPairs() {
       const pairs = storageGet('pairs') || [];
+      // مرتب‌سازی بر اساس sortOrder
+      const sortedPairs = sortPairsByOrder(pairs);
+      
       if (pairSelect) pairSelect.innerHTML = '';
       if (historyPairFilter) historyPairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
       if (multiDatePairFilter) multiDatePairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
-      pairs.forEach(p => {
+      
+      sortedPairs.forEach(p => {
         if (pairSelect) {
           const opt = document.createElement('option');
           opt.value = p.id;
@@ -1377,7 +1397,7 @@
           multiDatePairFilter.appendChild(opt3);
         }
       });
-      if (pairs.length === 0 && pairSelect) {
+      if (sortedPairs.length === 0 && pairSelect) {
         const opt = document.createElement('option');
         opt.value = '';
         opt.textContent = 'ابتدا یک جفت‌ارز اضافه کنید';
@@ -1385,31 +1405,42 @@
       }
       renderCategories();
     }
+
     function addPair(name) {
       if (!name || !name.trim()) return;
       const pairs = storageGet('pairs') || [];
       const selectedCategory = categorySelect ? categorySelect.value : null;
+      const newOrder = getNextSortOrder();
       pairs.push({
         id: uid(), 
         name: name.trim(),
-        categoryId: selectedCategory || null
+        categoryId: selectedCategory || null,
+        sortOrder: newOrder  // <--- اضافه شد
       });
       storageSet('pairs', pairs);
       renderPairs();
     }
-    // تابع swapPairs با ذخیره‌سازی درست اصلاح شده
+
+    // تابع swapPairs اصلاح شده با sortOrder
     function swapPairs(i, j) {
       const pairs = storageGet('pairs') || [];
       if (!pairs[i] || !pairs[j]) return;
-      // جابجایی دو عنصر
-      const temp = pairs[i];
-      pairs[i] = pairs[j];
-      pairs[j] = temp;
-      // ذخیره‌سازی در حافظه و IndexedDB
+      
+      // دریافت sortOrder فعلی
+      const orderI = pairs[i].sortOrder !== undefined ? pairs[i].sortOrder : i;
+      const orderJ = pairs[j].sortOrder !== undefined ? pairs[j].sortOrder : j;
+      
+      // تعویض sortOrder‌ها
+      pairs[i].sortOrder = orderJ;
+      pairs[j].sortOrder = orderI;
+      
+      // تعویض موقعیت در آرایه
+      [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+      
       storageSet('pairs', pairs);
-      // بازسازی کامل UI
       renderPairs();
     }
+
     function movePairToCategory(pairId, newCategoryId) {
       const pairs = storageGet('pairs') || [];
       const pair = pairs.find(p => p.id === pairId);
@@ -1419,6 +1450,22 @@
         renderPairs();
       }
     }
+
+    // تابع برای به‌روزرسانی sortOrder جفت‌ارزهای قدیمی
+    function upgradePairsWithSortOrder() {
+      const pairs = storageGet('pairs') || [];
+      let changed = false;
+      pairs.forEach((p, index) => {
+        if (p.sortOrder === undefined) {
+          p.sortOrder = index;
+          changed = true;
+        }
+      });
+      if (changed) {
+        storageSet('pairs', pairs);
+      }
+    }
+
     if (addPairBtn) {
       addPairBtn.addEventListener('click', () => { 
         addPair(newPairName ? newPairName.value : ''); 
@@ -1437,6 +1484,9 @@
     function renderCategories() {
       const categories = storageGet('categories') || [];
       const pairs = storageGet('pairs') || [];
+      // مرتب‌سازی بر اساس sortOrder
+      const sortedPairs = sortPairsByOrder(pairs);
+      
       if (categorySelect) {
         categorySelect.innerHTML = '<option value="">بدون دسته‌بندی</option>';
         categories.forEach(cat => {
@@ -1456,7 +1506,7 @@
             div.className = 'flex justify-between items-center p-1 px-2 rounded category-item';
             div.innerHTML = `
               <span class="text-xs">${cat.name}</span>
-              <span class="text-xs muted">${pairs.filter(p => p.categoryId === cat.id).length} جفت‌ارز</span>
+              <span class="text-xs muted">${sortedPairs.filter(p => p.categoryId === cat.id).length} جفت‌ارز</span>
             `;
             categoriesList.appendChild(div);
           });
@@ -1464,12 +1514,12 @@
       }
       if (categoriesContainer) {
         categoriesContainer.innerHTML = '';
-        const uncategorizedPairs = pairs.filter(p => !p.categoryId);
+        const uncategorizedPairs = sortedPairs.filter(p => !p.categoryId);
         if (uncategorizedPairs.length > 0) {
           renderCategorySection(null, 'بدون دسته‌بندی', uncategorizedPairs);
         }
         categories.forEach(category => {
-          const categoryPairs = pairs.filter(p => p.categoryId === category.id);
+          const categoryPairs = sortedPairs.filter(p => p.categoryId === category.id);
           if (categoryPairs.length > 0) {
             renderCategorySection(category.id, category.name, categoryPairs);
           }
@@ -1706,7 +1756,6 @@
             viewBtn.textContent = 'نمایش جزئیات';
             viewBtn.addEventListener('click', () => showDetail(e.id));
             bottom.appendChild(viewBtn);
-            wrapper.appendChild(bottom);
             group.appendChild(wrapper);
           });
         }
@@ -2783,12 +2832,14 @@
         await loadAllData();
         // Ensure defaults
         ensureDefaults();
+        // به‌روزرسانی جفت‌ارزهای قدیمی برای اضافه کردن sortOrder
+        upgradePairsWithSortOrder();
         if ((storageGet('pairs') || []).length === 0) {
           storageSet('pairs', [
-            {id: uid(), name: 'EURUSD', categoryId: 'forex'},
-            {id: uid(), name: 'GBPUSD', categoryId: 'forex'},
-            {id: uid(), name: 'BTCUSD', categoryId: 'crypto'},
-            {id: uid(), name: 'ETHUSD', categoryId: 'crypto'}
+            {id: uid(), name: 'EURUSD', categoryId: 'forex', sortOrder: 0},
+            {id: uid(), name: 'GBPUSD', categoryId: 'forex', sortOrder: 1},
+            {id: uid(), name: 'BTCUSD', categoryId: 'crypto', sortOrder: 2},
+            {id: uid(), name: 'ETHUSD', categoryId: 'crypto', sortOrder: 3}
           ]);
         }
         window.addEventListener('load', () => {
@@ -2799,7 +2850,7 @@
         renderPairs(); 
         renderHistory();
         setTimeout(() => {
-          console.log('✅ سیستم Calculator PRO - برنامه سوم با IndexedDB آماده است!');
+          console.log('✅ سیستم Calculator PRO - برنامه سوم با IndexedDB و sortOrder آماده است!');
         }, 1000);
       } catch (e) {
         console.error('Error initializing app:', e);
