@@ -567,8 +567,124 @@
 <script>
 // ---------- helpers ----------
 const uid = ()=> Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-const storageGet = k => JSON.parse(localStorage.getItem('calc_pro_1_' + k) || 'null');
-const storageSet = (k,v) => localStorage.setItem('calc_pro_1_' + k, JSON.stringify(v));
+
+// ---- IndexedDB wrapper ----
+const DB_NAME = 'CalcProDB_v1';
+const DB_VERSION = 1;
+let db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('pairs')) {
+        db.createObjectStore('pairs', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('entries')) {
+        db.createObjectStore('entries', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('categories')) {
+        db.createObjectStore('categories', { keyPath: 'id' });
+      }
+    };
+    request.onsuccess = (e) => {
+      db = e.target.result;
+      resolve(db);
+    };
+    request.onerror = (e) => {
+      reject(e.target.error);
+    };
+  });
+}
+
+function dbGetAll(storeName) {
+  return new Promise((resolve, reject) => {
+    if (!db) { reject(new Error('Database not open')); return; }
+    const tx = db.transaction(storeName, 'readonly');
+    const store = tx.objectStore(storeName);
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function dbClear(storeName) {
+  return new Promise((resolve, reject) => {
+    if (!db) { reject(new Error('Database not open')); return; }
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+    const request = store.clear();
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function dbPut(storeName, data) {
+  return new Promise((resolve, reject) => {
+    if (!db) { reject(new Error('Database not open')); return; }
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+    const request = store.put(data);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// ---- In-memory cache ----
+let memoryCache = {
+  pairs: [],
+  entries: [],
+  categories: []
+};
+
+async function loadAllData() {
+  try {
+    const [pairs, entries, categories] = await Promise.all([
+      dbGetAll('pairs'),
+      dbGetAll('entries'),
+      dbGetAll('categories')
+    ]);
+    memoryCache.pairs = pairs || [];
+    memoryCache.entries = entries || [];
+    memoryCache.categories = categories || [];
+  } catch (e) {
+    console.error('Error loading data from IndexedDB:', e);
+  }
+}
+
+// ---- Synchronous storage functions (using memory cache) ----
+function storageGet(k) {
+  if (k === 'pairs') return memoryCache.pairs;
+  if (k === 'entries') return memoryCache.entries;
+  if (k === 'categories') return memoryCache.categories;
+  return [];
+}
+
+function storageSet(k, v) {
+  if (k === 'pairs') {
+    memoryCache.pairs = v;
+    syncStoreToDB('pairs', v);
+  } else if (k === 'entries') {
+    memoryCache.entries = v;
+    syncStoreToDB('entries', v);
+  } else if (k === 'categories') {
+    memoryCache.categories = v;
+    syncStoreToDB('categories', v);
+  }
+}
+
+async function syncStoreToDB(storeName, data) {
+  try {
+    await dbClear(storeName);
+    for (const item of data) {
+      await dbPut(storeName, item);
+    }
+  } catch (e) {
+    console.error('Error syncing store to IndexedDB:', e);
+  }
+}
+
 const AUTO_PRUNE_ENABLED = false;
 const MAX_DAYS = 3650;
 function nowISO(){ return new Date().toISOString(); }
@@ -612,7 +728,10 @@ function upgradeClosestInfoForAllEntries() {
     storageSet('entries', entries);
   }
 }
-upgradeClosestInfoForAllEntries();
+// (تابع findClosestNumbers تعریف می‌شود، اما باید قبل از فراخوانی تعریف شود)
+// برای رفع وابستگی، تابع findClosestNumbers را بعد از تعریف، دوباره اجرا می‌کنیم
+// ولی فعلاً ارسال می‌شود.
+
 // ---------- تشخیص دستگاه موبایل/تبلت ----------
 function isMobileOrTablet() {
     return window.innerWidth <= 1024;
@@ -788,6 +907,9 @@ function findClosestNumbers(numbers) {
     secondDistance 
   };
 }
+
+// اجرای ارتقا پس از تعریف تابع
+upgradeClosestInfoForAllEntries();
 
 function renderClosestInfo(closestPairs, minDistance, inputFormat, secondPairs = [], secondDistance = null) {
   if (!closestInfo) return;
@@ -2051,11 +2173,30 @@ window.addEventListener('load', () => {
   if(historyDate) historyDate.value = today;
   setTimeout(() => { if(numericFields[0]) numericFields[0].focus(); }, 1000);
 });
-renderPairs(); 
-renderHistory();
-setTimeout(() => {
-  console.log('✅ سیستم Calculator PRO - برنامه اول آماده است!');
-}, 1000);
+
+// ---- Initialize app with IndexedDB ----
+async function initApp() {
+  try {
+    await openDB();
+    await loadAllData();
+    ensureDefaults();
+    if((storageGet('pairs')||[]).length === 0){ 
+      storageSet('pairs', [
+        {id:uid(), name:'EURUSD', categoryId: 'forex'},
+        {id:uid(), name:'GBPUSD', categoryId: 'forex'},
+        {id:uid(), name:'BTCUSD', categoryId: 'crypto'},
+        {id:uid(), name:'ETHUSD', categoryId: 'crypto'}
+      ]);
+    }
+    renderPairs(); 
+    renderHistory();
+    console.log('✅ سیستم Calculator PRO - برنامه اول با IndexedDB آماده است!');
+  } catch (e) {
+    console.error('Error initializing app:', e);
+    alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
+  }
+}
+initApp();
 </script>
 <div class="signature">
     طراحی و ساخت توسط ❤️ سعید شیخ احمد صفاری
