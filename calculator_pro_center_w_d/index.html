@@ -873,16 +873,17 @@
       return [];
     }
 
-    function storageSet(k, v) {
+    // ===== اصلاح مهم: تبدیل storageSet به async و استفاده از await =====
+    async function storageSet(k, v) {
       if (k === 'pairs') {
         memoryCache.pairs = v;
-        syncStoreToDB('pairs', v);
+        await syncStoreToDB('pairs', v);
       } else if (k === 'entries') {
         memoryCache.entries = v;
-        syncStoreToDB('entries', v);
+        await syncStoreToDB('entries', v);
       } else if (k === 'categories') {
         memoryCache.categories = v;
-        syncStoreToDB('categories', v);
+        await syncStoreToDB('categories', v);
       }
     }
 
@@ -1706,11 +1707,18 @@
       renderPairs();
     }
 
-    function swapPairs(i,j){
+    // ===== اصلاح مهم در swapPairs =====
+    // تابع swapPairs با ذخیره‌سازی همگام اصلاح شده
+    function swapPairs(i, j){
       const pairs = storageGet('pairs')||[];
       if(!pairs[i] || !pairs[j]) return;
-      [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+      // جابجایی دو عنصر
+      const temp = pairs[i];
+      pairs[i] = pairs[j];
+      pairs[j] = temp;
+      // ذخیره‌سازی با استفاده از storageSet که حالا async است
       storageSet('pairs', pairs);
+      // بازسازی کامل UI
       renderPairs();
     }
 
@@ -1729,10 +1737,26 @@
         const btn = e.target.closest('button'); if(!btn) return;
         const action = btn.dataset.action; const id = btn.dataset.id;
         const pairs = storageGet('pairs')||[]; const idx = pairs.findIndex(p => p.id === id);
-        if(action === 'up' && idx > 0) swapPairs(idx, idx-1);
-        if(action === 'down' && idx < pairs.length-1) swapPairs(idx, idx+1);
-        if(action === 'delete'){ if(!confirm('آیا حذف شود؟')) return; pairs.splice(idx,1); storageSet('pairs', pairs); renderPairs(); }
-        if(action === 'edit'){ const newName = prompt('نام جدید:', pairs[idx].name); if(newName && newName.trim()){ pairs[idx].name = newName.trim(); storageSet('pairs', pairs); renderPairs(); } }
+        if(action === 'up' && idx > 0) {
+          swapPairs(idx, idx-1);
+        }
+        if(action === 'down' && idx < pairs.length-1) {
+          swapPairs(idx, idx+1);
+        }
+        if(action === 'delete'){ 
+          if(!confirm('آیا حذف شود؟')) return; 
+          pairs.splice(idx,1); 
+          storageSet('pairs', pairs); 
+          renderPairs(); 
+        }
+        if(action === 'edit'){ 
+          const newName = prompt('نام جدید:', pairs[idx].name); 
+          if(newName && newName.trim()){ 
+            pairs[idx].name = newName.trim(); 
+            storageSet('pairs', pairs); 
+            renderPairs(); 
+          } 
+        }
       });
       
       categoriesContainer.addEventListener('change', (e) => {
