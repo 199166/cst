@@ -1,3 +1,4 @@
+<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8"/>
@@ -640,6 +641,10 @@ async function loadAllData() {
   }
 }
 
+// ============================================================
+// ===== اصلاح اصلی: تبدیل storageSet به async با await =====
+// ============================================================
+
 // ---- Synchronous storage functions (using memory cache) ----
 function storageGet(k) {
   if (k === 'pairs') return memoryCache.pairs;
@@ -648,16 +653,17 @@ function storageGet(k) {
   return [];
 }
 
-function storageSet(k, v) {
+// ===== اصلاح: storageSet به async تبدیل شد =====
+async function storageSet(k, v) {
   if (k === 'pairs') {
     memoryCache.pairs = v;
-    syncStoreToDB('pairs', v);
+    await syncStoreToDB('pairs', v);
   } else if (k === 'entries') {
     memoryCache.entries = v;
-    syncStoreToDB('entries', v);
+    await syncStoreToDB('entries', v);
   } else if (k === 'categories') {
     memoryCache.categories = v;
-    syncStoreToDB('categories', v);
+    await syncStoreToDB('categories', v);
   }
 }
 
@@ -1161,7 +1167,9 @@ function renderPairs(){
   }
   renderCategories();
 }
-function addPair(name){
+
+// ===== اصلاح: addPair به async تبدیل شد =====
+async function addPair(name){
   if(!name || !name.trim()) return;
   const pairs = storageGet('pairs')||[];
   const selectedCategory = categorySelect ? categorySelect.value : null;
@@ -1170,16 +1178,19 @@ function addPair(name){
     name: name.trim(),
     categoryId: selectedCategory || null
   });
-  storageSet('pairs', pairs);
+  await storageSet('pairs', pairs);
   renderPairs();
 }
-function swapPairs(i,j){
+
+// ===== اصلاح: swapPairs به async تبدیل شد =====
+async function swapPairs(i,j){
   const pairs = storageGet('pairs')||[];
   if(!pairs[i] || !pairs[j]) return;
   [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
-  storageSet('pairs', pairs);
+  await storageSet('pairs', pairs);
   renderPairs();
 }
+
 function movePairToCategory(pairId, newCategoryId){
   const pairs = storageGet('pairs')||[];
   const pair = pairs.find(p => p.id === pairId);
@@ -1189,8 +1200,20 @@ function movePairToCategory(pairId, newCategoryId){
     renderPairs();
   }
 }
-if(addPairBtn) addPairBtn.addEventListener('click', ()=>{ addPair(newPairName ? newPairName.value : ''); if(newPairName) newPairName.value=''; });
-if(clearPairsBtn) clearPairsBtn.addEventListener('click', ()=>{ if(confirm('آیا همه جفت‌ارزها حذف شوند؟')){ storageSet('pairs', []); renderPairs(); } });
+
+// ===== اصلاح: رویدادهای addPairBtn و clearPairsBtn به async تبدیل شدند =====
+if(addPairBtn) addPairBtn.addEventListener('click', async ()=>{ 
+  await addPair(newPairName ? newPairName.value : ''); 
+  if(newPairName) newPairName.value=''; 
+});
+
+if(clearPairsBtn) clearPairsBtn.addEventListener('click', async ()=>{ 
+  if(confirm('آیا همه جفت‌ارزها حذف شوند؟')){ 
+    await storageSet('pairs', []); 
+    renderPairs(); 
+  } 
+});
+
 // ---------- مدیریت دسته‌بندی‌ها ----------
 function renderCategories(){
   const categories = storageGet('categories') || [];
@@ -1234,6 +1257,7 @@ function renderCategories(){
     });
   }
 }
+
 function renderCategorySection(categoryId, categoryName, pairs){
   const section = document.createElement('div');
   section.className = 'category-section';
@@ -1277,6 +1301,7 @@ function renderCategorySection(categoryId, categoryName, pairs){
     content.classList.toggle('hidden');
   });
 }
+
 function addCategory(name){
   if(!name || !name.trim()) return;
   const categories = storageGet('categories') || [];
@@ -1288,6 +1313,7 @@ function addCategory(name){
   storageSet('categories', categories);
   renderCategories();
 }
+
 function deleteCategory(){
   const selectedCategoryId = categorySelect ? categorySelect.value : null;
   if(!selectedCategoryId){
@@ -1313,17 +1339,36 @@ function deleteCategory(){
   renderCategories();
   renderPairs();
 }
+
 if(addCategoryBtn) addCategoryBtn.addEventListener('click', () => { addCategory(newCategoryName ? newCategoryName.value : ''); if(newCategoryName) newCategoryName.value = ''; });
 if(deleteCategoryBtn) deleteCategoryBtn.addEventListener('click', deleteCategory);
+
+// ===== اصلاح: رویداد کلیک categoriesContainer به async تبدیل شد =====
 if(categoriesContainer){
-  categoriesContainer.addEventListener('click', (e)=>{
+  categoriesContainer.addEventListener('click', async (e)=>{
     const btn = e.target.closest('button'); if(!btn) return;
     const action = btn.dataset.action; const id = btn.dataset.id;
     const pairs = storageGet('pairs')||[]; const idx = pairs.findIndex(p => p.id === id);
-    if(action === 'up' && idx > 0) swapPairs(idx, idx-1);
-    if(action === 'down' && idx < pairs.length-1) swapPairs(idx, idx+1);
-    if(action === 'delete'){ if(!confirm('آیا حذف شود؟')) return; pairs.splice(idx,1); storageSet('pairs', pairs); renderPairs(); }
-    if(action === 'edit'){ const newName = prompt('نام جدید:', pairs[idx].name); if(newName && newName.trim()){ pairs[idx].name = newName.trim(); storageSet('pairs', pairs); renderPairs(); } }
+    if(action === 'up' && idx > 0) {
+      await swapPairs(idx, idx-1);
+    }
+    if(action === 'down' && idx < pairs.length-1) {
+      await swapPairs(idx, idx+1);
+    }
+    if(action === 'delete'){ 
+      if(!confirm('آیا حذف شود؟')) return; 
+      pairs.splice(idx,1); 
+      await storageSet('pairs', pairs); 
+      renderPairs(); 
+    }
+    if(action === 'edit'){ 
+      const newName = prompt('نام جدید:', pairs[idx].name); 
+      if(newName && newName.trim()){ 
+        pairs[idx].name = newName.trim(); 
+        await storageSet('pairs', pairs); 
+        renderPairs(); 
+      } 
+    }
   });
   categoriesContainer.addEventListener('change', (e) => {
     if(e.target.classList.contains('move-category')){
@@ -1333,6 +1378,7 @@ if(categoriesContainer){
     }
   });
 }
+
 // ---------- تاریخچه ----------
 function renderHistory(){
   if (multiDateSection && !multiDateSection.classList.contains('hidden')) {
@@ -1428,6 +1474,7 @@ function renderHistory(){
     historyList.appendChild(wrapper);
   });
 }
+
 function showDetail(entryId){
   const entries = storageGet('entries')||[]; 
   const e = entries.find(x=>x.id===entryId); 
@@ -1525,12 +1572,14 @@ function showDetail(entryId){
   if(deleteRecordBtn) deleteRecordBtn.onclick = ()=> deleteRecord(e.id);
   if(moveRecordBtn) moveRecordBtn.onclick = ()=> moveRecord(e.id);
 }
+
 if(closeDetail) closeDetail.addEventListener('click', ()=> { 
   if(detailModal) {
     detailModal.classList.add('hidden');
     detailModal.classList.remove('center-modal');
   }
 });
+
 function deleteRecord(id){ 
   if(!confirm('آیا از حذف این رکورد مطمئن هستید؟')) return; 
   const entries = storageGet('entries')||[]; 
@@ -1544,6 +1593,7 @@ function deleteRecord(id){
     detailModal.classList.remove('center-modal');
   }
 }
+
 function editRecord(id){
   const entries = storageGet('entries')||[]; const e = entries.find(x=>x.id===id); if(!e) return;
   if(!confirm('مقادیر رکورد در فرم بارگذاری خواهد شد. پس از ویرایش دکمهٔ محاسبه را بزنید تا رکورد جدید ذخیره شود. رکورد قدیمی حذف می‌شود. ادامه می‌دهید؟')) return;
@@ -1564,6 +1614,7 @@ function editRecord(id){
   }
   window.scrollTo({top:0, behavior:'smooth'});
 }
+
 function moveRecord(id){
   const newDate = prompt('تاریخ جدید (YYYY-MM-DD) را وارد کنید:'); if(!newDate) return;
   const d = new Date(newDate + 'T00:00:00'); if(isNaN(d)){ alert('تاریخ نامعتبر.'); return; }
@@ -1574,6 +1625,7 @@ function moveRecord(id){
     detailModal.classList.remove('center-modal');
   }
 }
+
 // ---------- backup/import ----------
 function showNotification(message, type = 'success') {
   const toast = document.createElement('div');
@@ -1586,6 +1638,7 @@ function showNotification(message, type = 'success') {
     }
   }, 4000);
 }
+
 if(exportBtn) exportBtn.addEventListener('click', ()=>{
   try {
     const payload = { 
@@ -1616,12 +1669,15 @@ if(exportBtn) exportBtn.addEventListener('click', ()=>{
     showNotification('❌ خطا در دانلود فایل پشتیبان: ' + err.message, 'error');
   }
 });
+
 if(importBtn) importBtn.addEventListener('click', ()=> importFile && importFile.click());
-if(importFile) importFile.addEventListener('change', (e)=>{ 
+
+// ===== اصلاح: importFile به async تبدیل شد =====
+if(importFile) importFile.addEventListener('change', async (e)=>{ 
   const f = e.target.files[0]; 
   if(!f) return; 
   const reader = new FileReader(); 
-  reader.onload = ()=>{ 
+  reader.onload = async ()=>{ 
     try{ 
       const obj = JSON.parse(reader.result); 
       if(!obj) throw new Error('فایل نامعتبر');
@@ -1631,12 +1687,12 @@ if(importFile) importFile.addEventListener('change', (e)=>{
         categories: storageGet('categories') || []
       };
       try {
-        if(Array.isArray(obj.pairs)) storageSet('pairs', obj.pairs);
-        else storageSet('pairs', []);
-        if(Array.isArray(obj.entries)) storageSet('entries', obj.entries);
-        else storageSet('entries', []);
-        if(Array.isArray(obj.categories)) storageSet('categories', obj.categories);
-        else storageSet('categories', []);
+        if(Array.isArray(obj.pairs)) await storageSet('pairs', obj.pairs);
+        else await storageSet('pairs', []);
+        if(Array.isArray(obj.entries)) await storageSet('entries', obj.entries);
+        else await storageSet('entries', []);
+        if(Array.isArray(obj.categories)) await storageSet('categories', obj.categories);
+        else await storageSet('categories', []);
         showNotification('بک‌آپ با موفقیت بارگذاری شد','success');
         renderPairs(); 
         renderHistory(); 
@@ -1647,9 +1703,9 @@ if(importFile) importFile.addEventListener('change', (e)=>{
         message += `• ${obj.categories?.length || 0} دسته‌بندی\n`;
         alert(message);
       } catch (error) {
-        storageSet('pairs', currentData.pairs);
-        storageSet('entries', currentData.entries);
-        storageSet('categories', currentData.categories);
+        await storageSet('pairs', currentData.pairs);
+        await storageSet('entries', currentData.entries);
+        await storageSet('categories', currentData.categories);
         throw error;
       }
     } catch(err) { 
@@ -1659,6 +1715,7 @@ if(importFile) importFile.addEventListener('change', (e)=>{
   reader.readAsText(f); 
   importFile.value=''; 
 });
+
 // ---------- UI controls ----------
 function updateToggleButton(isOpen) {
   const toggleIcon = document.getElementById('toggle_icon');
@@ -1678,6 +1735,7 @@ function updateToggleButton(isOpen) {
     toggleBtn.classList.add('closed');
   }
 }
+
 if(toggleHistoryBtn) toggleHistoryBtn.addEventListener('click', ()=>{
   const isCurrentlyHidden = historyPanel.classList.contains('hidden');
   if(isCurrentlyHidden){
@@ -1691,17 +1749,20 @@ if(toggleHistoryBtn) toggleHistoryBtn.addEventListener('click', ()=>{
     updateToggleButton(false);
   }
 });
+
 if(historyDate) historyDate.addEventListener('change', renderHistory);
 if(historyPairFilter) historyPairFilter.addEventListener('change', renderHistory);
 if(togglePairsHdr) togglePairsHdr.addEventListener('click', ()=> { boxPairs.classList.toggle('hidden'); });
 if(toggleCalcHdr) toggleCalcHdr.addEventListener('click', ()=> { boxCalc.classList.toggle('hidden'); });
 if(toggleHistoryHdr) toggleHistoryHdr.addEventListener('click', ()=> { boxHistory.classList.toggle('hidden'); });
+
 // ---------- صوت ----------
 let recognition = null;
 let isRecording = false;
 let isVoiceActive = false;
 let currentField = null;
 const numericFields = [inputY1, inputCurrentHigh, inputY2, inputCurrentLow, inputDailyHigh, inputDailyLow];
+
 function parseNumberFromTranscript(transcript){
   if(!transcript) return null;
   const persianDigits = {'۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9'};
@@ -1710,6 +1771,7 @@ function parseNumberFromTranscript(transcript){
   const match = normalized.match(/-?\d*\.?\d+/);
   return match ? match[0] : null;
 }
+
 function startVoiceRecognition(){
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SpeechRecognition){ 
@@ -1774,6 +1836,7 @@ function startVoiceRecognition(){
     console.log('خطا در شروع ضبط:', e);
   }
 }
+
 function stopVoiceRecognition(){
   isVoiceActive = false;
   try{
@@ -1787,6 +1850,7 @@ function stopVoiceRecognition(){
   }
   if(voiceStatus) voiceStatus.textContent = 'اتصال صوتی قطع شد';
 }
+
 function getFieldName(field){
   const names = {
     [inputY1]: 'عدد سقف',
@@ -1798,6 +1862,7 @@ function getFieldName(field){
   };
   return names[field] || 'این فیلد';
 }
+
 safeForEach(numericFields, (field) => {
   if(!field) return;
   field.addEventListener('focus', () => {
@@ -1810,6 +1875,7 @@ safeForEach(numericFields, (field) => {
     }
   });
 });
+
 if(microToggle){
   microToggle.addEventListener('click', ()=>{
     if(isVoiceActive){
@@ -1830,8 +1896,10 @@ if(microToggle){
     }
   });
 }
+
 // ---------- تاریخ چندگانه ----------
 let dateRanges = [];
+
 function toggleMultiDateMode() {
   const isMultiDateActive = multiDateSection.classList.contains('hidden');
   if (isMultiDateActive) {
@@ -1850,11 +1918,13 @@ function toggleMultiDateMode() {
     renderHistory();
   }
 }
+
 function addDateRange() {
   const dateId = uid();
   dateRanges.push({ id: dateId, date: '' });
   renderDateRanges();
 }
+
 function renderDateRanges() {
   if (!dateRangesContainer) return;
   dateRangesContainer.innerHTML = '';
@@ -1871,14 +1941,17 @@ function renderDateRanges() {
     dateRangesContainer.appendChild(dateItem);
   });
 }
+
 function updateDateRange(dateId, newDate) {
   const range = dateRanges.find(r => r.id === dateId);
   if (range) range.date = newDate;
 }
+
 function removeDateRange(dateId) {
   dateRanges = dateRanges.filter(r => r.id !== dateId);
   renderDateRanges();
 }
+
 function applyMultiDateFilter() {
   const selectedPair = multiDatePairFilter ? multiDatePairFilter.value : null;
   const selectedDates = dateRanges.filter(r => r.date).map(r => r.date);
@@ -1888,6 +1961,7 @@ function applyMultiDateFilter() {
   }
   renderMultiDateHistory(selectedPair, selectedDates);
 }
+
 function renderMultiDateHistory(pairFilter = null, dates = []) {
   const entries = (storageGet('entries')||[]).slice();
   entries.sort((a,b)=> new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
@@ -1970,6 +2044,7 @@ function renderMultiDateHistory(pairFilter = null, dates = []) {
     historyList.appendChild(groupWrapper);
   });
 }
+
 if(toggleMultiDateBtn) toggleMultiDateBtn.addEventListener('click', toggleMultiDateMode);
 if(addDateBtn) addDateBtn.addEventListener('click', addDateRange);
 if(applyMultiDateBtn) applyMultiDateBtn.addEventListener('click', applyMultiDateFilter);
@@ -1979,6 +2054,7 @@ if(multiDatePairFilter) multiDatePairFilter.addEventListener('change', function(
     if (selectedDates.length > 0) applyMultiDateFilter();
   }
 });
+
 // ---------- مدیریت پیشرفته ----------
 function manualPruneOldEntries(days = 365) {
   const entries = storageGet('entries') || [];
@@ -1992,6 +2068,7 @@ function manualPruneOldEntries(days = 365) {
   }
   return 0;
 }
+
 function showSystemStats() {
   const entries = storageGet('entries') || [];
   const pairs = storageGet('pairs') || [];
@@ -2042,6 +2119,7 @@ function showSystemStats() {
     $('stats_modal').classList.add('center-modal');
   }
 }
+
 function manageBackups() {
   const entries = storageGet('entries') || [];
   const pairs = storageGet('pairs') || [];
@@ -2085,6 +2163,7 @@ function manageBackups() {
     $('backups_modal').classList.add('center-modal');
   }
 }
+
 function createBackup() {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const entries = storageGet('entries') || [];
@@ -2107,7 +2186,9 @@ function createBackup() {
   URL.revokeObjectURL(url);
   alert(`✅ بک‌آپ با موفقیت ایجاد و دانلود شد!\n📁 فایل: calc-pro-1-backup-${timestamp}.json\n📊 حجم: ${(blob.size / 1024).toFixed(2)} KB`);
 }
-if ($('manual_prune_btn')) $('manual_prune_btn').addEventListener('click', function() {
+
+// ===== اصلاح: manual_prune_btn به async تبدیل شد =====
+if ($('manual_prune_btn')) $('manual_prune_btn').addEventListener('click', async function() {
   const days = parseInt($('manual_prune_days').value) || 365;
   if (days < 1) { alert('تعداد روز باید بیشتر از ۰ باشد'); return; }
   if (confirm(`آیا از حذف رکوردهای قدیمی‌تر از ${days} روز مطمئن هستید؟\nاین عمل غیرقابل بازگشت است.`)) {
@@ -2116,21 +2197,26 @@ if ($('manual_prune_btn')) $('manual_prune_btn').addEventListener('click', funct
     else alert('ℹ️ هیچ رکورد قدیمی‌ای برای حذف یافت نشد.');
   }
 });
+
 if ($('show_stats_btn')) $('show_stats_btn').addEventListener('click', showSystemStats);
 if ($('manage_backups_btn')) $('manage_backups_btn').addEventListener('click', manageBackups);
+
 if ($('close_stats')) $('close_stats').addEventListener('click', function() {
   $('stats_modal').classList.add('hidden');
   $('stats_modal').classList.remove('center-modal');
 });
+
 if ($('close_backups')) $('close_backups').addEventListener('click', function() {
   $('backups_modal').classList.add('hidden');
   $('backups_modal').classList.remove('center-modal');
 });
+
 window.addEventListener('click', function(event) {
   if (event.target === $('stats_modal')) $('stats_modal').classList.add('hidden');
   if (event.target === $('backups_modal')) $('backups_modal').classList.add('hidden');
   if (event.target === $('detail_modal')) $('detail_modal').classList.add('hidden');
 });
+
 window.addEventListener('keydown', function(event) {
   if (event.key === 'Escape') {
     if ($('stats_modal') && !$('stats_modal').classList.contains('hidden')) $('stats_modal').classList.add('hidden');
@@ -2138,6 +2224,7 @@ window.addEventListener('keydown', function(event) {
     if ($('detail_modal') && !$('detail_modal').classList.contains('hidden')) $('detail_modal').classList.add('hidden');
   }
 });
+
 // ---------- شروع اولیه ----------
 if((storageGet('pairs')||[]).length === 0){ 
   storageSet('pairs', [
@@ -2147,6 +2234,7 @@ if((storageGet('pairs')||[]).length === 0){
     {id:uid(), name:'ETHUSD', categoryId: 'crypto'}
   ]); 
 }
+
 window.addEventListener('load', () => {
   const today = new Date().toISOString().split('T')[0];
   if(historyDate) historyDate.value = today;
