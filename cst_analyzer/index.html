@@ -672,6 +672,53 @@ function formatNumberSmart(num, symbolName, originalInput) {
    return String(intVal);
 }
 
+// ---- IndexedDB wrapper ----
+const DB_NAME = 'CSTAnalyzerDB';
+const DB_VERSION = 1;
+let db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('mainStore')) {
+        db.createObjectStore('mainStore', { keyPath: 'id' });
+      }
+    };
+    request.onsuccess = (e) => {
+      db = e.target.result;
+      resolve(db);
+    };
+    request.onerror = (e) => {
+      reject(e.target.error);
+    };
+  });
+}
+
+function dbGet(id) {
+  return new Promise((resolve, reject) => {
+    if (!db) { reject(new Error('Database not open')); return; }
+    const tx = db.transaction('mainStore', 'readonly');
+    const store = tx.objectStore('mainStore');
+    const request = store.get(id);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function dbPut(data) {
+  return new Promise((resolve, reject) => {
+    if (!db) { reject(new Error('Database not open')); return; }
+    const tx = db.transaction('mainStore', 'readwrite');
+    const store = tx.objectStore('mainStore');
+    const request = store.put(data);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// ---- In-memory store ----
 const STORAGE_KEY = 'cst_data_final_v5';
 const SECTIONS_ORDER_KEY = 'cst_sections_order';
 const SECTION_OPEN_KEY = 'cst_section_open_';
@@ -690,6 +737,39 @@ const GUIDE_TEXT = `### راهنمای سریع چارت میله‌ای زاو�
 - **صفر/کوچک (خاکستری):** روند ثابت یا فشردگی → منتظر شکست باش.
 **نکات استفاده:** Hover کن تا "تفاوت" و "زاویه امروز" رو ببینی. خط افقی رو بکش برای مقایسه سطوح.
 اگر میله‌های قرمز/سبز بزرگ دیدی، چک کن تحلیل ۵‌روزه رو – احتمال تغییر روند زیاده! 🚀`;
+
+// ---------- ذخیره و بارگذاری با IndexedDB ----------
+async function saveStoreToDB() {
+  try {
+    await dbPut({ id: 'mainStore', data: store });
+  } catch (e) {
+    console.error('Error saving to IndexedDB:', e);
+  }
+}
+
+async function loadStoreFromDB() {
+  try {
+    const result = await dbGet('mainStore');
+    if (result && result.data) {
+      return result.data;
+    }
+    return null;
+  } catch (e) {
+    console.error('Error loading from IndexedDB:', e);
+    return null;
+  }
+}
+
+function loadStore(){
+  // We'll load asynchronously in init
+  // For synchronous compatibility, we keep a default empty store
+  // but actual load happens in initApp
+}
+
+function saveStore(){ 
+  // Save asynchronously to IndexedDB
+  saveStoreToDB();
+}
 
 // ---------- Drag & Drop برای جفت‌ارزها ----------
 function refreshSymbolsList(){
@@ -1858,58 +1938,72 @@ function toggleSection(sectionId) {
 
 // ---------- init ----------
 document.addEventListener('DOMContentLoaded', () => {
-  loadStore();
-  loadSectionsOrder();
-  refreshSymbolsList();
-  const sel = document.getElementById('selectedSymbol');
-  const sel3 = document.getElementById('selectedSymbol3');
-  if(sel.value) { 
-    const isDaysRange = document.getElementById('daysRangeToggle').classList.contains('active');
-    if (isDaysRange) {
-      const requestedDays = parseInt(document.getElementById('analysisDays').value) || 5;
-      renderSummaryForRange(sel.value, true, requestedDays);
-    } else {
-      const startDate = document.getElementById('startDate').value;
-      const endDate = document.getElementById('endDate').value;
-      
- 
-      if (startDate && endDate) {
-        renderSummaryForRange(sel.value, false, null, startDate, endDate);
-      }
-    }
-    sel3.value = sel.value;
-  }
-  sel.addEventListener('change', ()=>{ 
-    sel3.value = sel.value;
-    const isDaysRange = document.getElementById('daysRangeToggle').classList.contains('active');
-    if (isDaysRange) {
-      const requestedDays = parseInt(document.getElementById('analysisDays').value) || 5;
-      renderSummaryForRange(sel.value, true, requestedDays);
-    } else {
-      const startDate = document.getElementById('startDate').value;
-      const endDate = document.getElementById('endDate').value;
-      if (startDate && endDate) {
-        renderSummaryForRange(sel.value, false, null, startDate, endDate);
-      }
-    }
-  });
-  
-  if('speechSynthesis' in window){ 
-    window.speechSynthesis.onvoiceschanged = () => {};
-  }
-
-  document.querySelectorAll('.collapsible-card').forEach(card => {
-    const sectionId = card.dataset.section;
-    const isOpen = loadSectionOpenState(sectionId);
-    if (isOpen) {
-      card.classList.add('open');
-      card.querySelector('.collapsible-content').style.display = 'block';
-    } else {
-      card.classList.remove('open');
-      card.querySelector('.collapsible-content').style.display = 'none';
-    }
-  });
+  initApp();
 });
+
+function initApp() {
+  openDB().then(async () => {
+    const data = await loadStoreFromDB();
+    if (data) {
+      store = sanitizeAndMigrateStore(data);
+    } else {
+      store = { symbols: {}, symbolOrder: [] };
+    }
+    loadSectionsOrder();
+    refreshSymbolsList();
+    const sel = document.getElementById('selectedSymbol');
+    const sel3 = document.getElementById('selectedSymbol3');
+    if(sel.value) { 
+      const isDaysRange = document.getElementById('daysRangeToggle').classList.contains('active');
+      if (isDaysRange) {
+        const requestedDays = parseInt(document.getElementById('analysisDays').value) || 5;
+        renderSummaryForRange(sel.value, true, requestedDays);
+      } else {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        
+ 
+        if (startDate && endDate) {
+          renderSummaryForRange(sel.value, false, null, startDate, endDate);
+        }
+      }
+      sel3.value = sel.value;
+    }
+    sel.addEventListener('change', ()=>{ 
+      sel3.value = sel.value;
+      const isDaysRange = document.getElementById('daysRangeToggle').classList.contains('active');
+      if (isDaysRange) {
+        const requestedDays = parseInt(document.getElementById('analysisDays').value) || 5;
+        renderSummaryForRange(sel.value, true, requestedDays);
+      } else {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        if (startDate && endDate) {
+          renderSummaryForRange(sel.value, false, null, startDate, endDate);
+        }
+      }
+    });
+    
+    if('speechSynthesis' in window){ 
+      window.speechSynthesis.onvoiceschanged = () => {};
+    }
+
+    document.querySelectorAll('.collapsible-card').forEach(card => {
+      const sectionId = card.dataset.section;
+      const isOpen = loadSectionOpenState(sectionId);
+      if (isOpen) {
+        card.classList.add('open');
+        card.querySelector('.collapsible-content').style.display = 'block';
+      } else {
+        card.classList.remove('open');
+        card.querySelector('.collapsible-content').style.display = 'none';
+      }
+    });
+  }).catch(err => {
+    console.error('Error initializing app:', err);
+    alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
+  });
+}
 
 function sanitizeAndMigrateStore(data) {
   if (!data.symbols) data.symbols = {};
@@ -1940,23 +2034,6 @@ function sanitizeAndMigrateStore(data) {
   });
   
   return data;
-}
-
-function loadStore(){
-  let s;
-  try {
-    s = localStorage.getItem(STORAGE_KEY);
-    if(s) s = JSON.parse(s);
-    else s = { symbols: {}, symbolOrder: [] };
-  } catch(e){
-    console.error(e);
-    s = { symbols: {}, symbolOrder: [] };
-  }
-  store = sanitizeAndMigrateStore(s);
-}
-
-function saveStore(){ 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
 }
 
 function loadSectionsOrder() {
