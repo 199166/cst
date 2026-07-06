@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8"/>
@@ -1398,11 +1397,17 @@
       storageSet('pairs', pairs);
       renderPairs();
     }
+    // تابع swapPairs با ذخیره‌سازی درست اصلاح شده
     function swapPairs(i, j) {
       const pairs = storageGet('pairs') || [];
       if (!pairs[i] || !pairs[j]) return;
-      [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+      // جابجایی دو عنصر
+      const temp = pairs[i];
+      pairs[i] = pairs[j];
+      pairs[j] = temp;
+      // ذخیره‌سازی در حافظه و IndexedDB
       storageSet('pairs', pairs);
+      // بازسازی کامل UI
       renderPairs();
     }
     function movePairToCategory(pairId, newCategoryId) {
@@ -1471,7 +1476,7 @@
         });
       }
     }
-    // 🔥 تابع renderCategorySection دقیقاً از cod.txt کپی شده است
+    // 🔥 تابع renderCategorySection با پشتیبانی از ترتیب پایدار
     function renderCategorySection(categoryId, categoryName, pairs){
       const section = document.createElement('div');
       section.className = 'category-section';
@@ -1568,10 +1573,26 @@
         const btn = e.target.closest('button'); if(!btn) return;
         const action = btn.dataset.action; const id = btn.dataset.id;
         const pairs = storageGet('pairs')||[]; const idx = pairs.findIndex(p => p.id === id);
-        if(action === 'up' && idx > 0) swapPairs(idx, idx-1);
-        if(action === 'down' && idx < pairs.length-1) swapPairs(idx, idx+1);
-        if(action === 'delete'){ if(!confirm('آیا حذف شود؟')) return; pairs.splice(idx,1); storageSet('pairs', pairs); renderPairs(); }
-        if(action === 'edit'){ const newName = prompt('نام جدید:', pairs[idx].name); if(newName && newName.trim()){ pairs[idx].name = newName.trim(); storageSet('pairs', pairs); renderPairs(); } }
+        if(action === 'up' && idx > 0) {
+          swapPairs(idx, idx-1);
+        }
+        if(action === 'down' && idx < pairs.length-1) {
+          swapPairs(idx, idx+1);
+        }
+        if(action === 'delete'){ 
+          if(!confirm('آیا حذف شود؟')) return; 
+          pairs.splice(idx,1); 
+          storageSet('pairs', pairs); 
+          renderPairs(); 
+        }
+        if(action === 'edit'){ 
+          const newName = prompt('نام جدید:', pairs[idx].name); 
+          if(newName && newName.trim()){ 
+            pairs[idx].name = newName.trim(); 
+            storageSet('pairs', pairs); 
+            renderPairs(); 
+          } 
+        }
       });
       categoriesContainer.addEventListener('change', (e) => {
         if(e.target.classList.contains('move-category')){
@@ -1842,8 +1863,6 @@
       `;
       if (detailModal) {
         detailModal.classList.remove('hidden');
-        // detailModal is now using generic modal-overlay which has flex center built-in
-        // no need to add extra class center-modal unless specific override needed, but removed it for consistency
       }
       if (editRecordBtn) editRecordBtn.onclick = () => editRecord(e.id);
       if (deleteRecordBtn) deleteRecordBtn.onclick = () => deleteRecord(e.id);
@@ -1947,7 +1966,6 @@
           a.click(); 
           a.remove(); 
           URL.revokeObjectURL(url);
-          // ثبت این بک‌آپ به‌عنوان بک‌آپ داخلی نیز
           try { createBackup('manual-file', { note: 'ساخته شده همراه با دانلود فایل پشتیبان' }); } catch (e) { console.warn('خطا در ساخت بک‌آپ داخلی همزمان با دانلود:', e); }
           showNotification('✅ فایل پشتیبان با موفقیت دانلود شد');
         } catch (err) {
@@ -2243,7 +2261,6 @@
 
     function estimateSizeBytes(str) {
       if (!str) return 0;
-      // Rough UTF-8 size estimation
       let size = 0;
       for (let i = 0; i < str.length; i++) {
         const code = str.charCodeAt(i);
@@ -2336,7 +2353,6 @@
                 <option value="">همه</option>
                 <option value="manual">دستی</option>
                 <option value="manual-file">دستی (همراه دانلود)</option>
-                
                 <option value="auto-prune">خودکار قبل از حذف</option>
               </select>
               <input id="backup_search" class="small-btn bg-slate-600 flex-1 text-xs" placeholder="جستجو در یادداشت / شناسه / نسخه">
@@ -2745,7 +2761,6 @@
           return;
         }
         if (confirm(`قبل از حذف رکوردهای قدیمی، یک بک‌آپ خودکار گرفته می‌شود. سپس رکوردهای قدیمی‌تر از ${days} روز حذف خواهند شد. ادامه می‌دهید؟`)) {
-          // Emergency backup before prune
           createBackup('auto-prune', { note: `قبل از حذف رکوردهای قدیمی‌تر از ${days} روز` });
           const entries = storageGet('entries') || [];
           const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
