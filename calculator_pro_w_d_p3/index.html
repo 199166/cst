@@ -4,10 +4,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>calculator pro w/d - برنامه سوم</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- لینک فونت وزیرمتن -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
   <style>
-    /* استایل‌های CSS */
     :root{
       --bg:#1e293b;
       --card:#334155;
@@ -21,10 +19,9 @@
       color:var(--text-light); 
       min-height:100vh; 
       padding:20px;
-      font-size: 16px; /* سایز استاندارد پایه */
+      font-size: 16px;
       line-height: 1.6;
     }
-    /* اطمینان از اعمال فونت روی تمام اجزا */
     button, input, optgroup, select, textarea {
       font-family: 'Vazirmatn', sans-serif;
     }
@@ -61,7 +58,7 @@
       width:100%; 
       outline: none;
       transition: all 0.2s ease;
-      font-size: 1rem; /* سایز مناسب برای موبایل */
+      font-size: 1rem;
     }
     input[type="text"]:focus, input[type="date"]:focus, input[type="number"]:focus, select:focus, textarea:focus { 
       border-color: rgba(59, 130, 246, 0.5);
@@ -80,36 +77,12 @@
       transition: all 0.2s ease;
       font-size: 0.95rem;
     }
-    .box-red{ 
-      background:#7f1d1d;
-      color:#fff; 
-      border-color: #991b1b;
-    }
-    .box-green{ 
-      background:#064e3b; 
-      color:#fff; 
-      border-color: #065f46;
-    }
-    .box-gray{ 
-      background:#4b5563; 
-      color:#fff; 
-      border-color: #6b7280;
-    }
-    .box-blue{ 
-      background:#1e3a8a; 
-      color:#fff; 
-      border-color: #3730a3;
-    }
-    .box-yellow{ 
-      background:#854d0e; 
-      color:#fff; 
-      border-color: #a16207;
-    }
-    .num-label{ 
-      font-weight:700; 
-      margin-left:.45rem; 
-      opacity:.95;
-    }
+    .box-red{ background:#7f1d1d; color:#fff; border-color: #991b1b; }
+    .box-green{ background:#064e3b; color:#fff; border-color: #065f46; }
+    .box-gray{ background:#4b5563; color:#fff; border-color: #6b7280; }
+    .box-blue{ background:#1e3a8a; color:#fff; border-color: #3730a3; }
+    .box-yellow{ background:#854d0e; color:#fff; border-color: #a16207; }
+    .num-label{ font-weight:700; margin-left:.45rem; opacity:.95; }
     .small-btn{ 
       padding:0.5rem 0.75rem;
       border-radius:0.5rem; 
@@ -120,13 +93,11 @@
       color: var(--text-light);
       transition: all 0.3s ease;
       outline: none;
-      position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       min-height: 40px;
       font-weight: 500;
-      text-decoration: none;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     .small-btn:hover {
@@ -144,7 +115,6 @@
       transform: translateY(0);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
-    /* رنگ دکمه‌ها */
     .small-btn.bg-slate-600 { background: #475569; border-color: #64748b; color: #fff; }
     .small-btn.bg-slate-600:hover { background: #64748b; border-color: #94a3b8; }
     .small-btn.bg-emerald-600 { background: #059669; border-color: #10b981; color: #fff; }
@@ -161,12 +131,8 @@
     .small-btn.bg-purple-600:hover { background: #8b5cf6; border-color: #a78bfa; }
     .small-btn.bg-green-600 { background: #059669; border-color: #10b981; color: #fff; }
     .small-btn.bg-green-600:hover { background: #10b981; border-color: #34d399; }
-    .small-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-    /* استایل‌های مخصوص فهرست جفت‌ارزها — کپی دقیق از cod.txt */
+    .small-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    
     #categories_container .small-btn {
       padding: 0.2rem 0.4rem !important;
       font-size: 0.7rem !important;
@@ -180,144 +146,31 @@
       min-height: 22px !important;
       max-width: 120px;
     }
-    #categories_container button.small-btn {
-      min-width: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #categories_container li {
-      padding: 0.4rem 0.5rem !important;
-      gap: 0.3rem !important;
-    }
-    #categories_container .flex.gap-1 {
-      flex-wrap: nowrap !important;
-      gap: 0.2rem !important;
-      min-width: fit-content;
-    }
-    .thin-scroll::-webkit-scrollbar{ 
-      width:8px; 
-      height:8px;
-    }
-    .thin-scroll::-webkit-scrollbar-thumb{ 
-      background:rgba(255,255,255,0.1); 
-      border-radius:8px;
-    }
-    .hidden{ 
-      display:none !important;
-    }
-    .icon-btn{ 
-      background:var(--input-bg); 
-      border:1px solid rgba(255,255,255,0.08);
-      padding:.35rem .5rem; 
-      border-radius:6px; 
-      cursor:pointer; 
-      color:var(--text-light);
-      transition: all 0.2s ease;
-    }
-    .icon-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-    .title-click{ 
-      display:flex; 
-      align-items:center; 
-      gap:8px;
-    }
-    .category-header{ 
-      background:rgba(255,255,255,0.08); 
-      padding:.5rem; 
-      border-radius:6px; 
-      margin:.5rem 0; 
-      cursor:pointer; 
-      border:1px solid rgba(255,255,255,0.08);
-      transition: all 0.2s ease;
-    }
-    .category-header:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.15);
-    }
-    .category-content{ 
-      padding:.5rem; 
-      border-right:2px solid #0ea5a4;
-      margin-right:.5rem; 
-    }
-    .danger-zone{ 
-      background:#7f1d1d; 
-      border:1px solid rgba(239,68,68,0.3); 
-      padding:12px; 
-      border-radius:8px; 
-      margin-top:12px;
-    }
-    .calendar-icon{ 
-      color:var(--text-light); 
-      font-size:1.2rem;
-    }
-    .show-picker-btn{ 
-      color:var(--text-light) !important; 
-      background:rgba(255,255,255,0.15) !important; 
-      border:1px solid rgba(255,255,255,0.2) !important;
-      padding: 0.5rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .show-picker-btn:hover {
-      background: rgba(255, 255, 255, 0.25) !important;
-      border-color: rgba(255, 255, 255, 0.3) !important;
-    }
-    .center-modal{ 
-      display:flex !important; 
-      align-items:center;
-      justify-content:center; 
-    }
-    .category-item{ 
-      background:rgba(255,255,255,0.05); 
-      border:1px solid rgba(255,255,255,0.1);
-    }
-    .resizable-container { 
-      resize: vertical; 
-      overflow: auto; 
-      min-height: 120px; 
-      max-height: 400px;
-    }
-    .history-compact { 
-      max-height: none !important; 
-      overflow: visible !important;
-    }
-    .history-entry-compact {
-      background: var(--input-bg);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 8px;
-      transition: all 0.2s ease;
-    }
-    .history-entry-compact:hover {
-      border-color: rgba(255,255,255,0.2);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-    .backup-item {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 8px;
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin: 10px 0;
-    }
-    .stat-item {
-      background: rgba(255,255,255,0.05);
-      padding: 8px;
-      border-radius: 6px;
-      text-align: center;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    /* --- FIX: Unified Modal Styles --- */
+    #categories_container button.small-btn { min-width: 28px; display: flex; align-items: center; justify-content: center; }
+    #categories_container li { padding: 0.4rem 0.5rem !important; gap: 0.3rem !important; }
+    #categories_container .flex.gap-1 { flex-wrap: nowrap !important; gap: 0.2rem !important; min-width: fit-content; }
+    .thin-scroll::-webkit-scrollbar{ width:8px; height:8px; }
+    .thin-scroll::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.1); border-radius:8px; }
+    .hidden{ display:none !important; }
+    .icon-btn{ background:var(--input-bg); border:1px solid rgba(255,255,255,0.08); padding:.35rem .5rem; border-radius:6px; cursor:pointer; color:var(--text-light); transition: all 0.2s ease; }
+    .icon-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+    .title-click{ display:flex; align-items:center; gap:8px; }
+    .category-header{ background:rgba(255,255,255,0.08); padding:.5rem; border-radius:6px; margin:.5rem 0; cursor:pointer; border:1px solid rgba(255,255,255,0.08); transition: all 0.2s ease; }
+    .category-header:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.15); }
+    .category-content{ padding:.5rem; border-right:2px solid #0ea5a4; margin-right:.5rem; }
+    .danger-zone{ background:#7f1d1d; border:1px solid rgba(239,68,68,0.3); padding:12px; border-radius:8px; margin-top:12px; }
+    .calendar-icon{ color:var(--text-light); font-size:1.2rem; }
+    .show-picker-btn{ color:var(--text-light) !important; background:rgba(255,255,255,0.15) !important; border:1px solid rgba(255,255,255,0.2) !important; padding: 0.5rem; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; }
+    .show-picker-btn:hover { background: rgba(255, 255, 255, 0.25) !important; border-color: rgba(255, 255, 255, 0.3) !important; }
+    .center-modal{ display:flex !important; align-items:center; justify-content:center; }
+    .category-item{ background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); }
+    .resizable-container { resize: vertical; overflow: auto; min-height: 120px; max-height: 400px; }
+    .history-compact { max-height: none !important; overflow: visible !important; }
+    .history-entry-compact { background: var(--input-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; margin-bottom: 8px; transition: all 0.2s ease; }
+    .history-entry-compact:hover { border-color: rgba(255,255,255,0.2); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); }
+    .backup-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 10px 0; }
+    .stat-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -327,202 +180,142 @@
       background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(4px);
       z-index: 1000;
-      /* Flexbox for perfect centering */
       display: flex;
       align-items: center;
       justify-content: center;
-      /* Padding to ensure space from screen edges on mobile */
-      padding: 20px; 
+      padding: 20px;
     }
     .modal-content {
       position: relative;
       background: var(--card);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 10px;
-      /* Size constraints */
       width: 100%;
-      /* Adjust max-height to leave some space vertically if needed, though padding on overlay handles most */
-      max-height: 90vh; 
+      max-height: 90vh;
       overflow-y: auto;
-      /* Inner spacing handled by padding utility classes in HTML, but ensured here */
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
-    /* Specific max-widths can be handled by Tailwind classes (max-w-md, max-w-2xl) */
-    .closest-info {
-      background: rgba(245, 158, 11, 0.2);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      border-radius: 8px;
-      padding: 10px;
-      margin-top: 12px;
+    .closest-info { background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 10px; margin-top: 12px; }
+    .multi-date-controls { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+    .date-range-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px; margin-bottom: 8px; }
+    .date-comparison-header { background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px; padding: 8px; margin-bottom: 8px; }
+    .comparison-group { border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; margin-bottom: 12px; transition: all 0.2s ease; }
+    .comparison-group:hover { border-color: rgba(255,255,255,0.2); }
+    .signature {
+      color: white;
+      text-align: center;
+      padding: 16px;
+      font-family: 'Vazirmatn', system-ui;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 14px;
+      font-weight: 500;
+      display: block;
+      margin: 30px auto;
+      width: fit-content;
+      max-width: 90%;
+      box-sizing: border-box;
     }
-    .multi-date-controls {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 12px;
-    }
-    .date-range-item {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 6px;
-      padding: 8px;
-      margin-bottom: 8px;
-    }
-    .date-comparison-header {
-      background: rgba(59, 130, 246, 0.2);
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      border-radius: 6px;
-      padding: 8px;
-      margin-bottom: 8px;
-    }
-    .comparison-group {
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 12px;
-      transition: all 0.2s ease;
-    }
-    .comparison-group:hover {
-      border-color: rgba(255,255,255,0.2);
-    }
-.signature {
-  color: white;
-  text-align: center;
-  padding: 16px;
-  font-family: 'Vazirmatn', system-ui;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 14px;   /* دسکتاپ */
-  font-weight: 500;
-  display: block;
-  margin: 30px auto;
-  width: fit-content;
-  max-width: 90%;
-  box-sizing: border-box;
-}
-
-/* موبایل */
-@media (max-width: 768px) {
-  .signature {
-    font-size: 12px;
-  }
-}
-    /* مدیا کوئری برای موبایل */
+    @media (max-width: 768px) { .signature { font-size: 12px; } }
     @media only screen and (max-width: 768px) {
-      body {
-        padding: 10px; /* حاشیه کمتر در موبایل */
-      }
-      .small-btn {
-        min-height: 44px;
-        padding: 0.75rem 1rem;
-        font-size: 0.95rem; /* فونت خواناتر */
-        border-width: 2px;
-      }
-      /* استایل‌های موبایل برای فهرست جفت‌ارزها — کپی دقیق از cod.txt */
-      #categories_container .small-btn {
-        padding: 0.15rem 0.3rem !important;
-        font-size: 0.75rem !important;
-        min-height: 28px !important;
-      }
-      #categories_container select.small-btn {
-        padding: 0.1rem 0.25rem !important;
-        font-size: 0.7rem !important;
-        min-height: 26px !important;
-        max-width: 100px;
-      }
+      body { padding: 10px; }
+      .small-btn { min-height: 44px; padding: 0.75rem 1rem; font-size: 0.95rem; border-width: 2px; }
+      #categories_container .small-btn { padding: 0.15rem 0.3rem !important; font-size: 0.75rem !important; min-height: 28px !important; }
+      #categories_container select.small-btn { padding: 0.1rem 0.25rem !important; font-size: 0.7rem !important; min-height: 26px !important; max-width: 100px; }
       #categories_container button.small-btn { min-width: 24px; }
-      #categories_container li {
-        padding: 0.3rem 0.4rem !important;
-        gap: 0.2rem !important;
-        flex-wrap: wrap;
-      }
-      #categories_container .flex.gap-1 {
-        gap: 0.15rem !important;
-        order: 2;
-        width: 100%;
-        justify-content: flex-start;
-        margin-top: 0.3rem;
-        padding-top: 0.3rem;
-        border-top: 1px solid rgba(255,255,255,0.1);
-      }
+      #categories_container li { padding: 0.3rem 0.4rem !important; gap: 0.2rem !important; flex-wrap: wrap; }
+      #categories_container .flex.gap-1 { gap: 0.15rem !important; order: 2; width: 100%; justify-content: flex-start; margin-top: 0.3rem; padding-top: 0.3rem; border-top: 1px solid rgba(255,255,255,0.1); }
       #categories_container .flex-1 { order: 1; width: 100%; }
-      .signature {
-        font-size: 13px;
-        padding: 15px;
-      }
-      .small-btn:active {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.4);
-        transform: scale(0.98);
-      }
-      .box-out {
-        padding: 0.5rem 0.75rem;
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        font-size: 1rem;
-      }
-      .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 6px;
-      }
+      .signature { font-size: 13px; padding: 15px; }
+      .small-btn:active { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.4); transform: scale(0.98); }
+      .box-out { padding: 0.5rem 0.75rem; min-height: 44px; display: flex; align-items: center; font-size: 1rem; }
+      .stats-grid { grid-template-columns: 1fr; gap: 6px; }
     }
     @media only screen and (max-width: 480px) {
-      .signature {
-        font-size: 12px;
-        padding: 12px;
-      }
-      .small-btn {
-        padding: 0.875rem 1rem;
-        font-size: 0.95rem;
-      }
-      .section-title {
-        font-size: 1rem;
-      }
+      .signature { font-size: 12px; padding: 12px; }
+      .small-btn { padding: 0.875rem 1rem; font-size: 0.95rem; }
+      .section-title { font-size: 1rem; }
     }
-    #toggle_icon {
-      transition: all 0.3s ease;
-      font-weight: bold;
-      display: inline-block;
+    #toggle_icon { transition: all 0.3s ease; font-weight: bold; display: inline-block; }
+    #toggle_history_btn:hover #toggle_icon { transform: scale(1.2); }
+    #toggle_history_btn.open { background: #374151 !important; border-color: #6b7280 !important; }
+    #toggle_history_btn.closed { background: #475569 !important; border-color: #64748b !important; }
+    .micro-btn{ background:#0ea5a4; color:#021; padding:.45rem .6rem; border-radius:6px; font-weight:700; cursor:pointer; border: 2px solid #0ea5a4; transition: all 0.3s ease; }
+    .micro-btn:hover { background: #0d9488; border-color: #0d9488; transform: translateY(-1px); }
+    .micro-btn.recording{ background:#ef4444; color:#fff; border-color: #ef4444; }
+    .micro-btn.connected{ background:#10b981; color:#fff; border-color: #10b981; }
+
+    /* ===== باکس کپی سقف و کف فعلی - در تاریخچه ===== */
+    #fixed_numbers_box {
+      background: #1e3a8a;
+      border: 2px solid #3b82f6;
+      border-radius: 10px;
+      padding: 8px 14px;
+      margin: 8px 0 12px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+      cursor: default;
+      min-height: 44px;
     }
-    #toggle_history_btn:hover #toggle_icon {
-      transform: scale(1.2);
+    #fixed_numbers_box .copy-label {
+      font-size: 0.75rem;
+      color: #93c5fd;
+      font-weight: 500;
+      white-space: nowrap;
     }
-    #toggle_history_btn.open {
-      background: #374151 !important;
-      border-color: #6b7280 !important;
+    #fixed_numbers_box .num-item {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(0,0,0,0.3);
+      padding: 2px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      direction: ltr;
+      unicode-bidi: embed;
+      border: 1px solid transparent;
+      white-space: nowrap;
     }
-    #toggle_history_btn.closed {
-      background: #475569 !important;
-      border-color: #64748b !important;
+    #fixed_numbers_box .num-item:hover {
+      background: rgba(255,255,255,0.2);
+      border-color: #60a5fa;
+      transform: scale(1.05);
     }
-    .micro-btn{ 
-      background:#0ea5a4; 
-      color:#021; 
-      padding:.45rem .6rem; 
-      border-radius:6px; 
-      font-weight:700; 
-      cursor:pointer; 
-      border: 2px solid #0ea5a4;
-      transition: all 0.3s ease;
+    #fixed_numbers_box .num-item:active {
+      transform: scale(0.95);
     }
-    .micro-btn:hover {
-      background: #0d9488;
-      border-color: #0d9488;
-      transform: translateY(-1px);
+    #fixed_numbers_box .separator {
+      color: #93c5fd;
+      font-size: 0.9rem;
+      font-weight: 300;
     }
-    .micro-btn.recording{ 
-      background:#ef4444; 
-      color:#fff; 
-      border-color: #ef4444;
+    #fixed_numbers_box .pair-name {
+      font-size: 0.7rem;
+      color: #93c5fd;
+      background: rgba(255,255,255,0.1);
+      padding: 2px 8px;
+      border-radius: 10px;
+      white-space: nowrap;
     }
-    .micro-btn.connected{ 
-      background:#10b981; 
-      color:#fff; 
-      border-color: #10b981;
+    #fixed_numbers_box .label-high {
+      font-size: 0.6rem;
+      color: #93c5fd;
+      opacity: 0.7;
+    }
+    #fixed_numbers_box .label-low {
+      font-size: 0.6rem;
+      color: #93c5fd;
+      opacity: 0.7;
+    }
+    .fixed-numbers-container {
+      width: 100%;
     }
   </style>
 </head>
@@ -565,8 +358,7 @@
             <label class="muted">فهرست جفت‌ارزها</label>
             <span class="text-xs muted">(قابل تغییر سایز)</span>
           </div>
-          <div id="categories_container" class="resizable-container mt-2 thin-scroll border border-white/10 rounded p-2 space-y-3">
-          </div>
+          <div id="categories_container" class="resizable-container mt-2 thin-scroll border border-white/10 rounded p-2 space-y-3"></div>
         </div>
         <div class="border-t border-white/10 pt-3 mt-3">
           <div class="mb-2">
@@ -586,16 +378,10 @@
                 <input id="manual_prune_days" type="number" min="1" max="3650" value="365" class="flex-1 text-center"/>
                 <span class="muted text-xs flex items-center">روز</span>
               </div>
-              <button id="manual_prune_btn" class="small-btn bg-rose-700 hover:bg-rose-800 text-white w-full mt-2">
-                حذف رکوردهای قدیمی
-              </button>
+              <button id="manual_prune_btn" class="small-btn bg-rose-700 hover:bg-rose-800 text-white w-full mt-2">حذف رکوردهای قدیمی</button>
             </div>
-            <button id="show_stats_btn" class="small-btn bg-purple-600 hover:bg-purple-700 text-white w-full mb-2">
-              نمایش آمار و اطلاعات
-            </button>
-            <button id="manage_backups_btn" class="small-btn bg-indigo-600 hover:bg-indigo-700 text-white w-full">
-              مدیریت بک‌آپ‌ها
-            </button>
+            <button id="show_stats_btn" class="small-btn bg-purple-600 hover:bg-purple-700 text-white w-full mb-2">نمایش آمار و اطلاعات</button>
+            <button id="manage_backups_btn" class="small-btn bg-indigo-600 hover:bg-indigo-700 text-white w-full">مدیریت بک‌آپ‌ها</button>
             <p class="muted text-xs mt-2 text-center">این عملیات غیرقابل بازگشت هستند</p>
           </div>
           <p class="muted text-xs mt-2">تاریخ‌ها میلادی ذخیره و نمایش داده می‌شوند.</p>
@@ -615,7 +401,7 @@
             <label class="muted flex-1">جفت‌ارز</label>
             <button id="micro_toggle" class="micro-btn" title="شروع/توقف ورود صوتی">🎙 فعال کردن صوت</button>
           </div>
-          <select id="pair_select"></select>
+          <select id="pair_select" autocomplete="off"></select>
         </div>
         <div class="grid grid-cols-2 gap-3 mb-3">
           <div>
@@ -639,9 +425,7 @@
           <label class="muted">تاریخ (میلادی)</label>
           <div class="flex items-center gap-2">
             <input id="date_picker" type="date" class="flex-1"/>
-            <button type="button" onclick="document.getElementById('date_picker').showPicker()" class="small-btn show-picker-btn" title="نمایش تقویم">
-              📅
-            </button>
+            <button type="button" onclick="document.getElementById('date_picker').showPicker()" class="small-btn show-picker-btn" title="نمایش تقویم">📅</button>
           </div>
           <p class="muted text-xs mt-1">تاریخ انتخاب شده برای ذخیره رکورد استفاده می‌شود.</p>
         </div>
@@ -674,6 +458,23 @@
           <div class="text-sm font-semibold">تاریخچه</div>
           <div class="muted">کل: <span id="entries_count">0</span></div>
         </div>
+
+        <!-- ===== باکس کپی سقف و کف فعلی - در تاریخچه ===== -->
+        <div id="fixed_numbers_box" class="fixed-numbers-container">
+          <span class="copy-label">📊 سقف و کف فعلی:</span>
+          <span id="fixed_pair_name" class="pair-name">---</span>
+          <span>
+            <span class="label-high">سقف</span>
+            <span id="fixed_num_1" class="num-item" title="کلیک برای کپی سقف فعلی">---</span>
+          </span>
+          <span class="separator">|</span>
+          <span>
+            <span class="label-low">کف</span>
+            <span id="fixed_num_2" class="num-item" title="کلیک برای کپی کف فعلی">---</span>
+          </span>
+          <span style="font-size:0.7rem; color:#93c5fd; opacity:0.5;">(هر عدد جداگانه)</span>
+        </div>
+
         <div class="flex gap-2 mb-3">
           <button id="toggle_history_btn" class="small-btn flex-1 bg-slate-600 hover:bg-slate-700 flex items-center justify-center gap-2 transition-all duration-300 closed">
             <span id="toggle_icon" class="text-lg transition-all duration-300 transform">📁</span>
@@ -685,14 +486,12 @@
           <div class="multi-date-controls">
             <div class="flex items-center justify-between mb-3">
               <label class="muted font-semibold">📅 مشاهده چند تاریخ همزمان</label>
-              <button id="toggle_multi_date" class="small-btn bg-blue-600 hover:bg-blue-700 text-xs">
-                فعال کردن حالت چندتاریخی
-              </button>
+              <button id="toggle_multi_date" class="small-btn bg-blue-600 hover:bg-blue-700 text-xs">فعال کردن حالت چندتاریخی</button>
             </div>
             <div id="single_date_section">
               <div class="mb-2 grid grid-cols-2 gap-2">
                 <input id="history_date" type="date"/>
-                <select id="history_pair_filter">
+                <select id="history_pair_filter" autocomplete="off">
                   <option value="">همه جفت‌ارزها</option>
                 </select>
               </div>
@@ -700,26 +499,20 @@
             <div id="multi_date_section" class="hidden">
               <div class="mb-3">
                 <div class="flex items-center gap-2 mb-2">
-                  <select id="multi_date_pair_filter" class="flex-1">
+                  <select id="multi_date_pair_filter" autocomplete="off" class="flex-1">
                     <option value="">همه جفت‌ارزها</option>
                   </select>
                 </div>
-                <div id="date_ranges_container" class="space-y-2">
-                </div>
+                <div id="date_ranges_container" class="space-y-2"></div>
                 <div class="flex gap-2 mt-3">
-                  <button id="add_date_btn" class="small-btn bg-green-600 hover:bg-green-700 flex-1">
-                    ➕ افزودن تاریخ
-                  </button>
-                  <button id="apply_multi_date_btn" class="small-btn bg-blue-600 hover:bg-blue-700 flex-1">
-                    ✅ اعمال فیلتر
-                  </button>
+                  <button id="add_date_btn" class="small-btn bg-green-600 hover:bg-green-700 flex-1">➕ افزودن تاریخ</button>
+                  <button id="apply_multi_date_btn" class="small-btn bg-blue-600 hover:bg-blue-700 flex-1">✅ اعمال فیلتر</button>
                 </div>
               </div>
             </div>
           </div>
           <div id="history_list" class="history-compact space-y-2"></div>
         </div>
-        <!-- اصلاح شده: استفاده از کلاس استاندارد modal-overlay -->
         <div id="detail_modal" class="hidden modal-overlay">
           <div class="modal-content p-6 max-w-2xl">
             <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
@@ -737,15 +530,13 @@
       </div>
     </section>
   </div>
-  <!-- اصلاح شده: حذف mx-4 اضافی و استفاده از کلاس‌های جدید -->
   <div id="stats_modal" class="hidden modal-overlay">
     <div class="modal-content p-6 max-w-md">
       <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
         <h4 class="font-bold text-lg">📊 آمار و اطلاعات سیستم - برنامه سوم</h4>
         <button id="close_stats" class="small-btn bg-slate-600 hover:bg-slate-700">✕</button>
       </div>
-      <div id="stats_content" class="mt-2 text-sm space-y-4">
-      </div>
+      <div id="stats_content" class="mt-2 text-sm space-y-4"></div>
     </div>
   </div>
   <div id="backups_modal" class="hidden modal-overlay">
@@ -754,8 +545,7 @@
         <h4 class="font-bold text-lg">💾 مدیریت بک‌آپ‌ها - برنامه سوم</h4>
         <button id="close_backups" class="small-btn bg-slate-600 hover:bg-slate-700">✕</button>
       </div>
-      <div id="backups_content" class="mt-2 text-sm space-y-4">
-      </div>
+      <div id="backups_content" class="mt-2 text-sm space-y-4"></div>
     </div>
   </div>
   <script>
@@ -763,16 +553,14 @@
     const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     const AUTO_PRUNE_ENABLED = false;
     const MAX_DAYS = 3650;
-    function nowISO() { 
-      return new Date().toISOString();
-    }
+    function nowISO() { return new Date().toISOString(); }
     function formatGregorian(dtISO) {
       const d = new Date(dtISO);
       const pad = n => n.toString().padStart(2, '0');
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
-    // ---------- IndexedDB Wrapper (replaces localStorage) ----------
+    // ---------- IndexedDB Wrapper ----------
     const DB_NAME = 'CalcProDB_v3';
     const DB_VERSION = 1;
     let db = null;
@@ -782,31 +570,16 @@
         const request = indexedDB.open(DB_NAME, DB_VERSION);
         request.onupgradeneeded = (e) => {
           const db = e.target.result;
-          // Object stores
-          if (!db.objectStoreNames.contains('pairs')) {
-            db.createObjectStore('pairs', { keyPath: 'id' });
-          }
-          if (!db.objectStoreNames.contains('entries')) {
-            db.createObjectStore('entries', { keyPath: 'id' });
-          }
-          if (!db.objectStoreNames.contains('categories')) {
-            db.createObjectStore('categories', { keyPath: 'id' });
-          }
-          if (!db.objectStoreNames.contains('backups')) {
-            db.createObjectStore('backups', { keyPath: 'id' });
-          }
+          if (!db.objectStoreNames.contains('pairs')) db.createObjectStore('pairs', { keyPath: 'id' });
+          if (!db.objectStoreNames.contains('entries')) db.createObjectStore('entries', { keyPath: 'id' });
+          if (!db.objectStoreNames.contains('categories')) db.createObjectStore('categories', { keyPath: 'id' });
+          if (!db.objectStoreNames.contains('backups')) db.createObjectStore('backups', { keyPath: 'id' });
         };
-        request.onsuccess = (e) => {
-          db = e.target.result;
-          resolve(db);
-        };
-        request.onerror = (e) => {
-          reject(e.target.error);
-        };
+        request.onsuccess = (e) => { db = e.target.result; resolve(db); };
+        request.onerror = (e) => { reject(e.target.error); };
       });
     }
 
-    // Generic CRUD functions
     function dbGetAll(storeName) {
       return new Promise((resolve, reject) => {
         if (!db) { reject(new Error('Database not open')); return; }
@@ -829,17 +602,6 @@
       });
     }
 
-    function dbDelete(storeName, id) {
-      return new Promise((resolve, reject) => {
-        if (!db) { reject(new Error('Database not open')); return; }
-        const tx = db.transaction(storeName, 'readwrite');
-        const store = tx.objectStore(storeName);
-        const request = store.delete(id);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
-    }
-
     function dbClear(storeName) {
       return new Promise((resolve, reject) => {
         if (!db) { reject(new Error('Database not open')); return; }
@@ -852,33 +614,20 @@
     }
 
     // In-memory cache
-    let memoryCache = {
-      pairs: [],
-      entries: [],
-      categories: [],
-      backups: []
-    };
+    let memoryCache = { pairs: [], entries: [], categories: [], backups: [] };
 
-    // Load all data from IndexedDB into memory on startup
     async function loadAllData() {
       try {
         const [pairs, entries, categories, backups] = await Promise.all([
-          dbGetAll('pairs'),
-          dbGetAll('entries'),
-          dbGetAll('categories'),
-          dbGetAll('backups')
+          dbGetAll('pairs'), dbGetAll('entries'), dbGetAll('categories'), dbGetAll('backups')
         ]);
         memoryCache.pairs = pairs || [];
         memoryCache.entries = entries || [];
         memoryCache.categories = categories || [];
         memoryCache.backups = backups || [];
-      } catch (e) {
-        console.error('Error loading data from IndexedDB:', e);
-        // If DB fails, fallback to empty arrays (but we already have defaults)
-      }
+      } catch (e) { console.error('Error loading data from IndexedDB:', e); }
     }
 
-    // Synchronous storageGet (reads from memory)
     function storageGet(k) {
       if (k === 'pairs') return memoryCache.pairs;
       if (k === 'entries') return memoryCache.entries;
@@ -887,56 +636,27 @@
       return null;
     }
 
-    // Synchronous storageSet (updates memory and syncs to IndexedDB asynchronously)
     function storageSet(k, v) {
-      if (k === 'pairs') {
-        memoryCache.pairs = v;
-        // sync to DB in background
-        syncStoreToDB('pairs', v);
-      } else if (k === 'entries') {
-        memoryCache.entries = v;
-        syncStoreToDB('entries', v);
-      } else if (k === 'categories') {
-        memoryCache.categories = v;
-        syncStoreToDB('categories', v);
-      } else if (k === 'backups') {
-        memoryCache.backups = v;
-        syncStoreToDB('backups', v);
-      }
+      if (k === 'pairs') { memoryCache.pairs = v; syncStoreToDB('pairs', v); }
+      else if (k === 'entries') { memoryCache.entries = v; syncStoreToDB('entries', v); }
+      else if (k === 'categories') { memoryCache.categories = v; syncStoreToDB('categories', v); }
+      else if (k === 'backups') { memoryCache.backups = v; syncStoreToDB('backups', v); }
     }
 
-    // Async sync function to update IndexedDB
     async function syncStoreToDB(storeName, data) {
       try {
-        // Clear the store and put all items
         const tx = db.transaction(storeName, 'readwrite');
         const store = tx.objectStore(storeName);
-        await new Promise((resolve, reject) => {
-          const req = store.clear();
-          req.onsuccess = () => resolve();
-          req.onerror = () => reject(req.error);
-        });
-        // Put all items one by one
+        await new Promise((resolve, reject) => { const req = store.clear(); req.onsuccess = () => resolve(); req.onerror = () => reject(req.error); });
         for (const item of data) {
-          await new Promise((resolve, reject) => {
-            const req = store.put(item);
-            req.onsuccess = () => resolve();
-            req.onerror = () => reject(req.error);
-          });
+          await new Promise((resolve, reject) => { const req = store.put(item); req.onsuccess = () => resolve(); req.onerror = () => reject(req.error); });
         }
-      } catch (e) {
-        console.error('Error syncing store to IndexedDB:', e);
-      }
+      } catch (e) { console.error('Error syncing store to IndexedDB:', e); }
     }
 
-    // ---------- rest of the code (unchanged, but using storageGet/Set with memory cache) ----------
-    function ensureDefaults() { 
-      if (!storageGet('pairs') || storageGet('pairs').length === 0) {
-        storageSet('pairs', []); 
-      }
-      if (!storageGet('entries') || storageGet('entries').length === 0) {
-        storageSet('entries', []);
-      }
+    function ensureDefaults() {
+      if (!storageGet('pairs') || storageGet('pairs').length === 0) storageSet('pairs', []);
+      if (!storageGet('entries') || storageGet('entries').length === 0) storageSet('entries', []);
       if (!storageGet('categories') || storageGet('categories').length === 0) {
         storageSet('categories', [
           {id: 'default', name: 'اصلی'},
@@ -946,11 +666,7 @@
       }
     }
 
-    // ---------- تشخیص دستگاه موبایل/تبلت ----------
-    function isMobileOrTablet() {
-      return window.innerWidth <= 1024;
-    }
-    // ---------- مدیریت وضعیت باکس‌ها بر اساس دستگاه ----------
+    function isMobileOrTablet() { return window.innerWidth <= 1024; }
     function initializeBoxStates() {
       const boxPairs = document.getElementById('box_pairs');
       const boxCalc = document.getElementById('box_calc');
@@ -965,6 +681,7 @@
         if (boxHistory) boxHistory.classList.remove('hidden');
       }
     }
+
     // ---------- DOM refs ----------
     const $ = id => document.getElementById(id);
     const pairSelect = $('pair_select');
@@ -1028,7 +745,13 @@
     const backupsModal = $('backups_modal');
     const statsContent = $('stats_content');
     const backupsContent = $('backups_content');
-    // ---------- Multi-date state & controls ----------
+
+    // ---------- عناصر باکس کپی سقف و کف فعلی ----------
+    const fixedNum1 = $('fixed_num_1');
+    const fixedNum2 = $('fixed_num_2');
+    const fixedPairName = $('fixed_pair_name');
+
+    // ---------- Multi-date state ----------
     let isMultiDate = false;
     let dateRanges = [];
     function resetMultiDateUI() {
@@ -1085,24 +808,13 @@
         }
       });
     }
-    if (addDateBtn) {
-      addDateBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        addMultiDateRangeUI();
-      });
-    }
-    if (applyMultiDateBtn) {
-      applyMultiDateBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        renderHistory();
-      });
-    }
+    if (addDateBtn) addDateBtn.addEventListener('click', (e) => { e.preventDefault(); addMultiDateRangeUI(); });
+    if (applyMultiDateBtn) applyMultiDateBtn.addEventListener('click', (e) => { e.preventDefault(); renderHistory(); });
+
     // ---------- UI utils ----------
-    function safeForEach(arr, fn) { 
-      if (!Array.isArray(arr)) return; 
-      arr.forEach(fn);
-    }
-    // ---------- توابع جدید برای پردازش فرمت نقطه‌دار بدون اعشار ----------
+    function safeForEach(arr, fn) { if (!Array.isArray(arr)) return; arr.forEach(fn); }
+
+    // ---------- توابع پردازش فرمت ----------
     function parseFormattedInteger(str) {
       if (!str) return { rawNumber: NaN, format: { hasDot: false } };
       const original = str.toString().trim();
@@ -1123,28 +835,17 @@
       const fullNumberStr = (leftDigits + rightDigits) || '0';
       const totalLength = fullNumberStr.length;
       const rawNumber = parseInt(fullNumberStr, 10);
-      return {
-        rawNumber,
-        format: {
-          hasDot: true,
-          left: leftDigits.length,
-          right: rightDigits.length,
-          total: totalLength
-        }
-      };
+      return { rawNumber, format: { hasDot: true, left: leftDigits.length, right: rightDigits.length, total: totalLength } };
     }
+
     function formatOutputByInputFormat(number, inputFormat) {
       if (isNaN(number)) return '';
       const numStr = Math.abs(number).toString();
       const isNegative = number < 0;
-      if (!inputFormat || !inputFormat.hasDot) {
-        return isNegative ? '-' + numStr : numStr;
-      }
+      if (!inputFormat || !inputFormat.hasDot) return isNegative ? '-' + numStr : numStr;
       const { left, right, total } = inputFormat;
       let padded = numStr.padStart(total, '0');
-      if (padded.length > total) {
-        padded = padded.slice(-total);
-      }
+      if (padded.length > total) padded = padded.slice(-total);
       const leftPart = padded.slice(0, left);
       const rightPart = padded.slice(left);
       const finalLeft = leftPart === '' ? '0' : parseInt(leftPart || '0', 10).toString();
@@ -1152,6 +853,7 @@
       if (isNegative) result = '-' + result;
       return result;
     }
+
     function findClosestNumbers(numbers) {
       if (numbers.length < 2) return { pairs: [], minDistance: 0 };
       let minDistance = Infinity;
@@ -1159,23 +861,16 @@
       for (let i = 0; i < numbers.length; i++) {
         for (let j = i + 1; j < numbers.length; j++) {
           const distance = Math.abs(numbers[i].value - numbers[j].value);
-          if (distance < minDistance) {
-            minDistance = distance;
-            closestPairs.length = 0;
-            closestPairs.push([numbers[i], numbers[j]]);
-          } else if (distance === minDistance) {
-            closestPairs.push([numbers[i], numbers[j]]);
-          }
+          if (distance < minDistance) { minDistance = distance; closestPairs.length = 0; closestPairs.push([numbers[i], numbers[j]]); }
+          else if (distance === minDistance) closestPairs.push([numbers[i], numbers[j]]);
         }
       }
       return { pairs: closestPairs, minDistance };
     }
+
     function renderClosestInfo(closestPairs, minDistance, inputFormat) {
       if (!closestInfo) return;
-      if (closestPairs.length === 0) {
-        closestInfo.classList.add('hidden');
-        return;
-      }
+      if (closestPairs.length === 0) { closestInfo.classList.add('hidden'); return; }
       const displayDist = formatOutputByInputFormat(minDistance, inputFormat);
       let closestText = `<div class="text-sm font-semibold mb-2">نزدیک‌ترین اعداد (فاصله: ${displayDist}):</div>`;
       closestPairs.forEach(pair => {
@@ -1186,6 +881,7 @@
       closestInfo.innerHTML = closestText;
       closestInfo.classList.remove('hidden');
     }
+
     function computeOutputs(y1, y2, currentLow, currentHigh) {
       const result1 = Math.floor(Math.pow(Math.sqrt(y1) - 1, 2));
       const result2 = Math.floor(Math.pow(Math.sqrt(y1) - 0.5, 2));
@@ -1193,11 +889,13 @@
       const result4 = Math.floor(Math.pow(Math.sqrt(y2) + 0.5, 2));
       return [result1, result2, result3, result4];
     }
-    function decideColor(v, currentLow, currentHigh) { 
-      if (v < currentLow) return 'box-red'; 
-      if (v > currentHigh) return 'box-green'; 
+
+    function decideColor(v, currentLow, currentHigh) {
+      if (v < currentLow) return 'box-red';
+      if (v > currentHigh) return 'box-green';
       return 'box-gray';
     }
+
     function buildDisplayOutputs(outputs, currentLow, currentHigh, inputFormat, closestPairs = []) {
       const results = [];
       if (!isNaN(outputs[0])) results.push({ label: "فرمول ۱ (سقف)", value: outputs[0] });
@@ -1209,16 +907,10 @@
         const color = decideColor(result.value, currentLow, currentHigh);
         const displayVal = formatOutputByInputFormat(result.value, inputFormat);
         const suffix = (result.value < currentLow ? ' ↓ زیر کف فعلی' : (result.value > currentHigh ? ' ↑ بالای سقف فعلی' : ''));
-        return { 
-          order: index + 1, 
-          label: result.label,
-          raw: result.value, 
-          display: displayVal, 
-          color: color, 
-          suffix: suffix 
-        };
+        return { order: index + 1, label: result.label, raw: result.value, display: displayVal, color: color, suffix: suffix };
       });
     }
+
     function renderResultsDisplay(outputsDisplay) {
       if (!resultsList) return;
       resultsList.innerHTML = '';
@@ -1228,22 +920,17 @@
         span.title = `کلیک برای کپی: ${it.display}`;
         span.innerHTML = `<span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}`;
         span.addEventListener('click', () => copyToClipboard(it.display));
-        const p = document.createElement('div'); 
-        p.appendChild(span); 
-        resultsList.appendChild(p);
+        const p = document.createElement('div'); p.appendChild(span); resultsList.appendChild(p);
       });
     }
+
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
         const message = document.createElement('div');
         message.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce';
         message.innerHTML = `✅ عدد <strong>${text}</strong> کپی شد`;
         document.body.appendChild(message);
-        setTimeout(() => {
-          if (document.body.contains(message)) {
-            document.body.removeChild(message);
-          }
-        }, 2000);
+        setTimeout(() => { if (document.body.contains(message)) document.body.removeChild(message); }, 2000);
       }).catch(err => {
         console.error('خطا در کپی کردن: ', err);
         const textArea = document.createElement('textarea');
@@ -1254,26 +941,145 @@
         document.body.removeChild(textArea);
       });
     }
+
+    // ============================================================
+    // === تابع استخراج سقف و کف فعلی از آخرین رکورد ===
+    // ============================================================
+    function extractAndDisplayCurrentHighLow() {
+      if (!fixedNum1 || !fixedNum2) return;
+
+      let high = '---';
+      let low = '---';
+      let pairName = '---';
+      let pairId = null;
+
+      // 1. دریافت جفت‌ارز انتخاب‌شده از فیلتر تاریخچه
+      if (historyPairFilter && historyPairFilter.selectedIndex >= 0) {
+        const selectedOption = historyPairFilter.options[historyPairFilter.selectedIndex];
+        if (selectedOption && selectedOption.value) {
+          pairId = selectedOption.value;
+          const pair = (storageGet('pairs')||[]).find(p => p.id === pairId);
+          if (pair) pairName = pair.name;
+        }
+      }
+
+      // اگر جفت‌ارزی انتخاب نشده، از جفت‌ارز فعال در ماشین حساب استفاده کن
+      if (!pairId && pairSelect && pairSelect.selectedIndex >= 0) {
+        const selectedOption = pairSelect.options[pairSelect.selectedIndex];
+        if (selectedOption && selectedOption.value) {
+          pairId = selectedOption.value;
+          const pair = (storageGet('pairs')||[]).find(p => p.id === pairId);
+          if (pair) pairName = pair.name;
+        }
+      }
+
+      // 2. دریافت تاریخ انتخاب‌شده
+      let selectedDate = null;
+      if (historyDate && historyDate.value) {
+        selectedDate = historyDate.value;
+      }
+
+      // 3. جستجوی رکوردها در دیتابیس
+      const entries = storageGet('entries') || [];
+      let filteredEntries = entries;
+
+      if (pairId) filteredEntries = filteredEntries.filter(e => e.pairId === pairId);
+      if (selectedDate) {
+        filteredEntries = filteredEntries.filter(e => {
+          const entryDate = e.dateISO ? e.dateISO.split('T')[0] : null;
+          return entryDate === selectedDate;
+        });
+      }
+
+      // مرتب‌سازی بر اساس تاریخ (جدیدترین اول)
+      filteredEntries.sort((a, b) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
+
+      // 4. استخراج سقف و کف فعلی از اولین رکورد
+      if (filteredEntries.length > 0) {
+        const entry = filteredEntries[0];
+        if (entry.inputs) {
+          if (entry.inputs.currentHigh !== undefined && entry.inputs.currentHigh !== null && !isNaN(entry.inputs.currentHigh)) {
+            high = formatOutputByInputFormat(entry.inputs.currentHigh, entry.inputFormat);
+          }
+          if (entry.inputs.currentLow !== undefined && entry.inputs.currentLow !== null && !isNaN(entry.inputs.currentLow)) {
+            low = formatOutputByInputFormat(entry.inputs.currentLow, entry.inputFormat);
+          }
+        }
+      }
+
+      // 5. نمایش در باکس
+      fixedNum1.textContent = high;
+      fixedNum2.textContent = low;
+      fixedNum1.dataset.value = high;
+      fixedNum2.dataset.value = low;
+      
+      if (fixedPairName) {
+        fixedPairName.textContent = pairName !== '---' ? pairName : '---';
+      }
+    }
+
+    // ============================================================
+    // === تابع کپی اعداد (جداگانه) ===
+    // ============================================================
+    function copyNumber1() {
+      const val = fixedNum1.dataset.value || fixedNum1.textContent;
+      if (!val || val === '---') {
+        showNotification('⚠️ عددی برای کپی وجود ندارد!', 'error');
+        return;
+      }
+      copyToClipboard(val);
+    }
+
+    function copyNumber2() {
+      const val = fixedNum2.dataset.value || fixedNum2.textContent;
+      if (!val || val === '---') {
+        showNotification('⚠️ عددی برای کپی وجود ندارد!', 'error');
+        return;
+      }
+      copyToClipboard(val);
+    }
+
+    // ============================================================
+    // === اتصال رویدادها به اعداد باکس ===
+    // ============================================================
+    if (fixedNum1) fixedNum1.addEventListener('click', copyNumber1);
+    if (fixedNum2) fixedNum2.addEventListener('click', copyNumber2);
+
+    // ============================================================
+    // === رویدادهای بروزرسانی باکس ===
+    // ============================================================
+    if (historyPairFilter) {
+      historyPairFilter.addEventListener('change', function() {
+        setTimeout(extractAndDisplayCurrentHighLow, 200);
+      });
+    }
+
+    if (historyDate) {
+      historyDate.addEventListener('change', function() {
+        setTimeout(extractAndDisplayCurrentHighLow, 200);
+      });
+    }
+
+    if (pairSelect) {
+      pairSelect.addEventListener('change', function() {
+        setTimeout(extractAndDisplayCurrentHighLow, 200);
+      });
+    }
+
     // ---------- مدیریت داده‌ها ----------
     function saveEntry(pairId, inputs, outputsDisplay, note = '', dateISO = null, inputFormat = null, closestInfoData = null) {
       const entries = storageGet('entries') || [];
       const si = dateISO || nowISO();
       const entry = { 
-        id: uid(), 
-        pairId, 
-        dateISO: si, 
-        dateDisplay: formatGregorian(si), 
-        inputs, 
-        outputsDisplay, 
-        note,
-        inputFormat: inputFormat,
-        closestInfo: closestInfoData || null
+        id: uid(), pairId, dateISO: si, dateDisplay: formatGregorian(si), 
+        inputs, outputsDisplay, note, inputFormat: inputFormat, closestInfo: closestInfoData || null
       };
       entries.push(entry); 
       storageSet('entries', entries);
       if (AUTO_PRUNE_ENABLED) pruneOldEntries();
       renderHistory();
     }
+
     function pruneOldEntries() {
       if (!AUTO_PRUNE_ENABLED) return;
       const entries = storageGet('entries') || [];
@@ -1281,13 +1087,15 @@
       const kept = entries.filter(e => new Date(e.dateISO).getTime() >= cutoff);
       if (kept.length !== entries.length) storageSet('entries', kept);
     }
+
     initializeBoxStates();
+
     // ---------- event listeners ----------
     if (calculateButton) {
       calculateButton.addEventListener('click', () => {
-        if (!inputY1 || !inputY2 || !inputCurrentHigh || !inputCurrentLow) { 
-          if (errorMessage) errorMessage.textContent = 'خطا: برخی فیلدها موجود نیستند.'; 
-          return; 
+        if (!inputY1 || !inputY2 || !inputCurrentHigh || !inputCurrentLow) {
+          if (errorMessage) errorMessage.textContent = 'خطا: برخی فیلدها موجود نیستند.';
+          return;
         }
         if (errorMessage) errorMessage.textContent = '';
         try {
@@ -1328,15 +1136,13 @@
             originalCurrentHigh: inputCurrentHigh.value,
             originalY2: inputY2.value,
             originalCurrentLow: inputCurrentLow.value
-          }, displays, note, chosenISO, parsedY1.format, {
-            closestPairs: closestPairs,
-            minDistance: minDistance
-          });
-        } catch (err) { 
-          if (errorMessage) errorMessage.textContent = 'خطا: ' + err.message; 
+          }, displays, note, chosenISO, parsedY1.format, { closestPairs, minDistance });
+        } catch (err) {
+          if (errorMessage) errorMessage.textContent = 'خطا: ' + err.message;
         }
       });
     }
+
     if (resetButton) {
       resetButton.addEventListener('click', () => {
         if (inputY1) inputY1.value = '';
@@ -1345,14 +1151,12 @@
         if (inputCurrentLow) inputCurrentLow.value = '';
         if (resultsList) resultsList.innerHTML = '';
         if (errorMessage) errorMessage.textContent = '';
-        if (closestInfo) {
-          closestInfo.innerHTML = '';
-          closestInfo.classList.add('hidden');
-        }
+        if (closestInfo) { closestInfo.innerHTML = ''; closestInfo.classList.add('hidden'); }
+        setTimeout(extractAndDisplayCurrentHighLow, 100);
       });
     }
+
     // ---------- مدیریت جفت‌ارزها ----------
-    // ***** اصلاح: اضافه کردن sortOrder برای ماندگاری ترتیب *****
     function getNextSortOrder() {
       const pairs = storageGet('pairs') || [];
       if (pairs.length === 0) return 0;
@@ -1370,32 +1174,16 @@
 
     function renderPairs() {
       const pairs = storageGet('pairs') || [];
-      // مرتب‌سازی بر اساس sortOrder
       const sortedPairs = sortPairsByOrder(pairs);
       
-      if (pairSelect) pairSelect.innerHTML = '';
-      if (historyPairFilter) historyPairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
-      if (multiDatePairFilter) multiDatePairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>';
+      if (pairSelect) { pairSelect.innerHTML = ''; pairSelect.setAttribute('autocomplete', 'off'); }
+      if (historyPairFilter) { historyPairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>'; historyPairFilter.setAttribute('autocomplete', 'off'); }
+      if (multiDatePairFilter) { multiDatePairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>'; multiDatePairFilter.setAttribute('autocomplete', 'off'); }
       
       sortedPairs.forEach(p => {
-        if (pairSelect) {
-          const opt = document.createElement('option');
-          opt.value = p.id;
-          opt.textContent = p.name;
-          pairSelect.appendChild(opt);
-        }
-        if (historyPairFilter) {
-          const opt2 = document.createElement('option');
-          opt2.value = p.id;
-          opt2.textContent = p.name;
-          historyPairFilter.appendChild(opt2);
-        }
-        if (multiDatePairFilter) {
-          const opt3 = document.createElement('option');
-          opt3.value = p.id;
-          opt3.textContent = p.name;
-          multiDatePairFilter.appendChild(opt3);
-        }
+        if (pairSelect) { const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.name; pairSelect.appendChild(opt); }
+        if (historyPairFilter) { const opt2 = document.createElement('option'); opt2.value = p.id; opt2.textContent = p.name; historyPairFilter.appendChild(opt2); }
+        if (multiDatePairFilter) { const opt3 = document.createElement('option'); opt3.value = p.id; opt3.textContent = p.name; multiDatePairFilter.appendChild(opt3); }
       });
       if (sortedPairs.length === 0 && pairSelect) {
         const opt = document.createElement('option');
@@ -1411,32 +1199,19 @@
       const pairs = storageGet('pairs') || [];
       const selectedCategory = categorySelect ? categorySelect.value : null;
       const newOrder = getNextSortOrder();
-      pairs.push({
-        id: uid(), 
-        name: name.trim(),
-        categoryId: selectedCategory || null,
-        sortOrder: newOrder  // <--- اضافه شد
-      });
+      pairs.push({ id: uid(), name: name.trim(), categoryId: selectedCategory || null, sortOrder: newOrder });
       storageSet('pairs', pairs);
       renderPairs();
     }
 
-    // تابع swapPairs اصلاح شده با sortOrder
     function swapPairs(i, j) {
       const pairs = storageGet('pairs') || [];
       if (!pairs[i] || !pairs[j]) return;
-      
-      // دریافت sortOrder فعلی
       const orderI = pairs[i].sortOrder !== undefined ? pairs[i].sortOrder : i;
       const orderJ = pairs[j].sortOrder !== undefined ? pairs[j].sortOrder : j;
-      
-      // تعویض sortOrder‌ها
       pairs[i].sortOrder = orderJ;
       pairs[j].sortOrder = orderI;
-      
-      // تعویض موقعیت در آرایه
       [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
-      
       storageSet('pairs', pairs);
       renderPairs();
     }
@@ -1444,47 +1219,23 @@
     function movePairToCategory(pairId, newCategoryId) {
       const pairs = storageGet('pairs') || [];
       const pair = pairs.find(p => p.id === pairId);
-      if (pair) {
-        pair.categoryId = newCategoryId || null;
-        storageSet('pairs', pairs);
-        renderPairs();
-      }
+      if (pair) { pair.categoryId = newCategoryId || null; storageSet('pairs', pairs); renderPairs(); }
     }
 
-    // تابع برای به‌روزرسانی sortOrder جفت‌ارزهای قدیمی
     function upgradePairsWithSortOrder() {
       const pairs = storageGet('pairs') || [];
       let changed = false;
-      pairs.forEach((p, index) => {
-        if (p.sortOrder === undefined) {
-          p.sortOrder = index;
-          changed = true;
-        }
-      });
-      if (changed) {
-        storageSet('pairs', pairs);
-      }
+      pairs.forEach((p, index) => { if (p.sortOrder === undefined) { p.sortOrder = index; changed = true; } });
+      if (changed) storageSet('pairs', pairs);
     }
 
-    if (addPairBtn) {
-      addPairBtn.addEventListener('click', () => { 
-        addPair(newPairName ? newPairName.value : ''); 
-        if (newPairName) newPairName.value = ''; 
-      });
-    }
-    if (clearPairsBtn) {
-      clearPairsBtn.addEventListener('click', () => { 
-        if (confirm('آیا همه جفت‌ارزها حذف شوند؟')) { 
-          storageSet('pairs', []); 
-          renderPairs(); 
-        } 
-      });
-    }
+    if (addPairBtn) addPairBtn.addEventListener('click', () => { addPair(newPairName ? newPairName.value : ''); if (newPairName) newPairName.value = ''; });
+    if (clearPairsBtn) clearPairsBtn.addEventListener('click', () => { if (confirm('آیا همه جفت‌ارزها حذف شوند؟')) { storageSet('pairs', []); renderPairs(); } });
+
     // ---------- مدیریت دسته‌بندی‌ها ----------
     function renderCategories() {
       const categories = storageGet('categories') || [];
       const pairs = storageGet('pairs') || [];
-      // مرتب‌سازی بر اساس sortOrder
       const sortedPairs = sortPairsByOrder(pairs);
       
       if (categorySelect) {
@@ -1504,10 +1255,7 @@
           categories.forEach(cat => {
             const div = document.createElement('div');
             div.className = 'flex justify-between items-center p-1 px-2 rounded category-item';
-            div.innerHTML = `
-              <span class="text-xs">${cat.name}</span>
-              <span class="text-xs muted">${sortedPairs.filter(p => p.categoryId === cat.id).length} جفت‌ارز</span>
-            `;
+            div.innerHTML = `<span class="text-xs">${cat.name}</span><span class="text-xs muted">${sortedPairs.filter(p => p.categoryId === cat.id).length} جفت‌ارز</span>`;
             categoriesList.appendChild(div);
           });
         }
@@ -1515,19 +1263,15 @@
       if (categoriesContainer) {
         categoriesContainer.innerHTML = '';
         const uncategorizedPairs = sortedPairs.filter(p => !p.categoryId);
-        if (uncategorizedPairs.length > 0) {
-          renderCategorySection(null, 'بدون دسته‌بندی', uncategorizedPairs);
-        }
+        if (uncategorizedPairs.length > 0) renderCategorySection(null, 'بدون دسته‌بندی', uncategorizedPairs);
         categories.forEach(category => {
           const categoryPairs = sortedPairs.filter(p => p.categoryId === category.id);
-          if (categoryPairs.length > 0) {
-            renderCategorySection(category.id, category.name, categoryPairs);
-          }
+          if (categoryPairs.length > 0) renderCategorySection(category.id, category.name, categoryPairs);
         });
       }
     }
-    // 🔥 تابع renderCategorySection با پشتیبانی از ترتیب پایدار
-    function renderCategorySection(categoryId, categoryName, pairs){
+
+    function renderCategorySection(categoryId, categoryName, pairs) {
       const section = document.createElement('div');
       section.className = 'category-section';
       section.innerHTML = `
@@ -1540,16 +1284,12 @@
         </div>
       `;
       categoriesContainer.appendChild(section);
-      // رندر جفت‌ارزهای این دسته‌بندی
       const pairsList = section.querySelector(`.pairs-list-${categoryId || 'uncategorized'}`);
       pairs.forEach(p => {
         const li = document.createElement('li');
         li.className = 'flex items-center justify-between gap-2 p-2 rounded bg-white/5';
-        // درست کردن options برای select
         const categories = storageGet('categories') || [];
-        const categoryOptions = categories.map(cat => 
-          `<option value="${cat.id}" ${p.categoryId === cat.id ? 'selected' : ''}>${cat.name}</option>`
-        ).join('');
+        const categoryOptions = categories.map(cat => `<option value="${cat.id}" ${p.categoryId === cat.id ? 'selected' : ''}>${cat.name}</option>`).join('');
         li.innerHTML = `
           <div class="flex-1 text-sm">${p.name}</div>
           <div class="flex gap-1">
@@ -1566,39 +1306,32 @@
         `;
         pairsList.appendChild(li);
       });
-      // اضافه کردن event listener برای collapse/expand
       const header = section.querySelector('.category-header');
       header.addEventListener('click', () => {
         const content = section.querySelector('.category-content');
         content.classList.toggle('hidden');
       });
     }
+
     function addCategory(name) {
       if (!name || !name.trim()) return;
       const categories = storageGet('categories') || [];
-      if (categories.some(cat => cat.name === name.trim())) {
-        alert('این نام دسته‌بندی قبلاً وجود دارد!');
-        return;
-      }
+      if (categories.some(cat => cat.name === name.trim())) { alert('این نام دسته‌بندی قبلاً وجود دارد!'); return; }
       categories.push({id: uid(), name: name.trim()});
       storageSet('categories', categories);
       renderCategories();
     }
+
     function deleteCategory() {
       const selectedCategoryId = categorySelect ? categorySelect.value : null;
-      if (!selectedCategoryId) {
-        alert('لطفاً یک دسته‌بندی را انتخاب کنید!');
-        return;
-      }
+      if (!selectedCategoryId) { alert('لطفاً یک دسته‌بندی را انتخاب کنید!'); return; }
       const categories = storageGet('categories') || [];
       const category = categories.find(cat => cat.id === selectedCategoryId);
       if (!category) return;
       const pairs = storageGet('pairs') || [];
       const pairsInCategory = pairs.filter(p => p.categoryId === selectedCategoryId);
       if (pairsInCategory.length > 0) {
-        if (!confirm(`دسته‌بندی "${category.name}" دارای ${pairsInCategory.length} جفت‌ارز است. آیا می‌خواهید این دسته‌بندی حذف شود و جفت‌ارزهای آن به "بدون دسته‌بندی" منتقل شوند؟`)) {
-          return;
-        }
+        if (!confirm(`دسته‌بندی "${category.name}" دارای ${pairsInCategory.length} جفت‌ارز است. آیا می‌خواهید این دسته‌بندی حذف شود و جفت‌ارزهای آن به "بدون دسته‌بندی" منتقل شوند؟`)) return;
         pairsInCategory.forEach(p => { p.categoryId = null; });
         storageSet('pairs', pairs);
       } else {
@@ -1609,49 +1342,29 @@
       renderCategories();
       renderPairs();
     }
-    if (addCategoryBtn) {
-      addCategoryBtn.addEventListener('click', () => { 
-        addCategory(newCategoryName ? newCategoryName.value : ''); 
-        if (newCategoryName) newCategoryName.value = ''; 
-      });
-    }
-    if (deleteCategoryBtn) {
-      deleteCategoryBtn.addEventListener('click', deleteCategory);
-    }
+
+    if (addCategoryBtn) addCategoryBtn.addEventListener('click', () => { addCategory(newCategoryName ? newCategoryName.value : ''); if (newCategoryName) newCategoryName.value = ''; });
+    if (deleteCategoryBtn) deleteCategoryBtn.addEventListener('click', deleteCategory);
+
     if (categoriesContainer) {
-      categoriesContainer.addEventListener('click', (e)=>{
-        const btn = e.target.closest('button'); if(!btn) return;
+      categoriesContainer.addEventListener('click', (e) => {
+        const btn = e.target.closest('button'); if (!btn) return;
         const action = btn.dataset.action; const id = btn.dataset.id;
-        const pairs = storageGet('pairs')||[]; const idx = pairs.findIndex(p => p.id === id);
-        if(action === 'up' && idx > 0) {
-          swapPairs(idx, idx-1);
-        }
-        if(action === 'down' && idx < pairs.length-1) {
-          swapPairs(idx, idx+1);
-        }
-        if(action === 'delete'){ 
-          if(!confirm('آیا حذف شود؟')) return; 
-          pairs.splice(idx,1); 
-          storageSet('pairs', pairs); 
-          renderPairs(); 
-        }
-        if(action === 'edit'){ 
-          const newName = prompt('نام جدید:', pairs[idx].name); 
-          if(newName && newName.trim()){ 
-            pairs[idx].name = newName.trim(); 
-            storageSet('pairs', pairs); 
-            renderPairs(); 
-          } 
-        }
+        const pairs = storageGet('pairs') || []; const idx = pairs.findIndex(p => p.id === id);
+        if (action === 'up' && idx > 0) swapPairs(idx, idx - 1);
+        if (action === 'down' && idx < pairs.length - 1) swapPairs(idx, idx + 1);
+        if (action === 'delete') { if (!confirm('آیا حذف شود؟')) return; pairs.splice(idx, 1); storageSet('pairs', pairs); renderPairs(); }
+        if (action === 'edit') { const newName = prompt('نام جدید:', pairs[idx].name); if (newName && newName.trim()) { pairs[idx].name = newName.trim(); storageSet('pairs', pairs); renderPairs(); } }
       });
       categoriesContainer.addEventListener('change', (e) => {
-        if(e.target.classList.contains('move-category')){
+        if (e.target.classList.contains('move-category')) {
           const pairId = e.target.dataset.id;
           const newCategoryId = e.target.value || null;
           movePairToCategory(pairId, newCategoryId);
         }
       });
     }
+
     // ---------- تاریخچه ----------
     function renderMultiDateHistory(selectedPair, selectedDates) {
       const entries = (storageGet('entries') || []).slice();
@@ -1661,14 +1374,11 @@
         historyList.innerHTML = '<div class="muted text-sm text-center py-4">هیچ تاریخی انتخاب نشده است.</div>';
         return;
       }
-      const normDates = Array.from(new Set(selectedDates
-        .map(d => {
-          if (!d) return null;
-          const dt = new Date(d);
-          return isNaN(dt.getTime()) ? null : dt.toISOString().split('T')[0];
-        })
-        .filter(Boolean)
-      )).sort();
+      const normDates = Array.from(new Set(selectedDates.map(d => {
+        if (!d) return null;
+        const dt = new Date(d);
+        return isNaN(dt.getTime()) ? null : dt.toISOString().split('T')[0];
+      }).filter(Boolean))).sort();
       if (normDates.length === 0) {
         historyList.innerHTML = '<div class="muted text-sm text-center py-4">هیچ تاریخ معتبری انتخاب نشده است.</div>';
         return;
@@ -1696,11 +1406,7 @@
         group.className = 'comparison-group';
         const title = document.createElement('div');
         title.className = 'text-xs muted mb-2 font-semibold';
-        try {
-          title.textContent = 'تاریخ: ' + new Date(dateKey).toLocaleDateString('en-CA');
-        } catch (_) {
-          title.textContent = 'تاریخ: ' + dateKey;
-        }
+        try { title.textContent = 'تاریخ: ' + new Date(dateKey).toLocaleDateString('en-CA'); } catch (_) { title.textContent = 'تاریخ: ' + dateKey; }
         group.appendChild(title);
         if (groupEntries.length === 0) {
           const empty = document.createElement('div');
@@ -1714,7 +1420,7 @@
             const pair = pairs.find(p => p.id === e.pairId);
             const pairName = pair?.name || '—';
             const category = pair ? categories.find(c => c.id === pair.categoryId) : null;
-            const wrapper = document.createElement('div'); 
+            const wrapper = document.createElement('div');
             wrapper.className = 'history-entry-compact flex flex-col gap-3 hover:border-white/20 transition-colors';
             let closestHTML = '';
             if (e.closestInfo && e.closestInfo.closestPairs && e.closestInfo.closestPairs.length > 0) {
@@ -1723,9 +1429,7 @@
                 <div class="mt-2 pt-2 border-t border-white/10">
                   <div class="text-xs muted mb-1">نزدیک‌ترین اعداد (فاصله: ${displayDist}):</div>
                   <div class="text-xs space-y-1">
-                    ${e.closestInfo.closestPairs.map(pair => 
-                      `• ${pair[0].label} و ${pair[1].label}`
-                    ).join('<br>')}
+                    ${e.closestInfo.closestPairs.map(pair => `• ${pair[0].label} و ${pair[1].label}`).join('<br>')}
                   </div>
                 </div>
               `;
@@ -1739,20 +1443,14 @@
                 <div class="text-xs muted">${e.dateDisplay}</div>
               </div>
               <div class="flex gap-2 flex-wrap justify-center">
-                ${e.outputsDisplay.map(it => 
-                  `<span class="box-out ${it.color} cursor-pointer hover:opacity-80 transition-opacity" 
-                         title="کلیک برای کپی: ${it.display}"
-                         onclick="copyToClipboard('${it.display}')">
-                    <span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}
-                  </span>`
-                ).join('')}
+                ${e.outputsDisplay.map(it => `<span class="box-out ${it.color} cursor-pointer hover:opacity-80 transition-opacity" title="کلیک برای کپی: ${it.display}" onclick="copyToClipboard('${it.display}')"><span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}</span>`).join('')}
               </div>
               ${closestHTML}
             `;
             const bottom = document.createElement('div');
             bottom.className = 'flex gap-2 justify-end';
-            const viewBtn = document.createElement('button'); 
-            viewBtn.className = 'small-btn bg-indigo-600 hover:bg-indigo-700 rounded transition-colors'; 
+            const viewBtn = document.createElement('button');
+            viewBtn.className = 'small-btn bg-indigo-600 hover:bg-indigo-700 rounded transition-colors';
             viewBtn.textContent = 'نمایش جزئیات';
             viewBtn.addEventListener('click', () => showDetail(e.id));
             bottom.appendChild(viewBtn);
@@ -1761,18 +1459,15 @@
         }
         historyList.appendChild(group);
       });
-      if (!hasAny) {
-        historyList.innerHTML = '<div class="muted text-sm text-center py-4">برای تاریخ‌های انتخاب‌شده رکوردی یافت نشد.</div>';
-      }
+      if (!hasAny) historyList.innerHTML = '<div class="muted text-sm text-center py-4">برای تاریخ‌های انتخاب‌شده رکوردی یافت نشد.</div>';
+      setTimeout(extractAndDisplayCurrentHighLow, 200);
     }
+
     function renderHistory() {
       if (multiDateSection && !multiDateSection.classList.contains('hidden')) {
         const selectedPair = multiDatePairFilter ? multiDatePairFilter.value : null;
         const selectedDates = dateRanges.filter(r => r.date).map(r => r.date);
-        if (selectedDates.length > 0) {
-          renderMultiDateHistory(selectedPair, selectedDates);
-          return;
-        }
+        if (selectedDates.length > 0) { renderMultiDateHistory(selectedPair, selectedDates); return; }
       }
       const entries = (storageGet('entries') || []).slice();
       entries.sort((a, b) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
@@ -1788,15 +1483,16 @@
         filtered = entries.filter(e => new Date(e.dateISO).toDateString() === filterDate);
       }
       if (filterPair) filtered = filtered.filter(e => e.pairId === filterPair);
-      if (filtered.length === 0) { 
-        if (historyList) historyList.innerHTML = '<div class="muted text-sm text-center py-4">رکوردی جهت نمایش وجود ندارد.</div>'; 
+      if (filtered.length === 0) {
+        if (historyList) historyList.innerHTML = '<div class="muted text-sm text-center py-4">رکوردی جهت نمایش وجود ندارد.</div>';
+        setTimeout(extractAndDisplayCurrentHighLow, 100);
         return;
       }
       safeForEach(filtered, e => {
         const pair = (storageGet('pairs') || []).find(p => p.id === e.pairId);
         const pairName = pair?.name || '—';
         const category = pair ? (storageGet('categories') || []).find(c => c.id === pair.categoryId) : null;
-        const wrapper = document.createElement('div'); 
+        const wrapper = document.createElement('div');
         wrapper.className = 'history-entry-compact flex flex-col gap-3 hover:border-white/20 transition-colors';
         let closestHTML = '';
         if (e.closestInfo && e.closestInfo.closestPairs && e.closestInfo.closestPairs.length > 0) {
@@ -1805,9 +1501,7 @@
             <div class="mt-2 pt-2 border-t border-white/10">
               <div class="text-xs muted mb-1">نزدیک‌ترین اعداد (فاصله: ${displayDist}):</div>
               <div class="text-xs space-y-1">
-                ${e.closestInfo.closestPairs.map(pair => 
-                  `• ${pair[0].label} و ${pair[1].label}`
-                ).join('<br>')}
+                ${e.closestInfo.closestPairs.map(pair => `• ${pair[0].label} و ${pair[1].label}`).join('<br>')}
               </div>
             </div>
           `;
@@ -1821,30 +1515,26 @@
             <div class="text-xs muted">${e.dateDisplay}</div>
           </div>
           <div class="flex gap-2 flex-wrap justify-center">
-            ${e.outputsDisplay.map(it => 
-              `<span class="box-out ${it.color} cursor-pointer hover:opacity-80 transition-opacity" 
-                     title="کلیک برای کپی: ${it.display}"
-                     onclick="copyToClipboard('${it.display}')">
-                <span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}
-              </span>`
-            ).join('')}
+            ${e.outputsDisplay.map(it => `<span class="box-out ${it.color} cursor-pointer hover:opacity-80 transition-opacity" title="کلیک برای کپی: ${it.display}" onclick="copyToClipboard('${it.display}')"><span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}</span>`).join('')}
           </div>
           ${closestHTML}
         `;
-        const bottom = document.createElement('div'); 
+        const bottom = document.createElement('div');
         bottom.className = 'flex gap-2 justify-end';
-        const viewBtn = document.createElement('button'); 
+        const viewBtn = document.createElement('button');
         viewBtn.className = 'small-btn bg-indigo-600 hover:bg-indigo-700 rounded transition-colors';
-        viewBtn.textContent = 'نمایش جزئیات'; 
+        viewBtn.textContent = 'نمایش جزئیات';
         viewBtn.addEventListener('click', () => showDetail(e.id));
         bottom.appendChild(viewBtn);
         wrapper.appendChild(bottom);
         historyList.appendChild(wrapper);
       });
+      setTimeout(extractAndDisplayCurrentHighLow, 200);
     }
+
     function showDetail(entryId) {
       const entries = storageGet('entries') || [];
-      const e = entries.find(x => x.id === entryId); 
+      const e = entries.find(x => x.id === entryId);
       if (!e) return;
       const pair = (storageGet('pairs') || []).find(p => p.id === e.pairId);
       const pairName = pair?.name || '—';
@@ -1858,11 +1548,7 @@
             <div class="text-xs muted mb-3">نزدیک‌ترین اعداد</div>
             <div class="text-sm space-y-2">
               <div class="font-semibold">فاصله: ${displayDist}</div>
-              ${e.closestInfo.closestPairs.map(pair => 
-                `<div class="flex justify-between items-center p-2 bg-white/5 rounded">
-                  <div>${pair[0].label} و ${pair[1].label}</div>
-                </div>`
-              ).join('')}
+              ${e.closestInfo.closestPairs.map(pair => `<div class="flex justify-between items-center p-2 bg-white/5 rounded"><div>${pair[0].label} و ${pair[1].label}</div></div>`).join('')}
             </div>
           </div>
         `;
@@ -1872,10 +1558,7 @@
           <div class="space-y-3">
             <div class="bg-white/5 p-3 rounded">
               <div class="text-xs muted mb-1">جفت‌ارز</div>
-              <div class="font-semibold flex items-center gap-2">
-                ${pairName}
-                ${category ? `<span class="text-xs bg-blue-600 px-2 py-1 rounded">${category.name}</span>` : ''}
-              </div>
+              <div class="font-semibold flex items-center gap-2">${pairName}${category ? `<span class="text-xs bg-blue-600 px-2 py-1 rounded">${category.name}</span>` : ''}</div>
             </div>
             <div class="bg-white/5 p-3 rounded">
               <div class="text-xs muted mb-1">تاریخ (میلادی)</div>
@@ -1901,175 +1584,116 @@
         <div class="bg-white/5 p-4 rounded">
           <div class="text-xs muted mb-3">خروجی‌ها (مرتب‌شده)</div>
           <div class="flex flex-wrap gap-2 justify-center">
-            ${e.outputsDisplay.map(it => 
-              `<span class="box-out ${it.color} cursor-default text-sm">
-                <span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}
-              </span>`
-            ).join('')}
+            ${e.outputsDisplay.map(it => `<span class="box-out ${it.color} cursor-default text-sm"><span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}</span>`).join('')}
           </div>
         </div>
         ${closestHTML}
       `;
-      if (detailModal) {
-        detailModal.classList.remove('hidden');
-      }
+      if (detailModal) detailModal.classList.remove('hidden');
       if (editRecordBtn) editRecordBtn.onclick = () => editRecord(e.id);
       if (deleteRecordBtn) deleteRecordBtn.onclick = () => deleteRecord(e.id);
       if (moveRecordBtn) moveRecordBtn.onclick = () => moveRecord(e.id);
     }
-    if (closeDetail) {
-      closeDetail.addEventListener('click', () => { 
-        if (detailModal) {
-          detailModal.classList.add('hidden');
-        }
-      });
-    }
-    function deleteRecord(id) { 
-      if (!confirm('آیا از حذف این رکورد مطمئن هستید؟')) return; 
-      const entries = storageGet('entries') || []; 
+
+    if (closeDetail) closeDetail.addEventListener('click', () => { if (detailModal) detailModal.classList.add('hidden'); });
+
+    function deleteRecord(id) {
+      if (!confirm('آیا از حذف این رکورد مطمئن هستید؟')) return;
+      const entries = storageGet('entries') || [];
       const idx = entries.findIndex(x => x.id === id);
-      if (idx === -1) return; 
-      entries.splice(idx, 1); 
-      storageSet('entries', entries); 
-      renderHistory(); 
-      if (detailModal) {
-        detailModal.classList.add('hidden');
-      }
+      if (idx === -1) return;
+      entries.splice(idx, 1);
+      storageSet('entries', entries);
+      renderHistory();
+      if (detailModal) detailModal.classList.add('hidden');
     }
+
     function editRecord(id) {
       const entries = storageGet('entries') || [];
-      const e = entries.find(x => x.id === id); 
+      const e = entries.find(x => x.id === id);
       if (!e) return;
-      if (!confirm('مقادیر رکورد در فرم بارگذاری خواهد شد. پس از ویرایش دکمه‌” محاسبه را بزنید تا رکورد جدید ذخیره شود. رکورد قدیمی حذف می‌شود. ادامۀ می‌دهید؟')) return;
+      if (!confirm('مقادیر رکورد در فرم بارگذاری خواهد شد. پس از ویرایش دکمه محاسبه را بزنید تا رکورد جدید ذخیره شود. رکورد قدیمی حذف می‌شود. ادامه می‌دهید؟')) return;
       if (pairSelect) pairSelect.value = e.pairId || '';
-      if (inputY1) inputY1.value = e.inputs.originalY1; 
-      if (inputCurrentHigh) inputCurrentHigh.value = e.inputs.originalCurrentHigh; 
+      if (inputY1) inputY1.value = e.inputs.originalY1;
+      if (inputCurrentHigh) inputCurrentHigh.value = e.inputs.originalCurrentHigh;
       if (inputY2) inputY2.value = e.inputs.originalY2;
-      if (inputCurrentLow) inputCurrentLow.value = e.inputs.originalCurrentLow; 
-      if (noteInput) noteInput.value = e.note || ''; 
+      if (inputCurrentLow) inputCurrentLow.value = e.inputs.originalCurrentLow;
+      if (noteInput) noteInput.value = e.note || '';
       if (datePicker) datePicker.value = e.dateDisplay.split(' ')[0] || '';
       const idx = entries.findIndex(x => x.id === id);
-      if (idx !== -1) { 
-        entries.splice(idx, 1); 
-        storageSet('entries', entries); 
-      }
-      renderHistory(); 
-      if (detailModal) {
-        detailModal.classList.add('hidden');
-      }
+      if (idx !== -1) { entries.splice(idx, 1); storageSet('entries', entries); }
+      renderHistory();
+      if (detailModal) detailModal.classList.add('hidden');
       window.scrollTo({top: 0, behavior: 'smooth'});
     }
+
     function moveRecord(id) {
-      const newDate = prompt('تاریخ جدید (YYYY-MM-DD) را وارد کنید:'); 
+      const newDate = prompt('تاریخ جدید (YYYY-MM-DD) را وارد کنید:');
       if (!newDate) return;
-      const d = new Date(newDate + 'T00:00:00'); 
-      if (isNaN(d)) { 
-        alert('تاریخ نامعتبر.'); 
-        return; 
-      }
+      const d = new Date(newDate + 'T00:00:00');
+      if (isNaN(d)) { alert('تاریخ نامعتبر.'); return; }
       const entries = storageGet('entries') || [];
-      const e = entries.find(x => x.id === id); 
+      const e = entries.find(x => x.id === id);
       if (!e) return;
-      e.dateISO = d.toISOString(); 
-      e.dateDisplay = formatGregorian(e.dateISO); 
-      storageSet('entries', entries); 
-      renderHistory(); 
-      if (detailModal) {
-        detailModal.classList.add('hidden');
-      }
+      e.dateISO = d.toISOString();
+      e.dateDisplay = formatGregorian(e.dateISO);
+      storageSet('entries', entries);
+      renderHistory();
+      if (detailModal) detailModal.classList.add('hidden');
     }
+
     // ---------- backup/import ----------
     function showNotification(message, type = 'success') {
       const toast = document.createElement('div');
       toast.className = `fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce ${type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`;
       toast.innerHTML = message;
       document.body.appendChild(toast);
-      setTimeout(() => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      }, 4000);
+      setTimeout(() => { if (document.body.contains(toast)) document.body.removeChild(toast); }, 4000);
     }
+
     if (exportBtn) {
       exportBtn.addEventListener('click', () => {
         try {
-          const payload = { 
-            pairs: storageGet('pairs') || [], 
-            entries: storageGet('entries') || [], 
-            categories: storageGet('categories') || [],
-            meta: {
-              created: new Date().toISOString(),
-              version: '3.0',
-              entryCount: (storageGet('entries') || []).length,
-              pairCount: (storageGet('pairs') || []).length,
-              categoryCount: (storageGet('categories') || []).length,
-              backupId: uid()
-            }
-          };
+          const payload = { pairs: storageGet('pairs') || [], entries: storageGet('entries') || [], categories: storageGet('categories') || [], meta: { created: new Date().toISOString(), version: '3.0', entryCount: (storageGet('entries') || []).length, pairCount: (storageGet('pairs') || []).length, categoryCount: (storageGet('categories') || []).length, backupId: uid() } };
           const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json;charset=utf-8'});
-          const url = URL.createObjectURL(blob); 
-          const a = document.createElement('a'); 
-          a.href = url; 
-          a.download = 'calculator_pro_w_d_p3-' + new Date().toISOString().slice(0, 10) + '.json'; 
-          document.body.appendChild(a); 
-          a.click(); 
-          a.remove(); 
-          URL.revokeObjectURL(url);
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'calculator_pro_w_d_p3-' + new Date().toISOString().slice(0, 10) + '.json';
+          document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
           try { createBackup('manual-file', { note: 'ساخته شده همراه با دانلود فایل پشتیبان' }); } catch (e) { console.warn('خطا در ساخت بک‌آپ داخلی همزمان با دانلود:', e); }
           showNotification('✅ فایل پشتیبان با موفقیت دانلود شد');
-        } catch (err) {
-          console.error('خطا در دانلود بک‌آپ:', err);
-          showNotification('❌ خطا در دانلود فایل پشتیبان: ' + err.message, 'error');
-        }
+        } catch (err) { console.error('خطا در دانلود بک‌آپ:', err); showNotification('❌ خطا در دانلود فایل پشتیبان: ' + err.message, 'error'); }
       });
     }
-    if (importBtn) {
-      importBtn.addEventListener('click', () => importFile && importFile.click());
-    }
+
+    if (importBtn) importBtn.addEventListener('click', () => importFile && importFile.click());
     if (importFile) {
-      importFile.addEventListener('change', (e) => { 
-        const f = e.target.files[0]; 
-        if (!f) return; 
-        const reader = new FileReader(); 
-        reader.onload = () => { 
-          try { 
-            const obj = JSON.parse(reader.result); 
+      importFile.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const obj = JSON.parse(reader.result);
             if (!obj) throw new Error('فایل نامعتبر');
-            const currentData = {
-              pairs: storageGet('pairs') || [],
-              entries: storageGet('entries') || [],
-              categories: storageGet('categories') || []
-            };
+            const currentData = { pairs: storageGet('pairs') || [], entries: storageGet('entries') || [], categories: storageGet('categories') || [] };
             try {
-              if (Array.isArray(obj.pairs)) storageSet('pairs', obj.pairs);
-              else storageSet('pairs', []);
-              if (Array.isArray(obj.entries)) storageSet('entries', obj.entries);
-              else storageSet('entries', []);
-              if (Array.isArray(obj.categories)) storageSet('categories', obj.categories);
-              else storageSet('categories', []);
+              if (Array.isArray(obj.pairs)) storageSet('pairs', obj.pairs); else storageSet('pairs', []);
+              if (Array.isArray(obj.entries)) storageSet('entries', obj.entries); else storageSet('entries', []);
+              if (Array.isArray(obj.categories)) storageSet('categories', obj.categories); else storageSet('categories', []);
               showNotification('بک‌آپ با موفقیت بارگذاری شد', 'success');
-              renderPairs(); 
-              renderHistory(); 
-              let message = '✅ بک‌آپ با موفقیت بارگذاری شد!\n';
-              message += `📊 اطلاعات بک‌آپ:\n`;
-              message += `• ${obj.entries?.length || 0} رکورد تاریخی\n`;
-              message += `• ${obj.pairs?.length || 0} جفت‌ارز\n`;
-              message += `• ${obj.categories?.length || 0} دسته‌بندی\n`;
+              renderPairs(); renderHistory();
+              let message = '✅ بک‌آپ با موفقیت بارگذاری شد!\n📊 اطلاعات بک‌آپ:\n• ' + (obj.entries?.length || 0) + ' رکورد تاریخی\n• ' + (obj.pairs?.length || 0) + ' جفت‌ارز\n• ' + (obj.categories?.length || 0) + ' دسته‌بندی';
               alert(message);
-            } catch (error) {
-              storageSet('pairs', currentData.pairs);
-              storageSet('entries', currentData.entries);
-              storageSet('categories', currentData.categories);
-              throw error;
-            }
-          } catch (err) { 
-            alert('خطا در بارگذاری بک‌آپ: ' + err.message);
-          } 
-        }; 
-        reader.readAsText(f); 
-        importFile.value = ''; 
+            } catch (error) { storageSet('pairs', currentData.pairs); storageSet('entries', currentData.entries); storageSet('categories', currentData.categories); throw error; }
+          } catch (err) { alert('خطا در بارگذاری بک‌آپ: ' + err.message); }
+        };
+        reader.readAsText(f);
+        importFile.value = '';
       });
     }
+
     // ---------- UI controls ----------
     function updateToggleButton(isOpen) {
       const toggleIcon = document.getElementById('toggle_icon');
@@ -2089,44 +1713,36 @@
         toggleBtn.classList.add('closed');
       }
     }
+
     if (toggleHistoryBtn) {
       toggleHistoryBtn.addEventListener('click', () => {
         const isCurrentlyHidden = historyPanel.classList.contains('hidden');
         if (isCurrentlyHidden) {
-          historyPanel.classList.remove('hidden'); 
+          historyPanel.classList.remove('hidden');
           updateToggleButton(true);
           const today = new Date().toISOString().split('T')[0];
           if (historyDate) historyDate.value = today;
           renderHistory();
-        } else { 
-          historyPanel.classList.add('hidden'); 
+        } else {
+          historyPanel.classList.add('hidden');
           updateToggleButton(false);
         }
       });
     }
+
     if (historyDate) historyDate.addEventListener('change', renderHistory);
     if (historyPairFilter) historyPairFilter.addEventListener('change', renderHistory);
-    if (togglePairsHdr) {
-      togglePairsHdr.addEventListener('click', () => { 
-        if (boxPairs) boxPairs.classList.toggle('hidden'); 
-      });
-    }
-    if (toggleCalcHdr) {
-      toggleCalcHdr.addEventListener('click', () => { 
-        if (boxCalc) boxCalc.classList.toggle('hidden'); 
-      });
-    }
-    if (toggleHistoryHdr) {
-      toggleHistoryHdr.addEventListener('click', () => { 
-        if (boxHistory) boxHistory.classList.toggle('hidden'); 
-      });
-    }
+    if (togglePairsHdr) togglePairsHdr.addEventListener('click', () => { if (boxPairs) boxPairs.classList.toggle('hidden'); });
+    if (toggleCalcHdr) toggleCalcHdr.addEventListener('click', () => { if (boxCalc) boxCalc.classList.toggle('hidden'); });
+    if (toggleHistoryHdr) toggleHistoryHdr.addEventListener('click', () => { if (boxHistory) boxHistory.classList.toggle('hidden'); });
+
     // ---------- Voice Command ----------
     let recognition = null;
     let isRecording = false;
     let isVoiceActive = false;
     let currentField = null;
     const numericFields = [inputY1, inputCurrentHigh, inputY2, inputCurrentLow];
+
     function parseNumberFromTranscript(transcript) {
       if (!transcript) return null;
       const persianDigits = {'۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9'};
@@ -2135,12 +1751,10 @@
       const match = normalized.match(/-?\d*\.?\d+/);
       return match ? match[0] : null;
     }
+
     function startVoiceRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) { 
-        if (voiceStatus) voiceStatus.textContent = 'مرورگر شما از تشخیص صوت پشتیبانی نمی‌کند.';
-        return; 
-      }
+      if (!SpeechRecognition) { if (voiceStatus) voiceStatus.textContent = 'مرورگر شما از تشخیص صوت پشتیبانی نمی‌کند.'; return; }
       recognition = new SpeechRecognition();
       recognition.lang = 'fa-IR';
       recognition.interimResults = false;
@@ -2149,31 +1763,20 @@
       recognition.onstart = () => {
         isRecording = true;
         if (microToggle) microToggle.classList.add('recording');
-        if (voiceStatus && currentField) {
-          const fieldName = getFieldName(currentField);
-          voiceStatus.textContent = `🎤 در حال گوش دادن لطفاً عدد را بگویید`;
-        }
+        if (voiceStatus && currentField) voiceStatus.textContent = `🎤 در حال گوش دادن لطفاً عدد را بگویید`;
       };
       recognition.onend = () => {
         isRecording = false;
         if (microToggle) microToggle.classList.remove('recording');
         if (isVoiceActive && currentField) {
-          setTimeout(() => {
-            if (!isRecording && isVoiceActive) {
-              startVoiceRecognition();
-            }
-          }, 300);
+          setTimeout(() => { if (!isRecording && isVoiceActive) startVoiceRecognition(); }, 300);
         }
       };
       recognition.onerror = (ev) => {
         isRecording = false;
         if (microToggle) microToggle.classList.remove('recording');
         if (isVoiceActive && currentField) {
-          setTimeout(() => {
-            if (!isRecording && isVoiceActive) {
-              startVoiceRecognition();
-            }
-          }, 1000);
+          setTimeout(() => { if (!isRecording && isVoiceActive) startVoiceRecognition(); }, 1000);
         }
       };
       recognition.onresult = (event) => {
@@ -2181,58 +1784,39 @@
         const numStr = parseNumberFromTranscript(transcript);
         if (numStr && currentField) {
           currentField.value = numStr;
-          const fieldName = getFieldName(currentField);
           if (voiceStatus) voiceStatus.textContent = `✅ عدد "${numStr}" در فیلد مورد نظر وارد شد`;
           const currentIndex = numericFields.indexOf(currentField);
           if (currentIndex < numericFields.length - 1) {
-            setTimeout(() => {
-              numericFields[currentIndex + 1].focus();
-            }, 500);
+            setTimeout(() => { numericFields[currentIndex + 1].focus(); }, 500);
           }
-        } else if (voiceStatus) {
-          voiceStatus.textContent = '❌ عدد تشخیص داده نشد. دوباره تلاش کنید.';
-        }
+        } else if (voiceStatus) voiceStatus.textContent = '❌ عدد تشخیص داده نشد. دوباره تلاش کنید.';
       };
-      try {
-        recognition.start();
-      } catch (e) {
-        console.log('خطا در شروع ضبط:', e);
-      }
+      try { recognition.start(); } catch (e) { console.log('خطا در شروع ضبط:', e); }
     }
+
     function stopVoiceRecognition() {
       isVoiceActive = false;
-      try {
-        if (recognition) recognition.stop();
-      } catch (e) {}
+      try { if (recognition) recognition.stop(); } catch (e) {}
       recognition = null;
       isRecording = false;
-      if (microToggle) {
-        microToggle.classList.remove('recording');
-        microToggle.classList.remove('connected');
-      }
+      if (microToggle) { microToggle.classList.remove('recording'); microToggle.classList.remove('connected'); }
       if (voiceStatus) voiceStatus.textContent = 'اتصال صوتی قطع شد';
     }
+
     function getFieldName(field) {
-      const names = {
-        [inputY1]: 'عدد سقف',
-        [inputCurrentHigh]: 'عدد فعلی سقف', 
-        [inputY2]: 'عدد کف',
-        [inputCurrentLow]: 'عدد فعلی کف'
-      };
+      const names = { [inputY1]: 'عدد سقف', [inputCurrentHigh]: 'عدد فعلی سقف', [inputY2]: 'عدد کف', [inputCurrentLow]: 'عدد فعلی کف' };
       return names[field] || 'این فیلد';
     }
+
     safeForEach(numericFields, (field) => {
       if (!field) return;
       field.addEventListener('focus', () => {
         currentField = field;
-        if (isVoiceActive && !isRecording) {
-          startVoiceRecognition();
-        } else if (isVoiceActive) {
-          const fieldName = getFieldName(field);
-          if (voiceStatus) voiceStatus.textContent = `🎤 در حال گوش دادن لطفاً عدد را بگویید`;
-        }
+        if (isVoiceActive && !isRecording) startVoiceRecognition();
+        else if (isVoiceActive) if (voiceStatus) voiceStatus.textContent = `🎤 در حال گوش دادن لطفاً عدد را بگویید`;
       });
     });
+
     if (microToggle) {
       microToggle.addEventListener('click', () => {
         if (isVoiceActive) {
@@ -2245,14 +1829,12 @@
           microToggle.classList.add('connected');
           if (voiceStatus) voiceStatus.textContent = 'اتصال صوتی فعال شد. روی فیلد مورد نظر کلیک کنید.';
           const emptyField = numericFields.find(field => !field.value || field.value.trim() === '');
-          if (emptyField) {
-            emptyField.focus();
-          } else {
-            numericFields[0].focus();
-          }
+          if (emptyField) emptyField.focus();
+          else numericFields[0].focus();
         }
       });
     }
+
     // ---------- Modal Functions ----------
     if (showStatsBtn) {
       showStatsBtn.addEventListener('click', () => {
@@ -2261,52 +1843,29 @@
           const pairs = storageGet('pairs') || [];
           const entries = storageGet('entries') || [];
           const categories = storageGet('categories') || [];
-          let statsHTML = `
+          statsContent.innerHTML = `
             <div class="stats-grid">
-              <div class="stat-item">
-                <div class="text-lg font-bold">${pairs.length}</div>
-                <div class="text-xs muted">جفت‌ارز</div>
-              </div>
-              <div class="stat-item">
-                <div class="text-lg font-bold">${entries.length}</div>
-                <div class="text-xs muted">رکورد تاریخی</div>
-              </div>
-              <div class="stat-item">
-                <div class="text-lg font-bold">${categories.length}</div>
-                <div class="text-xs muted">دسته‌بندی</div>
-              </div>
-              <div class="stat-item">
-                <div class="text-lg font-bold">${new Date().toLocaleDateString('fa-IR')}</div>
-                <div class="text-xs muted">تاریخ امروز</div>
-              </div>
+              <div class="stat-item"><div class="text-lg font-bold">${pairs.length}</div><div class="text-xs muted">جفت‌ارز</div></div>
+              <div class="stat-item"><div class="text-lg font-bold">${entries.length}</div><div class="text-xs muted">رکورد تاریخی</div></div>
+              <div class="stat-item"><div class="text-lg font-bold">${categories.length}</div><div class="text-xs muted">دسته‌بندی</div></div>
+              <div class="stat-item"><div class="text-lg font-bold">${new Date().toLocaleDateString('fa-IR')}</div><div class="text-xs muted">تاریخ امروز</div></div>
             </div>
           `;
-          if (statsContent) {
-            statsContent.innerHTML = statsHTML;
-          }
         }
       });
     }
-    if (closeStats) {
-      closeStats.addEventListener('click', () => {
-        if (statsModal) statsModal.classList.add('hidden');
-      });
-    }
-    
-    // ---------- Backups modal & prune with advanced features ----------
+
+    if (closeStats) closeStats.addEventListener('click', () => { if (statsModal) statsModal.classList.add('hidden'); });
+
+    // ---------- Backups ----------
     function openBackupsModal() {
       if (!backupsModal || !backupsContent) return;
       backupsModal.classList.remove('hidden');
       renderBackupsUI();
     }
 
-    function getBackups() {
-      return storageGet('backups') || [];
-    }
-
-    function saveBackups(list) {
-      storageSet('backups', list || []);
-    }
+    function getBackups() { return storageGet('backups') || []; }
+    function saveBackups(list) { storageSet('backups', list || []); }
 
     function estimateSizeBytes(str) {
       if (!str) return 0;
@@ -2342,19 +1901,7 @@
     }
 
     function buildCurrentPayload() {
-      return {
-        pairs: storageGet('pairs') || [],
-        entries: storageGet('entries') || [],
-        categories: storageGet('categories') || [],
-        meta: {
-          created: new Date().toISOString(),
-          version: '3.0',
-          entryCount: (storageGet('entries') || []).length,
-          pairCount: (storageGet('pairs') || []).length,
-          categoryCount: (storageGet('categories') || []).length,
-          backupId: uid()
-        }
-      };
+      return { pairs: storageGet('pairs') || [], entries: storageGet('entries') || [], categories: storageGet('categories') || [], meta: { created: new Date().toISOString(), version: '3.0', entryCount: (storageGet('entries') || []).length, pairCount: (storageGet('pairs') || []).length, categoryCount: (storageGet('categories') || []).length, backupId: uid() } };
     }
 
     function createBackup(type = 'manual', options = {}) {
@@ -2363,17 +1910,7 @@
       const enc = simpleEncrypt(json, options.password || '');
       const sizeBytes = estimateSizeBytes(enc.cipher);
       const backups = getBackups();
-      const backup = {
-        id: payload.meta.backupId,
-        createdISO: payload.meta.created,
-        type,
-        sizeBytes,
-        meta: payload.meta,
-        data: enc.cipher,
-        encrypted: enc.encrypted,
-        note: options.note || '',
-        passwordHint: options.passwordHint || ''
-      };
+      const backup = { id: payload.meta.backupId, createdISO: payload.meta.created, type, sizeBytes, meta: payload.meta, data: enc.cipher, encrypted: enc.encrypted, note: options.note || '', passwordHint: options.passwordHint || '' };
       backups.push(backup);
       saveBackups(backups);
       return backup;
@@ -2393,44 +1930,27 @@
       let autoCount = backups.filter(b => b.type && b.type.startsWith('auto')).length;
       let manualCount = backups.length - autoCount;
 
-      let html = `
+      backupsContent.innerHTML = `
         <div class="multi-date-controls">
           <div class="flex flex-col gap-2 mb-3">
             <div class="flex gap-2 flex-wrap items-center">
               <span class="muted text-xs">فیلتر نوع بک‌آپ:</span>
-              <select id="backup_filter_type" class="small-btn bg-slate-600 text-xs">
-                <option value="">همه</option>
-                <option value="manual">دستی</option>
-                <option value="manual-file">دستی (همراه دانلود)</option>
-                <option value="auto-prune">خودکار قبل از حذف</option>
-              </select>
+              <select id="backup_filter_type" class="small-btn bg-slate-600 text-xs"><option value="">همه</option><option value="manual">دستی</option><option value="manual-file">دستی (همراه دانلود)</option><option value="auto-prune">خودکار قبل از حذف</option></select>
               <input id="backup_search" class="small-btn bg-slate-600 flex-1 text-xs" placeholder="جستجو در یادداشت / شناسه / نسخه">
             </div>
             <div class="stats-grid">
-              <div class="stat-item">
-                <div class="text-lg font-bold">${backups.length}</div>
-                <div class="text-xs muted">تعداد کل بک‌آپ‌ها</div>
-              </div>
-              <div class="stat-item">
-                <div class="text-lg font-bold">${manualCount}</div>
-                <div class="text-xs muted">بک‌آپ‌های دستی</div>
-              </div>
-              <div class="stat-item">
-                <div class="text-lg font-bold">${autoCount}</div>
-                <div class="text-xs muted">بک‌آپ‌های خودکار</div>
-              </div>
-              <div class="stat-item">
-                <div class="text-lg font-bold">${formatBytes(totalSize)}</div>
-                <div class="text-xs muted">حجم تقریبی ذخیره‌شده</div>
-              </div>
+              <div class="stat-item"><div class="text-lg font-bold">${backups.length}</div><div class="text-xs muted">تعداد کل بک‌آپ‌ها</div></div>
+              <div class="stat-item"><div class="text-lg font-bold">${manualCount}</div><div class="text-xs muted">بک‌آپ‌های دستی</div></div>
+              <div class="stat-item"><div class="text-lg font-bold">${autoCount}</div><div class="text-xs muted">بک‌آپ‌های خودکار</div></div>
+              <div class="stat-item"><div class="text-lg font-bold">${formatBytes(totalSize)}</div><div class="text-xs muted">حجم تقریبی ذخیره‌شده</div></div>
             </div>
           </div>
           <div class="date-range-item mb-3">
             <div class="text-xs font-semibold mb-2">ساخت بک‌آپ داخلی جدید</div>
             <div class="flex flex-col gap-2">
-              <input id="backup_note" class="small-btn bg-slate-600 text-xs" placeholder="یادداشت (اختیاری) مثلا قبل از تغییرات مهم">
+              <input id="backup_note" class="small-btn bg-slate-600 text-xs" placeholder="یادداشت (اختیاری)">
               <div class="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
-                <input id="backup_password" type="password" class="small-btn bg-slate-600 text-xs w-full md:flex-1" placeholder="رمز (اختیاری برای قفل کردن بک‌آپ)">
+                <input id="backup_password" type="password" class="small-btn bg-slate-600 text-xs w-full md:flex-1" placeholder="رمز (اختیاری)">
                 <input id="backup_password_hint" class="small-btn bg-slate-600 text-xs w-full md:flex-1" placeholder="یادآور رمز (اختیاری)">
               </div>
               <button id="create_internal_backup" class="small-btn bg-green-600 hover:bg-green-700 w-full">💾 ساخت بک‌آپ داخلی</button>
@@ -2448,68 +1968,44 @@
               <button id="backup_prune_auto" class="small-btn bg-rose-700 hover:bg-rose-800 flex-1 text-xs" style="display:none">حذف فقط خودکارهای قدیمی</button>
             </div>
           </div>
-          <div class="date-comparison-header flex items-center justify-between mb-2" style="display:none">
-            <span class="text-xs">مقایسه دو بک‌آپ انتخاب‌شده</span>
-            <button id="backup_compare_btn" class="small-btn bg-blue-600 hover:bg-blue-700 text-xs">🔍 مقایسه</button>
-          </div>
         </div>
         <div id="backups_list" class="space-y-2"></div>
         <div id="backups_compare_result" class="closest-info hidden"></div>
       `;
 
-      backupsContent.innerHTML = html;
-
       const listContainer = document.getElementById('backups_list');
       const filterSelect = document.getElementById('backup_filter_type');
       const searchInput = document.getElementById('backup_search');
-      const compareResult = document.getElementById('backups_compare_result');
-
-      let selectedForCompare = [];
 
       function renderList() {
         if (!listContainer) return;
         const typeFilter = filterSelect ? filterSelect.value : '';
         const query = (searchInput ? searchInput.value : '').toLowerCase();
         listContainer.innerHTML = '';
-
         let filtered = backups.filter(b => {
           let ok = true;
           if (typeFilter && b.type !== typeFilter) ok = false;
           if (ok && query) {
-            const q = query;
             const hay = (b.note || '') + ' ' + (b.meta?.version || '') + ' ' + (b.id || '');
-            if (!hay.toLowerCase().includes(q)) ok = false;
+            if (!hay.toLowerCase().includes(query)) ok = false;
           }
           return ok;
         });
-
         if (filtered.length === 0) {
           listContainer.innerHTML = '<div class="muted text-center text-xs py-4">هیچ بک‌آپی برای نمایش وجود ندارد.</div>';
           return;
         }
-
         filtered.forEach(b => {
           const created = new Date(b.createdISO);
           const row = document.createElement('div');
           row.className = 'backup-item flex flex-col gap-2';
           const dateText = isNaN(created) ? b.createdISO : created.toLocaleString('fa-IR');
-          const typeLabel = (b.type || 'manual')
-            .replace('manual-file', 'دستی+فایل')
-            .replace('manual', 'دستی')
-            .replace('auto-daily', 'خودکار روزانه')
-            .replace('auto-prune', 'خودکار قبل حذف');
+          const typeLabel = (b.type || 'manual').replace('manual-file', 'دستی+فایل').replace('manual', 'دستی').replace('auto-daily', 'خودکار روزانه').replace('auto-prune', 'خودکار قبل حذف');
           const encText = b.encrypted ? '🔒 رمزدار' : '🔓 معمولی';
-
           row.innerHTML = `
             <div class="flex items-center justify-between gap-2">
-              <div class="flex flex-col">
-                <span class="text-xs font-semibold">شناسه: ${b.id}</span>
-                <span class="text-xs muted">نوع: ${typeLabel} | ${encText}</span>
-              </div>
-              <div class="text-xs text-right">
-                <div>${dateText}</div>
-                <div class="muted">حجم تقریبی: ${formatBytes(b.sizeBytes || 0)}</div>
-              </div>
+              <div class="flex flex-col"><span class="text-xs font-semibold">شناسه: ${b.id}</span><span class="text-xs muted">نوع: ${typeLabel} | ${encText}</span></div>
+              <div class="text-xs text-right"><div>${dateText}</div><div class="muted">حجم تقریبی: ${formatBytes(b.sizeBytes || 0)}</div></div>
             </div>
             <div class="flex flex-wrap gap-2 text-xs muted">
               <span>رکوردها: ${b.meta?.entryCount || 0}</span>
@@ -2522,26 +2018,15 @@
               <button class="small-btn bg-blue-600 hover:bg-blue-700 text-xs flex-1" data-action="preview" data-id="${b.id}">مشاهده جزئیات</button>
               <button class="small-btn bg-emerald-600 hover:bg-emerald-700 text-xs flex-1" data-action="restore" data-id="${b.id}">بازیابی</button>
               <button class="small-btn bg-rose-600 hover:bg-rose-700 text-xs flex-1" data-action="delete" data-id="${b.id}">حذف بک‌آپ</button>
-              <button class="small-btn bg-slate-600 hover:bg-slate-700 text-xs" data-action="select-compare" data-id="${b.id}" style="display:none">
-                ${selectedForCompare.includes(b.id) ? '❌ حذف از مقایسه' : '🔁 انتخاب برای مقایسه'}
-              </button>
             </div>
           `;
-
           listContainer.appendChild(row);
         });
       }
 
       renderList();
-
       if (filterSelect) filterSelect.addEventListener('change', renderList);
-      if (searchInput) searchInput.addEventListener('input', () => {
-        if (compareResult) {
-          compareResult.classList.add('hidden');
-          compareResult.innerHTML = '';
-        }
-        renderList();
-      });
+      if (searchInput) searchInput.addEventListener('input', renderList);
 
       if (listContainer) {
         listContainer.addEventListener('click', (e) => {
@@ -2550,38 +2035,18 @@
           const id = btn.getAttribute('data-id');
           const action = btn.getAttribute('data-action');
           if (!id || !action) return;
-
-          if (action === 'preview') {
-            previewBackup(id);
-          } else if (action === 'restore') {
-            restoreBackup(id);
-          } else if (action === 'delete') {
-            deleteBackup(id);
-            renderBackupsUI();
-          } else if (action === 'select-compare') {
-            if (selectedForCompare.includes(id)) {
-              selectedForCompare = selectedForCompare.filter(x => x !== id);
-            } else {
-              if (selectedForCompare.length >= 2) {
-                alert('فقط دو بک‌آپ را می‌توانید برای مقایسه انتخاب کنید.');
-              } else {
-                selectedForCompare.push(id);
-              }
-            }
-            renderBackupsUI();
-          }
+          if (action === 'preview') previewBackup(id);
+          else if (action === 'restore') restoreBackup(id);
+          else if (action === 'delete') { deleteBackup(id); renderBackupsUI(); }
         });
       }
 
       const createBtn = document.getElementById('create_internal_backup');
       if (createBtn) {
         createBtn.addEventListener('click', () => {
-          const noteEl = document.getElementById('backup_note');
-          const passEl = document.getElementById('backup_password');
-          const hintEl = document.getElementById('backup_password_hint');
-          const note = noteEl ? noteEl.value : '';
-          const password = passEl ? passEl.value : '';
-          const hint = hintEl ? hintEl.value : '';
+          const note = document.getElementById('backup_note')?.value || '';
+          const password = document.getElementById('backup_password')?.value || '';
+          const hint = document.getElementById('backup_password_hint')?.value || '';
           createBackup('manual', { note, password, passwordHint: hint });
           showNotification('✅ بک‌آپ داخلی با موفقیت ساخته شد', 'success');
           renderBackupsUI();
@@ -2589,57 +2054,24 @@
       }
 
       const pruneAllBtn = document.getElementById('backup_prune_all');
-      const pruneAutoBtn = document.getElementById('backup_prune_auto');
       const pruneDaysEl = document.getElementById('backup_prune_days');
-
-      function doPrune(autoOnly) {
-        const days = pruneDaysEl ? parseInt(pruneDaysEl.value, 10) : NaN;
-        if (!days || isNaN(days) || days < 1) {
-          alert('لطفاً تعداد روز معتبر برای حذف بک‌آپ‌ها وارد کنید.');
-          return;
-        }
-        const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
-        let backups = getBackups();
-        const before = backups.length;
-        backups = backups.filter(b => {
-          const t = new Date(b.createdISO).getTime();
-          if (isNaN(t)) return true;
-          if (t < cutoff) {
-            if (!autoOnly) return false;
-            if (b.type && b.type.startsWith('auto')) {
-              return false;
-            }
-          }
-          return true;
-        });
-        saveBackups(backups);
-        const removed = before - backups.length;
-        showNotification(removed > 0 ? `✅ ${removed} بک‌آپ قدیمی حذف شد` : 'بک‌آپ قدیمی مطابق فیلتر یافت نشد.');
-        renderBackupsUI();
-      }
-
-      if (pruneAllBtn) pruneAllBtn.addEventListener('click', () => doPrune(false));
-      if (pruneAutoBtn) pruneAutoBtn.addEventListener('click', () => doPrune(true));
-
-      const compareBtn = document.getElementById('backup_compare_btn');
-      if (compareBtn) {
-        compareBtn.addEventListener('click', () => {
-          if (!compareResult) return;
-          if (selectedForCompare.length !== 2) {
-            alert('برای مقایسه باید دقیقاً دو بک‌آپ انتخاب کنید.');
-            return;
-          }
-          const [id1, id2] = selectedForCompare;
-          const backupsMap = Object.fromEntries(backups.map(b => [b.id, b]));
-          const b1 = backupsMap[id1];
-          const b2 = backupsMap[id2];
-          if (!b1 || !b2) {
-            alert('خطا در یافتن بک‌آپ‌های انتخاب‌شده.');
-            return;
-          }
-          const report = compareBackups(b1, b2);
-          compareResult.classList.remove('hidden');
-          compareResult.innerHTML = report;
+      if (pruneAllBtn) {
+        pruneAllBtn.addEventListener('click', () => {
+          const days = pruneDaysEl ? parseInt(pruneDaysEl.value, 10) : NaN;
+          if (!days || isNaN(days) || days < 1) { alert('لطفاً تعداد روز معتبر وارد کنید.'); return; }
+          const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
+          let backups = getBackups();
+          const before = backups.length;
+          backups = backups.filter(b => {
+            const t = new Date(b.createdISO).getTime();
+            if (isNaN(t)) return true;
+            if (t < cutoff) return false;
+            return true;
+          });
+          saveBackups(backups);
+          const removed = before - backups.length;
+          showNotification(removed > 0 ? `✅ ${removed} بک‌آپ قدیمی حذف شد` : 'بک‌آپ قدیمی یافت نشد.');
+          renderBackupsUI();
         });
       }
     }
@@ -2657,81 +2089,34 @@
           jsonStr = simpleDecrypt(jsonStr, password);
         }
         payload = JSON.parse(jsonStr);
-      } catch (err) {
-        alert('خطا در خواندن محتوای بک‌آپ: ' + err.message);
-        return;
-      }
-      const pairsCount = payload.pairs?.length || 0;
-      const entriesCount = payload.entries?.length || 0;
-      const categoriesCount = payload.categories?.length || 0;
+      } catch (err) { alert('خطا در خواندن محتوای بک‌آپ: ' + err.message); return; }
       const samplePairs = payload.pairs?.slice(0, 5).map(p => p.name).join('، ') || 'بدون جفت‌ارز';
-      let msg = `
-        نوع: ${b.type}
-        تاریخ ایجاد: ${new Date(b.createdISO).toLocaleString('fa-IR')}
-        رکوردها: ${entriesCount}
-        جفت‌ارزها: ${pairsCount}
-        دسته‌بندی‌ها: ${categoriesCount}
-        نمونه جفت‌ارزها: ${samplePairs}
-      `;
-      alert(msg);
+      alert(`نوع: ${b.type}\nتاریخ ایجاد: ${new Date(b.createdISO).toLocaleString('fa-IR')}\nرکوردها: ${payload.entries?.length || 0}\nجفت‌ارزها: ${payload.pairs?.length || 0}\nدسته‌بندی‌ها: ${payload.categories?.length || 0}\nنمونه جفت‌ارزها: ${samplePairs}`);
     }
 
     function restoreBackup(id) {
       const backups = getBackups();
       const b = backups.find(x => x.id === id);
-      if (!b) {
-        alert('بک‌آپ یافت نشد.');
-        return;
-      }
+      if (!b) { alert('بک‌آپ یافت نشد.'); return; }
       let jsonStr = b.data;
       if (b.encrypted) {
         const password = prompt('این بک‌آپ رمزدار است. برای بازیابی، رمز را وارد کنید:');
         if (!password) return;
-        try {
-          jsonStr = simpleDecrypt(jsonStr, password);
-        } catch (err) {
-          alert('رمز اشتباه یا خطا در باز کردن بک‌آپ.');
-          return;
-        }
+        try { jsonStr = simpleDecrypt(jsonStr, password); } catch (err) { alert('رمز اشتباه یا خطا در باز کردن بک‌آپ.'); return; }
       }
       let payload = null;
-      try {
-        payload = JSON.parse(jsonStr);
-      } catch (err) {
-        alert('محتوای بک‌آپ نامعتبر است.');
-        return;
-      }
+      try { payload = JSON.parse(jsonStr); } catch (err) { alert('محتوای بک‌آپ نامعتبر است.'); return; }
       const mode = prompt('نوع بازیابی را انتخاب کنید:\n1 = کامل (همه داده‌ها جایگزین شوند)\n2 = فقط جفت‌ارزها و دسته‌بندی‌ها\n3 = فقط تاریخچه');
       if (!mode) return;
       const m = mode.trim();
-      if (!['1','2','3'].includes(m)) {
-        alert('گزینه نامعتبر.');
-        return;
-      }
+      if (!['1','2','3'].includes(m)) { alert('گزینه نامعتبر.'); return; }
       if (!confirm('آیا از بازیابی این بک‌آپ مطمئن هستید؟ داده‌های فعلی شما مطابق نوع بازیابی تغییر می‌کنند.')) return;
-
-      const currentData = {
-        pairs: storageGet('pairs') || [],
-        entries: storageGet('entries') || [],
-        categories: storageGet('categories') || []
-      };
+      const currentData = { pairs: storageGet('pairs') || [], entries: storageGet('entries') || [], categories: storageGet('categories') || [] };
       try {
-        if (m === '1' || m === '2') {
-          storageSet('pairs', Array.isArray(payload.pairs) ? payload.pairs : []);
-          storageSet('categories', Array.isArray(payload.categories) ? payload.categories : []);
-        }
-        if (m === '1' || m === '3') {
-          storageSet('entries', Array.isArray(payload.entries) ? payload.entries : []);
-        }
-        renderPairs();
-        renderHistory();
-        showNotification('✅ بازیابی بک‌آپ با موفقیت انجام شد', 'success');
-      } catch (err) {
-        storageSet('pairs', currentData.pairs);
-        storageSet('entries', currentData.entries);
-        storageSet('categories', currentData.categories);
-        alert('خطا در بازیابی بک‌آپ: ' + err.message);
-      }
+        if (m === '1' || m === '2') { storageSet('pairs', Array.isArray(payload.pairs) ? payload.pairs : []); storageSet('categories', Array.isArray(payload.categories) ? payload.categories : []); }
+        if (m === '1' || m === '3') { storageSet('entries', Array.isArray(payload.entries) ? payload.entries : []); }
+        renderPairs(); renderHistory(); showNotification('✅ بازیابی بک‌آپ با موفقیت انجام شد', 'success');
+      } catch (err) { storageSet('pairs', currentData.pairs); storageSet('entries', currentData.entries); storageSet('categories', currentData.categories); alert('خطا در بازیابی بک‌آپ: ' + err.message); }
     }
 
     function deleteBackup(id) {
@@ -2739,100 +2124,33 @@
       const before = backups.length;
       backups = backups.filter(b => b.id !== id);
       saveBackups(backups);
-      if (backups.length < before) {
-        showNotification('✅ بک‌آپ انتخاب‌شده حذف شد', 'success');
-      }
+      if (backups.length < before) showNotification('✅ بک‌آپ انتخاب‌شده حذف شد', 'success');
     }
 
-    function compareBackups(b1, b2) {
-      let p1, p2;
-      try {
-        let j1 = b1.data;
-        let j2 = b2.data;
-        if (b1.encrypted) {
-          const pass1 = prompt('بک‌آپ اول رمزدار است. رمز را وارد کنید:');
-          if (!pass1) throw new Error('رمز لازم است.');
-          j1 = simpleDecrypt(j1, pass1);
-        }
-        if (b2.encrypted) {
-          const pass2 = prompt('بک‌آپ دوم رمزدار است. رمز را وارد کنید:');
-          if (!pass2) throw new Error('رمز لازم است.');
-          j2 = simpleDecrypt(j2, pass2);
-        }
-        p1 = JSON.parse(j1);
-        p2 = JSON.parse(j2);
-      } catch (err) {
-        return `<div class="text-xs text-red-300">خطا در مقایسه: ${err.message}</div>`;
-      }
-      const setPairs1 = new Set((p1.pairs || []).map(p => p.name));
-      const setPairs2 = new Set((p2.pairs || []).map(p => p.name));
-      const addedPairs = [...setPairs2].filter(x => !setPairs1.has(x));
-      const removedPairs = [...setPairs1].filter(x => !setPairs2.has(x));
+    if (manageBackupsBtn) manageBackupsBtn.addEventListener('click', openBackupsModal);
+    if (closeBackups) closeBackups.addEventListener('click', () => { if (backupsModal) backupsModal.classList.add('hidden'); });
 
-      const e1 = p1.entries || [];
-      const e2 = p2.entries || [];
-      const diffEntries = e2.length - e1.length;
-
-      return `
-        <div class="text-xs">
-          <div class="font-semibold mb-1">نتیجه مقایسه دو بک‌آپ:</div>
-          <div class="mb-1">تفاوت تعداد رکوردها: ${diffEntries}</div>
-          <div class="mb-1">جفت‌ارزهای اضافه‌شده در بک‌آپ دوم: ${addedPairs.length ? addedPairs.join('، ') : 'ندارد'}</div>
-          <div class="mb-1">جفت‌ارزهای حذف‌شده نسبت به بک‌آپ اول: ${removedPairs.length ? removedPairs.join('، ') : 'ندارد'}</div>
-        </div>
-      `;
-    }
-
-    function ensureDailyAutoBackup() {
-      const today = new Date().toISOString().slice(0, 10);
-      const backups = getBackups();
-      const exists = backups.some(b => b.type === 'auto-daily' && (b.createdISO || '').slice(0, 10) === today);
-      if (!exists) {
-        createBackup('auto-daily', { note: 'بک‌آپ خودکار روزانه' });
-      }
-    }
-
-    if (manageBackupsBtn) {
-      manageBackupsBtn.addEventListener('click', () => {
-        openBackupsModal();
-      });
-    }
-    if (closeBackups) {
-      closeBackups.addEventListener('click', () => {
-        if (backupsModal) backupsModal.classList.add('hidden');
-      });
-    }
     if (manualPruneBtn) {
       manualPruneBtn.addEventListener('click', () => {
         const days = document.getElementById('manual_prune_days').value;
-        if (!days || isNaN(days) || days < 1) {
-          alert('لطفاً تعداد روز معتبر وارد کنید.');
-          return;
-        }
+        if (!days || isNaN(days) || days < 1) { alert('لطفاً تعداد روز معتبر وارد کنید.'); return; }
         if (confirm(`قبل از حذف رکوردهای قدیمی، یک بک‌آپ خودکار گرفته می‌شود. سپس رکوردهای قدیمی‌تر از ${days} روز حذف خواهند شد. ادامه می‌دهید؟`)) {
           createBackup('auto-prune', { note: `قبل از حذف رکوردهای قدیمی‌تر از ${days} روز` });
           const entries = storageGet('entries') || [];
           const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
           const kept = entries.filter(e => new Date(e.dateISO).getTime() >= cutoff);
-          if (kept.length !== entries.length) {
-            storageSet('entries', kept);
-            renderHistory();
-            alert(`${entries.length - kept.length} رکورد قدیمی حذف شد.`);
-          } else {
-            alert('هیچ رکورد قدیمی‌ای برای حذف یافت نشد.');
-          }
+          if (kept.length !== entries.length) { storageSet('entries', kept); renderHistory(); alert(`${entries.length - kept.length} رکورد قدیمی حذف شد.`); }
+          else alert('هیچ رکورد قدیمی‌ای برای حذف یافت نشد.');
         }
       });
     }
+
     // ---------- شروع اولیه ----------
-    // We need to initialize data after DB is loaded
     async function initApp() {
       try {
         await openDB();
         await loadAllData();
-        // Ensure defaults
         ensureDefaults();
-        // به‌روزرسانی جفت‌ارزهای قدیمی برای اضافه کردن sortOrder
         upgradePairsWithSortOrder();
         if ((storageGet('pairs') || []).length === 0) {
           storageSet('pairs', [
@@ -2845,24 +2163,16 @@
         window.addEventListener('load', () => {
           const today = new Date().toISOString().split('T')[0];
           if (historyDate) historyDate.value = today;
-          setTimeout(() => { if (inputY1) inputY1.focus(); }, 1000);
+          setTimeout(() => { if (inputY1) inputY1.focus(); extractAndDisplayCurrentHighLow(); }, 1000);
         });
-        renderPairs(); 
+        renderPairs();
         renderHistory();
-        setTimeout(() => {
-          console.log('✅ سیستم Calculator PRO - برنامه سوم با IndexedDB و sortOrder آماده است!');
-        }, 1000);
-      } catch (e) {
-        console.error('Error initializing app:', e);
-        alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
-      }
+        setTimeout(() => console.log('✅ سیستم Calculator PRO - برنامه سوم با باکس سقف و کف فعلی آماده است!'), 1000);
+      } catch (e) { console.error('Error initializing app:', e); alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.'); }
     }
     initApp();
   </script>
-  <div class="signature">
-    طراحی و ساخت توسط ❤️ سعید شیخ احمد صفاری
-  </div>
-    <BR>
-    <BR>
+  <div class="signature">طراحی و ساخت توسط ❤️ سعید شیخ احمد صفاری</div>
+  <br><br>
 </body>
 </html>
