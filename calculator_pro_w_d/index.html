@@ -3,7 +3,6 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
   <title>calculator pro w/d - برنامه اول</title>
-  <!-- فراخوانی فونت وزیرمتن -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
   <script src="https://cdn.tailwindcss.com"></script>
 <style>
@@ -311,6 +310,72 @@
     #toggle_history_btn:hover #toggle_icon { transform: scale(1.2); }
     #toggle_history_btn.open { background: #374151 !important; border-color: #6b7280 !important; }
     #toggle_history_btn.closed { background: #475569 !important; border-color: #64748b !important; }
+
+    /* ===== باکس کپی اعداد دو سطر اول - در تاریخچه ===== */
+    #fixed_numbers_box {
+      background: #1e3a8a;
+      border: 2px solid #3b82f6;
+      border-radius: 10px;
+      padding: 8px 14px;
+      margin: 8px 0 12px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+      cursor: default;
+      min-height: 44px;
+    }
+    #fixed_numbers_box .copy-label {
+      font-size: 0.75rem;
+      color: #93c5fd;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    #fixed_numbers_box .num-item {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(0,0,0,0.3);
+      padding: 2px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      direction: ltr;
+      unicode-bidi: embed;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    #fixed_numbers_box .num-item:hover {
+      background: rgba(255,255,255,0.2);
+      border-color: #60a5fa;
+      transform: scale(1.05);
+    }
+    #fixed_numbers_box .num-item:active {
+      transform: scale(0.95);
+    }
+    #fixed_numbers_box .separator {
+      color: #93c5fd;
+      font-size: 0.9rem;
+      font-weight: 300;
+    }
+    #fixed_numbers_box .empty-text {
+      color: #93c5fd;
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+    #fixed_numbers_box .pair-name {
+      font-size: 0.7rem;
+      color: #93c5fd;
+      background: rgba(255,255,255,0.1);
+      padding: 2px 8px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+    .fixed-numbers-container {
+      width: 100%;
+    }
 </style>
 </head>
 <body>
@@ -469,6 +534,17 @@
           <div class="text-sm font-semibold">تاریخچه</div>
           <div class="muted">کل: <span id="entries_count">0</span></div>
         </div>
+
+        <!-- ===== باکس کپی اعداد دو سطر اول - در تاریخچه ===== -->
+        <div id="fixed_numbers_box" class="fixed-numbers-container">
+          <span class="copy-label">📋 اعداد دو سطر اول (نزدیک‌ترین فاصله):</span>
+          <span id="fixed_pair_name" class="pair-name">---</span>
+          <span id="fixed_num_1" class="num-item" title="کلیک برای کپی عدد اول">---</span>
+          <span class="separator">|</span>
+          <span id="fixed_num_2" class="num-item" title="کلیک برای کپی عدد دوم">---</span>
+          <span style="font-size:0.7rem; color:#93c5fd; opacity:0.5;">(هر عدد جداگانه)</span>
+        </div>
+
 <div class="flex gap-2 mb-3">
   <button id="toggle_history_btn" class="small-btn flex-1 bg-slate-600 hover:bg-slate-700 flex items-center justify-center gap-2 transition-all duration-300 closed">
     <span id="toggle_icon" class="text-lg transition-all duration-300 transform">📁</span>
@@ -695,8 +771,6 @@ ensureDefaults();
 // === راه‌حل اصلی: اضافه کردن sortOrder به جفت‌ارزها ===
 // ============================================================
 
-// این تابع برای زمانی که جفت‌ارز جدید اضافه می‌شود،
-// sortOrder را به صورت خودکار تنظیم می‌کند
 function getNextSortOrder() {
   const pairs = storageGet('pairs') || [];
   if (pairs.length === 0) return 0;
@@ -704,7 +778,6 @@ function getNextSortOrder() {
   return maxOrder + 1;
 }
 
-// تابع کمکی برای مرتب‌سازی جفت‌ارزها بر اساس sortOrder
 function sortPairsByOrder(pairs) {
   return pairs.slice().sort((a, b) => {
     const orderA = a.sortOrder !== undefined ? a.sortOrder : 0;
@@ -713,7 +786,6 @@ function sortPairsByOrder(pairs) {
   });
 }
 
-// بازنویسی تابع addPair با اضافه کردن sortOrder
 function addPair(name){
   if(!name || !name.trim()) return;
   const pairs = storageGet('pairs')||[];
@@ -723,36 +795,26 @@ function addPair(name){
     id: uid(), 
     name: name.trim(),
     categoryId: selectedCategory || null,
-    sortOrder: newOrder  // <--- اضافه شد
+    sortOrder: newOrder
   });
   storageSet('pairs', pairs);
   renderPairs();
 }
 
-// بازنویسی تابع swapPairs برای به‌روزرسانی sortOrder
 function swapPairs(i,j){
   const pairs = storageGet('pairs')||[];
   if(!pairs[i] || !pairs[j]) return;
-  
-  // دریافت sortOrder فعلی
   const orderI = pairs[i].sortOrder !== undefined ? pairs[i].sortOrder : i;
   const orderJ = pairs[j].sortOrder !== undefined ? pairs[j].sortOrder : j;
-  
-  // تعویض sortOrder‌ها
   pairs[i].sortOrder = orderJ;
   pairs[j].sortOrder = orderI;
-  
-  // تعویض موقعیت در آرایه
   [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
-  
   storageSet('pairs', pairs);
   renderPairs();
 }
 
-// بازنویسی تابع renderPairs برای مرتب‌سازی بر اساس sortOrder
 function renderPairs(){
   const pairs = storageGet('pairs') || [];
-  // مرتب‌سازی بر اساس sortOrder
   const sortedPairs = sortPairsByOrder(pairs);
   
   if(pairSelect) pairSelect.innerHTML = '';
@@ -788,11 +850,9 @@ function renderPairs(){
   renderCategories();
 }
 
-// بازنویسی تابع renderCategories برای مرتب‌سازی بر اساس sortOrder
 function renderCategories(){
   const categories = storageGet('categories') || [];
   const pairs = storageGet('pairs') || [];
-  // مرتب‌سازی بر اساس sortOrder
   const sortedPairs = sortPairsByOrder(pairs);
   
   if(categorySelect){
@@ -835,7 +895,6 @@ function renderCategories(){
   }
 }
 
-// تابع renderCategorySection بدون تغییر (فقط برای نمایش)
 function renderCategorySection(categoryId, categoryName, pairs){
   const section = document.createElement('div');
   section.className = 'category-section';
@@ -880,7 +939,6 @@ function renderCategorySection(categoryId, categoryName, pairs){
   });
 }
 
-// تابع addCategory بدون تغییر
 function addCategory(name){
   if(!name || !name.trim()) return;
   const categories = storageGet('categories') || [];
@@ -893,7 +951,6 @@ function addCategory(name){
   renderCategories();
 }
 
-// تابع deleteCategory بدون تغییر
 function deleteCategory(){
   const selectedCategoryId = categorySelect ? categorySelect.value : null;
   if(!selectedCategoryId){
@@ -920,8 +977,6 @@ function deleteCategory(){
   renderPairs();
 }
 
-// اضافه کردن تابع برای به‌روزرسانی sortOrder همه جفت‌ارزها
-// (برای جفت‌ارزهایی که قبلاً sortOrder ندارند)
 function upgradePairsWithSortOrder() {
   const pairs = storageGet('pairs') || [];
   let changed = false;
@@ -937,8 +992,58 @@ function upgradePairsWithSortOrder() {
 }
 
 // ============================================================
-// === ادامه کد اصلی (بدون تغییر) ===
+// === تابع برای استخراج اعداد از closestInfo یک رکورد ===
+// === و فقط دو سطر اول رو برمیگردونه (از هر دو بخش) ===
 // ============================================================
+function extractNumbersFromClosestInfo(closestInfoData, inputFormat) {
+  if (!closestInfoData) return null;
+  
+  const allPairs = [];
+  
+  // جمع‌آوری همه سطرها از هر دو بخش
+  if (closestInfoData.closestPairs && closestInfoData.closestPairs.length > 0) {
+    closestInfoData.closestPairs.forEach(pair => {
+      if (pair && pair.length >= 2) {
+        allPairs.push(pair);
+      }
+    });
+  }
+  
+  if (closestInfoData.secondPairs && closestInfoData.secondPairs.length > 0) {
+    closestInfoData.secondPairs.forEach(pair => {
+      if (pair && pair.length >= 2) {
+        allPairs.push(pair);
+      }
+    });
+  }
+  
+  if (allPairs.length === 0) return null;
+  
+  // فقط دو سطر اول رو برمیداریم
+  const firstTwoPairs = allPairs.slice(0, 2);
+  const numbers = [];
+  
+  for (const pair of firstTwoPairs) {
+    if (pair && pair.length >= 2) {
+      // عدد سمت راست (اولین عدد در جفت)
+      const num = pair[0].value;
+      if (num !== undefined && num !== null && !isNaN(num)) {
+        const formatted = formatOutputByInputFormat(num, inputFormat);
+        numbers.push(formatted);
+      } else {
+        numbers.push('---');
+      }
+    } else {
+      numbers.push('---');
+    }
+  }
+  
+  while (numbers.length < 2) {
+    numbers.push('---');
+  }
+  
+  return numbers;
+}
 
 function upgradeClosestInfoForAllEntries() {
   const entries = storageGet('entries') || [];
@@ -965,11 +1070,9 @@ function upgradeClosestInfoForAllEntries() {
   }
 }
 
-// ---------- تشخیص دستگاه موبایل/تبلت ----------
 function isMobileOrTablet() {
     return window.innerWidth <= 1024;
 }
-// ---------- مدیریت وضعیت باکس‌ها بر اساس دستگاه ----------
 function initializeBoxStates() {
     if (isMobileOrTablet()) {
         if(boxPairs) boxPairs.classList.add('hidden');
@@ -1037,6 +1140,16 @@ const multiDatePairFilter = $('multi_date_pair_filter');
 const dateRangesContainer = $('date_ranges_container');
 const addDateBtn = $('add_date_btn');
 const applyMultiDateBtn = $('apply_multi_date_btn');
+
+// ---------- عناصر باکس کپی اعداد ثابت (در تاریخچه) ----------
+const fixedNum1 = $('fixed_num_1');
+const fixedNum2 = $('fixed_num_2');
+const fixedPairName = $('fixed_pair_name');
+
+// ---------- متغیر برای ذخیره اعداد فعلی ----------
+let currentFixedNumbers = ['---', '---'];
+let currentPairId = null;
+
 // ---------- UI utils ----------
 function safeForEach(arr, fn){ if(!Array.isArray(arr)) return; arr.forEach(fn); }
 
@@ -1141,10 +1254,177 @@ function findClosestNumbers(numbers) {
 
 upgradeClosestInfoForAllEntries();
 
+// ============================================================
+// === تابع اصلی: استخراج اعداد دو سطر اول از تاریخچه ===
+// === از هر دو بخش "نزدیک‌ترین اعداد" و "نزدیک‌ترین فاصله بعدی" ===
+// ============================================================
+function extractAndDisplayFixedNumbers() {
+  if (!fixedNum1 || !fixedNum2) return;
+
+  let numbers = ['---', '---'];
+  let pairName = '---';
+  let pairId = null;
+
+  // 1. دریافت جفت‌ارز انتخاب‌شده از فیلتر تاریخچه
+  if (historyPairFilter && historyPairFilter.selectedIndex >= 0) {
+    const selectedOption = historyPairFilter.options[historyPairFilter.selectedIndex];
+    if (selectedOption && selectedOption.value) {
+      pairId = selectedOption.value;
+      const pair = (storageGet('pairs')||[]).find(p => p.id === pairId);
+      if (pair) pairName = pair.name;
+    }
+  }
+
+  // اگر جفت‌ارزی انتخاب نشده، از جفت‌ارز فعال در ماشین حساب استفاده کن
+  if (!pairId && pairSelect && pairSelect.selectedIndex >= 0) {
+    const selectedOption = pairSelect.options[pairSelect.selectedIndex];
+    if (selectedOption && selectedOption.value) {
+      pairId = selectedOption.value;
+      const pair = (storageGet('pairs')||[]).find(p => p.id === pairId);
+      if (pair) pairName = pair.name;
+    }
+  }
+
+  // 2. دریافت تاریخ انتخاب‌شده
+  let selectedDate = null;
+  if (historyDate && historyDate.value) {
+    selectedDate = historyDate.value;
+  }
+
+  // 3. جستجوی رکوردها در دیتابیس
+  const entries = storageGet('entries') || [];
+  let filteredEntries = entries;
+
+  // فیلتر بر اساس جفت‌ارز
+  if (pairId) {
+    filteredEntries = filteredEntries.filter(e => e.pairId === pairId);
+  }
+
+  // فیلتر بر اساس تاریخ
+  if (selectedDate) {
+    filteredEntries = filteredEntries.filter(e => {
+      const entryDate = e.dateISO ? e.dateISO.split('T')[0] : null;
+      return entryDate === selectedDate;
+    });
+  }
+
+  // مرتب‌سازی بر اساس تاریخ (جدیدترین اول)
+  filteredEntries.sort((a, b) => 
+    new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime()
+  );
+
+  // 4. استخراج اعداد از اولین رکوردی که closestInfo دارد
+  let found = false;
+  for (const entry of filteredEntries) {
+    if (entry.closestInfo) {
+      const extracted = extractNumbersFromClosestInfo(entry.closestInfo, entry.inputFormat);
+      if (extracted && extracted.length >= 2 && extracted[0] !== '---' && extracted[1] !== '---') {
+        numbers = extracted;
+        found = true;
+        break;
+      }
+    }
+  }
+
+  // 5. اگر رکوردی پیدا نشد، از outputsDisplay استفاده کن
+  if (!found) {
+    for (const entry of filteredEntries) {
+      if (entry.outputsDisplay && entry.outputsDisplay.length >= 2) {
+        const firstTwo = entry.outputsDisplay.slice(0, 2);
+        const extracted = [];
+        for (const item of firstTwo) {
+          if (item.raw !== undefined && item.raw !== null && !isNaN(item.raw)) {
+            const formatted = formatOutputByInputFormat(item.raw, entry.inputFormat);
+            extracted.push(formatted);
+          } else {
+            extracted.push('---');
+          }
+        }
+        while (extracted.length < 2) extracted.push('---');
+        if (extracted[0] !== '---' && extracted[1] !== '---') {
+          numbers = extracted;
+          found = true;
+          break;
+        }
+      }
+    }
+  }
+
+  // 6. نمایش در باکس
+  currentFixedNumbers = numbers;
+  currentPairId = pairId;
+
+  fixedNum1.textContent = numbers[0];
+  fixedNum2.textContent = numbers[1];
+  fixedNum1.dataset.value = numbers[0];
+  fixedNum2.dataset.value = numbers[1];
+  
+  if (fixedPairName) {
+    fixedPairName.textContent = pairName !== '---' ? pairName : '---';
+  }
+}
+
+// ============================================================
+// === تابع کپی اعداد (جداگانه) ===
+// ============================================================
+function copyNumber1() {
+  const val = fixedNum1.dataset.value || fixedNum1.textContent;
+  if (!val || val === '---') {
+    showNotification('⚠️ عددی برای کپی وجود ندارد!', 'error');
+    return;
+  }
+  copyToClipboard(val);
+}
+
+function copyNumber2() {
+  const val = fixedNum2.dataset.value || fixedNum2.textContent;
+  if (!val || val === '---') {
+    showNotification('⚠️ عددی برای کپی وجود ندارد!', 'error');
+    return;
+  }
+  copyToClipboard(val);
+}
+
+// ============================================================
+// === اتصال رویدادها به اعداد باکس ===
+// ============================================================
+if (fixedNum1) {
+  fixedNum1.addEventListener('click', copyNumber1);
+}
+if (fixedNum2) {
+  fixedNum2.addEventListener('click', copyNumber2);
+}
+
+// ============================================================
+// === رویدادهای بروزرسانی باکس ===
+// ============================================================
+if (historyPairFilter) {
+  historyPairFilter.addEventListener('change', function() {
+    setTimeout(extractAndDisplayFixedNumbers, 200);
+  });
+}
+
+if (historyDate) {
+  historyDate.addEventListener('change', function() {
+    setTimeout(extractAndDisplayFixedNumbers, 200);
+  });
+}
+
+if (pairSelect) {
+  pairSelect.addEventListener('change', function() {
+    setTimeout(extractAndDisplayFixedNumbers, 200);
+  });
+}
+
+// ============================================================
+// === تابع renderClosestInfo اصلی (با بروزرسانی باکس) ===
+// ============================================================
 function renderClosestInfo(closestPairs, minDistance, inputFormat, secondPairs = [], secondDistance = null) {
   if (!closestInfo) return;
   if (!closestPairs || closestPairs.length === 0) {
     closestInfo.classList.add('hidden');
+    closestInfo.innerHTML = '';
+    setTimeout(extractAndDisplayFixedNumbers, 100);
     return;
   }
   const displayDist = formatOutputByInputFormat(minDistance, inputFormat);
@@ -1167,6 +1447,7 @@ function renderClosestInfo(closestPairs, minDistance, inputFormat, secondPairs =
 
   closestInfo.innerHTML = closestText;
   closestInfo.classList.remove('hidden');
+  setTimeout(extractAndDisplayFixedNumbers, 100);
 }
 
 function computeOutputs(y1, y2, currentLow, currentHigh, dailyHigh, dailyLow) {
@@ -1257,7 +1538,7 @@ function copyToClipboard(text) {
 }
 
 // ---------- مدیریت داده‌ها ----------
-function saveEntry(pairId, inputs, outputsDisplay, note='', dateISO=null, inputFormat=null, closestInfo=null){
+function saveEntry(pairId, inputs, outputsDisplay, note='', dateISO=null, inputFormat=null, closestInfoData=null){
   const entries = storageGet('entries')||[];
   const si = dateISO || nowISO();
   const entry = { 
@@ -1269,7 +1550,7 @@ function saveEntry(pairId, inputs, outputsDisplay, note='', dateISO=null, inputF
     outputsDisplay, 
     note,
     inputFormat: inputFormat,
-    closestInfo: closestInfo || null
+    closestInfo: closestInfoData || null
   };
   entries.push(entry); 
   storageSet('entries', entries);
@@ -1374,18 +1655,15 @@ if(resetButton) resetButton.addEventListener('click', ()=>{
   if(closestInfo) {
     closestInfo.innerHTML = '';
     closestInfo.classList.add('hidden');
+    setTimeout(extractAndDisplayFixedNumbers, 100);
   }
 });
 
 // ---------- مدیریت جفت‌ارزها ----------
-// (توابع addPair و swapPairs و renderPairs و renderCategories قبلاً بازنویسی شده‌اند)
-
 if(addPairBtn) addPairBtn.addEventListener('click', ()=>{ addPair(newPairName ? newPairName.value : ''); if(newPairName) newPairName.value=''; });
 if(clearPairsBtn) clearPairsBtn.addEventListener('click', ()=>{ if(confirm('آیا همه جفت‌ارزها حذف شوند؟')){ storageSet('pairs', []); renderPairs(); } });
 
 // ---------- مدیریت دسته‌بندی‌ها ----------
-// (توابع addCategory و deleteCategory قبلاً بازنویسی شده‌اند)
-
 if(addCategoryBtn) addCategoryBtn.addEventListener('click', () => { addCategory(newCategoryName ? newCategoryName.value : ''); if(newCategoryName) newCategoryName.value = ''; });
 if(deleteCategoryBtn) deleteCategoryBtn.addEventListener('click', deleteCategory);
 
@@ -1408,7 +1686,6 @@ if(categoriesContainer){
   });
 }
 
-// تابع movePairToCategory با حفظ sortOrder
 function movePairToCategory(pairId, newCategoryId){
   const pairs = storageGet('pairs')||[];
   const pair = pairs.find(p => p.id === pairId);
@@ -1445,6 +1722,7 @@ function renderHistory(){
   if(filterPair) filtered = filtered.filter(e => e.pairId === filterPair);
   if(filtered.length === 0){ 
     if(historyList) historyList.innerHTML = '<div class="muted text-sm text-center py-4">رکوردی جهت نمایش وجود ندارد.</div>'; 
+    setTimeout(extractAndDisplayFixedNumbers, 100);
     return; 
   }
   safeForEach(filtered, e=>{
@@ -1513,6 +1791,7 @@ function renderHistory(){
     wrapper.appendChild(bottom);
     historyList.appendChild(wrapper);
   });
+  setTimeout(extractAndDisplayFixedNumbers, 200);
 }
 function showDetail(entryId){
   const entries = storageGet('entries')||[]; 
@@ -2235,7 +2514,10 @@ if((storageGet('pairs')||[]).length === 0){
 window.addEventListener('load', () => {
   const today = new Date().toISOString().split('T')[0];
   if(historyDate) historyDate.value = today;
-  setTimeout(() => { if(numericFields[0]) numericFields[0].focus(); }, 1000);
+  setTimeout(() => { 
+    if(numericFields[0]) numericFields[0].focus(); 
+    extractAndDisplayFixedNumbers();
+  }, 500);
 });
 
 // ---- Initialize app with IndexedDB ----
@@ -2244,7 +2526,6 @@ async function initApp() {
     await openDB();
     await loadAllData();
     ensureDefaults();
-    // به‌روزرسانی جفت‌ارزهای قدیمی برای اضافه کردن sortOrder
     upgradePairsWithSortOrder();
     if((storageGet('pairs')||[]).length === 0){ 
       storageSet('pairs', [
@@ -2256,7 +2537,8 @@ async function initApp() {
     }
     renderPairs(); 
     renderHistory();
-    console.log('✅ سیستم Calculator PRO - برنامه اول با IndexedDB و sortOrder آماده است!');
+    setTimeout(extractAndDisplayFixedNumbers, 600);
+    console.log('✅ سیستم با باکس کپی اعداد دو سطر اول در تاریخچه آماده است!');
   } catch (e) {
     console.error('Error initializing app:', e);
     alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
