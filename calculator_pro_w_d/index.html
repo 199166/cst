@@ -311,34 +311,37 @@
     #toggle_history_btn.open { background: #374151 !important; border-color: #6b7280 !important; }
     #toggle_history_btn.closed { background: #475569 !important; border-color: #64748b !important; }
 
-    /* ===== باکس کپی اعداد دو سطر اول - در تاریخچه ===== */
+    /* ===== باکس کپی اعداد دو سطر اول - در تاریخچه (ریسپانسیو) ===== */
     #fixed_numbers_box {
       background: #1e3a8a;
       border: 2px solid #3b82f6;
       border-radius: 10px;
-      padding: 8px 14px;
-      margin: 8px 0 12px 0;
+      padding: 6px 10px;
+      margin: 6px 0 10px 0;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      justify-content: flex-start;
+      gap: 6px;
       flex-wrap: wrap;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
       cursor: default;
-      min-height: 44px;
+      min-height: 38px;
+      width: 100%;
+      box-sizing: border-box;
     }
     #fixed_numbers_box .copy-label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #93c5fd;
       font-weight: 500;
       white-space: nowrap;
+      flex-shrink: 0;
     }
     #fixed_numbers_box .num-item {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 700;
       color: #fff;
       background: rgba(0,0,0,0.3);
-      padding: 2px 10px;
+      padding: 1px 10px;
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -346,6 +349,7 @@
       unicode-bidi: embed;
       border: 1px solid transparent;
       white-space: nowrap;
+      flex-shrink: 0;
     }
     #fixed_numbers_box .num-item:hover {
       background: rgba(255,255,255,0.2);
@@ -357,24 +361,74 @@
     }
     #fixed_numbers_box .separator {
       color: #93c5fd;
-      font-size: 0.9rem;
-      font-weight: 300;
-    }
-    #fixed_numbers_box .empty-text {
-      color: #93c5fd;
       font-size: 0.8rem;
-      opacity: 0.6;
+      font-weight: 300;
+      flex-shrink: 0;
+      padding: 0 2px;
     }
     #fixed_numbers_box .pair-name {
       font-size: 0.7rem;
       color: #93c5fd;
       background: rgba(255,255,255,0.1);
-      padding: 2px 8px;
+      padding: 2px 10px;
       border-radius: 10px;
       white-space: nowrap;
+      flex-shrink: 0;
+    }
+    #fixed_numbers_box .hint-text {
+      font-size: 0.6rem;
+      color: #93c5fd;
+      opacity: 0.5;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-right: 4px;
     }
     .fixed-numbers-container {
       width: 100%;
+    }
+
+    /* تنظیمات ریسپانسیو برای باکس آبی */
+    @media only screen and (max-width: 600px) {
+      #fixed_numbers_box {
+        padding: 5px 8px;
+        gap: 4px;
+        justify-content: center;
+      }
+      #fixed_numbers_box .copy-label {
+        font-size: 0.6rem;
+        width: 100%;
+        text-align: center;
+      }
+      #fixed_numbers_box .num-item {
+        font-size: 0.85rem;
+        padding: 1px 8px;
+      }
+      #fixed_numbers_box .pair-name {
+        font-size: 0.6rem;
+        padding: 1px 6px;
+      }
+      #fixed_numbers_box .separator {
+        font-size: 0.7rem;
+      }
+      #fixed_numbers_box .hint-text {
+        font-size: 0.55rem;
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    @media only screen and (max-width: 400px) {
+      #fixed_numbers_box .num-item {
+        font-size: 0.75rem;
+        padding: 1px 6px;
+      }
+      #fixed_numbers_box .copy-label {
+        font-size: 0.55rem;
+      }
+      #fixed_numbers_box .pair-name {
+        font-size: 0.55rem;
+        padding: 1px 4px;
+      }
     }
 </style>
 </head>
@@ -535,14 +589,14 @@
           <div class="muted">کل: <span id="entries_count">0</span></div>
         </div>
 
-        <!-- ===== باکس کپی اعداد دو سطر اول - در تاریخچه ===== -->
+        <!-- ===== باکس کپی اعداد دو سطر اول - در تاریخچه (ریسپانسیو) ===== -->
         <div id="fixed_numbers_box" class="fixed-numbers-container">
           <span class="copy-label">📋 اعداد دو سطر اول (نزدیک‌ترین فاصله):</span>
-          <span id="fixed_pair_name" class="pair-name">---</span>
           <span id="fixed_num_1" class="num-item" title="کلیک برای کپی عدد اول">---</span>
           <span class="separator">|</span>
           <span id="fixed_num_2" class="num-item" title="کلیک برای کپی عدد دوم">---</span>
-          <span style="font-size:0.7rem; color:#93c5fd; opacity:0.5;">(هر عدد جداگانه)</span>
+          <span id="fixed_pair_name" class="pair-name">---</span>
+          <span class="hint-text">(هر عدد جداگانه)</span>
         </div>
 
 <div class="flex gap-2 mb-3">
