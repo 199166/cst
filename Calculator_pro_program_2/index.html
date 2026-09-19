@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculator_pro_program_2 - فرمول کد ۲ (سقف و کف)</title>
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --bg:#1e293b;
+    --card:#334155;
+    --muted:#9aa6bf;
+    --input-bg:#475569;
+    --text-light:#f1f5f9;
+  }
+  body{
+    font-family: 'Vazirmatn', sans-serif;
+    background:var(--bg);
+    color:var(--text-light);
+    min-height:100vh;
+    padding:20px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  button, input, select, textarea { font-family: 'Vazirmatn', sans-serif; }
+  .card{ background:var(--card); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; }
+  .section-header{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    cursor:pointer; padding:.5rem; border-radius:8px; background:var(--input-bg);
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .section-title{ font-weight:700; }
+  .muted{ color:var(--muted); font-size:.9rem; }
+  input[type="text"], input[type="date"], input[type="number"], select, textarea {
+    background:var(--input-bg); border:1px solid rgba(255,255,255,0.1);
+    color:var(--text-light); padding:.6rem .5rem; border-radius:6px;
+    width:100%; outline: none; transition: all 0.2s ease; font-size: 1rem;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  }
+  .box-out{
+    padding:.35rem .6rem; border-radius:6px; display:inline-block;
+    cursor:pointer; margin:.25rem 0; border: 1px solid transparent;
+    transition: all 0.2s ease; font-size: 0.95rem;
+  }
+  .box-red{ background:#7f1d1d; color:#fff; border-color:#991b1b; }
+  .box-green{ background:#064e3b; color:#fff; border-color:#065f46; }
+  .box-gray{ background:#4b5563; color:#fff; border-color:#6b7280; }
+  .box-blue{ background:#1e3a8a; color:#fff; border-color:#3730a3; }
+  .box-yellow{ background:#854d0e; color:#fff; border-color:#a16207; }
+  .num-label{ font-weight:700; margin-left:.45rem; opacity:.95; }
+  .small-btn{
+    padding:0.5rem 0.75rem; border-radius:0.5rem; font-size:0.9rem;
+    cursor:pointer; border: 2px solid rgba(255,255,255,0.2);
+    background: var(--input-bg); color: var(--text-light);
+    transition: all 0.3s ease; outline: none; display: inline-flex;
+    align-items: center; justify-content: center; min-height: 40px;
+    font-weight: 500; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .small-btn:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  .small-btn.bg-slate-600 { background:#475569; border-color:#64748b; color:#fff; }
+  .small-btn.bg-slate-600:hover { background:#64748b; border-color:#94a3b8; }
+  .small-btn.bg-emerald-600 { background:#059669; border-color:#10b981; color:#fff; }
+  .small-btn.bg-emerald-600:hover { background:#10b981; border-color:#34d399; }
+  .small-btn.bg-rose-600 { background:#dc2626; border-color:#ef4444; color:#fff; }
+  .small-btn.bg-rose-600:hover { background:#ef4444; border-color:#f87171; }
+  .small-btn.bg-blue-600 { background:#2563eb; border-color:#3b82f6; color:#fff; }
+  .small-btn.bg-blue-600:hover { background:#3b82f6; border-color:#60a5fa; }
+  .small-btn.bg-yellow-600 { background:#d97706; border-color:#f59e0b; color:#fff; }
+  .small-btn.bg-yellow-600:hover { background:#f59e0b; border-color:#fbbf24; }
+  .small-btn.bg-indigo-600 { background:#4f46e5; border-color:#6366f1; color:#fff; }
+  .small-btn.bg-indigo-600:hover { background:#6366f1; border-color:#818cf8; }
+  .small-btn.bg-purple-600 { background:#7c3aed; border-color:#8b5cf6; color:#fff; }
+  .small-btn.bg-purple-600:hover { background:#8b5cf6; border-color:#a78bfa; }
+  .small-btn.bg-green-600 { background:#059669; border-color:#10b981; color:#fff; }
+  .small-btn.bg-green-600:hover { background:#10b981; border-color:#34d399; }
+  .small-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  #categories_container .small-btn {
+    padding:0.2rem 0.4rem !important; font-size:0.7rem !important;
+    min-height:24px !important; border-width:1px !important; white-space:nowrap;
+  }
+  #categories_container select.small-btn {
+    padding:0.15rem 0.3rem !important; font-size:0.65rem !important;
+    min-height:22px !important; max-width:120px;
+  }
+  #categories_container button.small-btn { min-width:28px; display:flex; align-items:center; justify-content:center; }
+  #categories_container li { padding:0.4rem 0.5rem !important; gap:0.3rem !important; }
+  #categories_container .flex.gap-1 { flex-wrap:nowrap !important; gap:0.2rem !important; min-width:fit-content; }
+  .thin-scroll::-webkit-scrollbar{ width:8px; height:8px; }
+  .thin-scroll::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.1); border-radius:8px; }
+  .hidden{ display:none !important; }
+  .title-click{ display:flex; align-items:center; gap:8px; }
+  .category-header{
+    background:rgba(255,255,255,0.08); padding:.5rem; border-radius:6px;
+    margin:.5rem 0; cursor:pointer; border:1px solid rgba(255,255,255,0.08);
+    transition: all 0.2s ease;
+  }
+  .category-header:hover { background:rgba(255,255,255,0.12); }
+  .category-content{ padding:.5rem; border-right:2px solid #0ea5a4; margin-right:.5rem; }
+  .danger-zone{ background:#7f1d1d; border:1px solid rgba(239,68,68,0.3); padding:12px; border-radius:8px; margin-top:12px; }
+  .show-picker-btn{
+    background:rgba(255,255,255,0.15) !important;
+    border:1px solid rgba(255,255,255,0.2) !important;
+    padding:0.5rem; border-radius:6px; cursor:pointer;
+    color: var(--text-light);
+  }
+  .show-picker-btn:hover { background:rgba(255,255,255,0.25) !important; }
+  .center-modal{ display:flex !important; align-items:center; justify-content:center; }
+  .category-item{ background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); }
+  .resizable-container { resize: vertical; overflow: auto; min-height: 120px; max-height: 400px; }
+  .history-compact { max-height: none !important; overflow: visible !important; }
+  .history-entry-compact {
+    background: var(--input-bg); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 10px; margin-bottom: 8px;
+    transition: all 0.2s ease;
+  }
+  .history-entry-compact:hover { border-color:rgba(255,255,255,0.2); box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+  .backup-item { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; margin-bottom:8px; }
+  .stats-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin:10px 0; }
+  .stat-item { background:rgba(255,255,255,0.05); padding:8px; border-radius:6px; text-align:center; border:1px solid rgba(255,255,255,0.1); }
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-content {
+    position: relative; background: var(--card);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+    width: 100%; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  }
+  .closest-info { background:rgba(245,158,11,0.2); border:1px solid rgba(245,158,11,0.3); border-radius:8px; padding:10px; margin-top:12px; }
+  .multi-date-controls { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; margin-bottom:12px; }
+  .date-range-item { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:6px; padding:8px; margin-bottom:8px; }
+  .date-comparison-header { background:rgba(59,130,246,0.2); border:1px solid rgba(59,130,246,0.3); border-radius:6px; padding:8px; margin-bottom:8px; }
+  .comparison-group { border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; margin-bottom:12px; transition:all 0.2s ease; }
+  .comparison-group:hover { border-color:rgba(255,255,255,0.2); }
+  .signature {
+    color: white; text-align: center; padding: 16px;
+    font-family: 'Vazirmatn', system-ui;
+    background: rgba(255,255,255,0.1); border-radius: 10px;
+    backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2);
+    font-size: 14px; font-weight: 500; display: block;
+    margin: 30px auto; width: fit-content; max-width: 90%;
+    box-sizing: border-box;
+  }
+  @media (max-width: 768px) { .signature { font-size: 12px; } }
+  @media only screen and (max-width: 768px) {
+    body { padding: 10px; }
+    .small-btn { min-height: 44px; padding: 0.75rem 1rem; font-size: 0.95rem; border-width: 2px; }
+    #categories_container .small-btn { padding: 0.15rem 0.3rem !important; font-size: 0.75rem !important; min-height: 28px !important; }
+    #categories_container select.small-btn { padding: 0.1rem 0.25rem !important; font-size: 0.7rem !important; min-height: 26px !important; max-width: 100px; }
+    #categories_container button.small-btn { min-width: 24px; }
+    #categories_container li { padding: 0.3rem 0.4rem !important; gap: 0.2rem !important; flex-wrap: wrap; }
+    #categories_container .flex.gap-1 { gap: 0.15rem !important; order: 2; width: 100%; justify-content: flex-start; margin-top: 0.3rem; padding-top: 0.3rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    #categories_container .flex-1 { order: 1; width: 100%; }
+    .signature { font-size: 13px; padding: 15px; }
+    .small-btn:active { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); transform: scale(0.98); }
+    .box-out { padding: 0.5rem 0.75rem; min-height: 44px; display: flex; align-items: center; font-size: 1rem; }
+    .stats-grid { grid-template-columns: 1fr; gap: 6px; }
+  }
+  @media only screen and (max-width: 480px) {
+    .signature { font-size: 12px; padding: 12px; }
+    .small-btn { padding: 0.875rem 1rem; font-size: 0.95rem; }
+    .section-title { font-size: 1rem; }
+  }
+  #toggle_icon { transition: all 0.3s ease; font-weight: bold; display: inline-block; }
+  #toggle_history_btn:hover #toggle_icon { transform: scale(1.2); }
+  #toggle_history_btn.open { background: #374151 !important; border-color: #6b7280 !important; }
+  #toggle_history_btn.closed { background: #475569 !important; border-color: #64748b !important; }
+  .micro-btn{ background:#0ea5a4; color:#021; padding:.45rem .6rem; border-radius:6px; font-weight:700; cursor:pointer; border: 2px solid #0ea5a4; transition: all 0.3s ease; }
+  .micro-btn:hover { background: #0d9488; border-color: #0d9488; transform: translateY(-1px); }
+  .micro-btn.recording{ background:#ef4444; color:#fff; border-color: #ef4444; }
+  .micro-btn.connected{ background:#10b981; color:#fff; border-color: #10b981; }
+
+  /* ===== باکس کپی سقف و کف ===== */
+  #fixed_numbers_box {
+    background: #1e3a8a;
+    border: 2px solid #3b82f6;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 8px 0 12px 0;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+    cursor: default;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  #fixed_numbers_box .header-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; flex-wrap: wrap; margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding-bottom: 6px;
+  }
+  #fixed_numbers_box .copy-label { font-size: 0.75rem; color: #93c5fd; font-weight: 500; white-space: nowrap; }
+  #fixed_numbers_box .pair-name {
+    font-size: 0.75rem; color: #93c5fd; background: rgba(255,255,255,0.12);
+    padding: 2px 10px; border-radius: 12px; white-space: nowrap; font-weight: 600;
+  }
+  #fixed_numbers_box .numbers-row {
+    display: flex; align-items: stretch; justify-content: space-around;
+    gap: 8px; flex-wrap: wrap;
+  }
+  #fixed_numbers_box .num-card {
+    display: flex; flex-direction: column; align-items: center;
+    background: rgba(0,0,0,0.2); border-radius: 8px;
+    padding: 4px 10px; min-width: 55px; flex: 0 1 auto;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.2s ease;
+  }
+  #fixed_numbers_box .num-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+  #fixed_numbers_box .num-item {
+    font-size: 0.95rem; font-weight: 700; color: #fff;
+    cursor: pointer; transition: all 0.2s ease;
+    direction: ltr; unicode-bidi: embed;
+    padding: 0 2px; text-align: center; line-height: 1.5;
+  }
+  #fixed_numbers_box .num-item:hover { color: #93c5fd; transform: scale(1.05); }
+  #fixed_numbers_box .num-item:active { transform: scale(0.95); }
+  #fixed_numbers_box .label-tag {
+    font-size: 0.5rem; color: #93c5fd; opacity: 0.6;
+    text-align: center; line-height: 1.3; white-space: nowrap; margin-top: 1px;
+  }
+  @media only screen and (max-width: 768px) {
+    #fixed_numbers_box { padding: 8px 10px; }
+    #fixed_numbers_box .header-row { margin-bottom: 6px; padding-bottom: 4px; }
+    #fixed_numbers_box .copy-label { font-size: 0.65rem; }
+    #fixed_numbers_box .pair-name { font-size: 0.65rem; padding: 1px 8px; }
+    #fixed_numbers_box .num-card { padding: 3px 6px; min-width: 40px; }
+    #fixed_numbers_box .num-item { font-size: 0.75rem; }
+    #fixed_numbers_box .label-tag { font-size: 0.4rem; }
+  }
+  @media only screen and (max-width: 480px) {
+    #fixed_numbers_box { padding: 6px 8px; }
+    #fixed_numbers_box .num-card { padding: 2px 4px; min-width: 32px; }
+    #fixed_numbers_box .num-item { font-size: 0.65rem; }
+    #fixed_numbers_box .label-tag { font-size: 0.35rem; }
+  }
+
+  /* ===== کارت نتیجه سقف و کف ===== */
+  .output-card {
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    border: 2px solid;
+    transition: all 0.2s ease;
+  }
+  .output-card.ceiling {
+    background: rgba(6, 78, 59, 0.35);
+    border-color: #10b981;
+  }
+  .output-card.floor {
+    background: rgba(127, 29, 29, 0.35);
+    border-color: #ef4444;
+  }
+  .output-card .output-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .output-card.ceiling .output-title { color: #6ee7b7; }
+  .output-card.floor .output-title { color: #fca5a5; }
+  .output-card .output-value {
+    font-size: 1.35rem;
+    font-weight: 800;
+    font-family: monospace;
+    direction: ltr;
+    unicode-bidi: embed;
+    cursor: pointer;
+    padding: 4px 0;
+    transition: all 0.2s ease;
+  }
+  .output-card.ceiling .output-value { color: #34d399; }
+  .output-card.floor .output-value { color: #f87171; }
+  .output-card .output-value:hover { opacity: 0.8; transform: scale(1.02); }
+  .output-card .output-steps {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    direction: ltr;
+    unicode-bidi: embed;
+    text-align: left;
+  }
+  .output-card .output-steps span { font-family: monospace; }
+</style>
+</head>
+<body>
+  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+    <!-- ================= ستون چپ: مدیریت جفت‌ارز ================= -->
+    <aside class="card">
+      <div id="hdr_pairs" class="section-header">
+        <div class="title-click">
+          <span class="hamburger-icon">⇅</span>
+          <span class="section-title">مدیریت جفت‌ارز</span>
+        </div>
+      </div>
+      <div id="box_pairs" class="mt-3">
+        <div class="mb-4 p-3 rounded bg-[var(--input-bg)] border border-white/10">
+          <label class="muted block mb-2">مدیریت دسته‌بندی‌ها</label>
+          <div class="flex gap-2 mb-2">
+            <input id="new_category_name" placeholder="نام دسته‌بندی جدید" type="text" class="flex-1"/>
+            <button id="add_category_btn" class="small-btn bg-blue-600 hover:bg-blue-700">افزودن</button>
+          </div>
+          <div class="flex gap-2 mb-2">
+            <select id="category_select" class="flex-1">
+              <option value="">بدون دسته‌بندی</option>
+            </select>
+            <button id="delete_category_btn" class="small-btn bg-rose-600 hover:bg-rose-700" title="حذف دسته‌بندی انتخاب شده">🗑</button>
+          </div>
+          <div class="mt-2">
+            <label class="muted text-xs">دسته‌بندی‌های موجود:</label>
+            <div id="categories_list" class="mt-1 space-y-1 max-h-20 overflow-y-auto thin-scroll"></div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <input id="new_pair_name" placeholder="مثال: EURUSD" type="text"/>
+          <div class="flex gap-2 mt-2">
+            <button id="add_pair_btn" class="small-btn bg-emerald-600 hover:bg-emerald-700">افزودن</button>
+            <button id="clear_pairs_btn" class="small-btn bg-rose-600 hover:bg-rose-700">حذف همه</button>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="muted">فهرست جفت‌ارزها</label>
+            <span class="text-xs muted">(قابل تغییر سایز)</span>
+          </div>
+          <div id="categories_container" class="resizable-container mt-2 thin-scroll border border-white/10 rounded p-2 space-y-3"></div>
+        </div>
+        <div class="border-t border-white/10 pt-3 mt-3">
+          <div class="mb-2">
+            <button id="export_btn" class="small-btn bg-blue-600 hover:bg-blue-700 w-full">دانلود بک‌آپ (JSON)</button>
+          </div>
+          <div class="mb-2">
+            <input id="import_file" type="file" accept="application/json" class="hidden"/>
+            <button id="import_btn" class="small-btn bg-yellow-600 hover:bg-yellow-700 w-full">بارگذاری بک‌آپ (JSON)</button>
+          </div>
+          <div class="danger-zone">
+            <div class="text-center mb-2">
+              <span class="text-white font-semibold">⚠ مدیریت پیشرفته داده‌ها</span>
+            </div>
+            <div class="mb-3">
+              <label class="muted text-xs block mb-1">حذف رکوردهای قدیمی‌تر از:</label>
+              <div class="flex gap-2">
+                <input id="manual_prune_days" type="number" min="1" max="3650" value="365" class="flex-1 text-center"/>
+                <span class="muted text-xs flex items-center">روز</span>
+              </div>
+              <button id="manual_prune_btn" class="small-btn bg-rose-700 hover:bg-rose-800 text-white w-full mt-2">حذف رکوردهای قدیمی</button>
+            </div>
+            <button id="show_stats_btn" class="small-btn bg-purple-600 hover:bg-purple-700 text-white w-full mb-2">نمایش آمار و اطلاعات</button>
+            <button id="manage_backups_btn" class="small-btn bg-indigo-600 hover:bg-indigo-700 text-white w-full">مدیریت بک‌آپ‌ها</button>
+            <p class="muted text-xs mt-2 text-center">این عملیات غیرقابل بازگشت هستند</p>
+          </div>
+          <p class="muted text-xs mt-2">تاریخ‌ها میلادی ذخیره و نمایش داده می‌شوند.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ================= ستون وسط: ماشین حساب ================= -->
+    <main class="card">
+      <div id="hdr_calc" class="section-header">
+        <div class="title-click">
+          <span class="hamburger-icon">⇅</span>
+          <span class="section-title">ماشین حساب فرمول‌ها</span>
+        </div>
+      </div>
+      <div id="box_calc" class="mt-3">
+        <div class="mb-3">
+          <div class="flex items-center gap-2 mb-2">
+            <label class="muted flex-1">جفت‌ارز</label>
+            <button id="micro_toggle" class="micro-btn" title="شروع/توقف ورود صوتی">🎙 فعال کردن صوت</button>
+          </div>
+          <select id="pair_select" autocomplete="off"></select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label class="muted">سقف</label>
+            <input id="input_ceiling" type="text" placeholder="عدد سقف"/>
+          </div>
+          <div>
+            <label class="muted">کف</label>
+            <input id="input_floor" type="text" placeholder="عدد کف"/>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="muted">تاریخ (میلادی)</label>
+          <div class="flex items-center gap-2">
+            <input id="date_picker" type="date" class="flex-1"/>
+            <button type="button" onclick="document.getElementById('date_picker').showPicker()" class="small-btn show-picker-btn" title="نمایش تقویم">📅</button>
+          </div>
+          <p class="muted text-xs mt-1">تاریخ انتخاب شده برای ذخیره رکورد استفاده می‌شود.</p>
+        </div>
+        <div class="mb-3">
+          <label class="muted">یادداشت (اختیاری)</label>
+          <textarea id="note_input" rows="2" placeholder=""></textarea>
+        </div>
+        <div class="flex gap-2 mb-3">
+          <button id="calculate_button" class="small-btn bg-emerald-600 hover:bg-emerald-700 flex-1">محاسبه و ذخیره</button>
+          <button id="reset_button" class="small-btn bg-slate-600 hover:bg-slate-700 flex-1">ریست</button>
+        </div>
+
+        <div>
+          <h4 class="muted mb-2">خروجی‌ها</h4>
+          <div id="outputs_area" class="space-y-2"></div>
+          <p id="error_message" class="muted text-rose-400 mt-2"></p>
+          <p id="voice_status" class="muted mt-2"></p>
+        </div>
+      </div>
+    </main>
+
+    <!-- ================= ستون راست: تاریخچه ================= -->
+    <section class="card">
+      <div id="hdr_history" class="section-header">
+        <div class="title-click">
+          <span class="hamburger-icon">⇅</span>
+          <span class="section-title">تاریخچه</span>
+        </div>
+      </div>
+      <div id="box_history" class="mt-3">
+        <div class="flex items-center justify-between mb-2">
+          <div class="text-sm font-semibold">تاریخچه</div>
+          <div class="muted">کل: <span id="entries_count">0</span></div>
+        </div>
+
+        <!-- باکس کپی سقف و کف -->
+        <div id="fixed_numbers_box" class="fixed-numbers-container">
+          <div class="header-row">
+            <span class="copy-label">📊 سقف / کف</span>
+            <span id="fixed_pair_name" class="pair-name">---</span>
+          </div>
+          <div class="numbers-row">
+            <div class="num-card">
+              <span class="num-item" id="fixed_num_1" title="کلیک برای کپی سقف">---</span>
+              <span class="label-tag">سقف</span>
+            </div>
+            <div class="num-card">
+              <span class="num-item" id="fixed_num_2" title="کلیک برای کپی کف">---</span>
+              <span class="label-tag">کف</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-2 mb-3">
+          <button id="toggle_history_btn" class="small-btn flex-1 bg-slate-600 hover:bg-slate-700 flex items-center justify-center gap-2 transition-all duration-300 closed">
+            <span id="toggle_icon" class="text-lg transition-all duration-300 transform">📁</span>
+            <span id="toggle_text" class="transition-all duration-300">نمایش ذخیره‌ها</span>
+          </button>
+          <button id="quick_prune" class="small-btn bg-rose-600 hover:bg-rose-700 hidden">پاک ۳۰ روزه</button>
+        </div>
+
+        <div id="history_panel" class="mt-3 hidden">
+          <div class="multi-date-controls">
+            <div class="flex items-center justify-between mb-3">
+              <label class="muted font-semibold">📅 مشاهده چند تاریخ همزمان</label>
+              <button id="toggle_multi_date" class="small-btn bg-blue-600 hover:bg-blue-700 text-xs">فعال کردن حالت چندتاریخی</button>
+            </div>
+            <div id="single_date_section">
+              <div class="mb-2 grid grid-cols-2 gap-2">
+                <input id="history_date" type="date"/>
+                <select id="history_pair_filter" autocomplete="off">
+                  <option value="">همه جفت‌ارزها</option>
+                </select>
+              </div>
+            </div>
+            <div id="multi_date_section" class="hidden">
+              <div class="mb-3">
+                <div class="flex items-center gap-2 mb-2">
+                  <select id="multi_date_pair_filter" autocomplete="off" class="flex-1">
+                    <option value="">همه جفت‌ارزها</option>
+                  </select>
+                </div>
+                <div id="date_ranges_container" class="space-y-2"></div>
+                <div class="flex gap-2 mt-3">
+                  <button id="add_date_btn" class="small-btn bg-green-600 hover:bg-green-700 flex-1">➕ افزودن تاریخ</button>
+                  <button id="apply_multi_date_btn" class="small-btn bg-blue-600 hover:bg-blue-700 flex-1">✅ اعمال فیلتر</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="history_list" class="history-compact space-y-2"></div>
+        </div>
+
+        <div id="detail_modal" class="hidden modal-overlay">
+          <div class="modal-content p-6 max-w-2xl">
+            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
+              <h4 class="font-bold text-lg">جزئیات کامل رکورد</h4>
+              <button id="close_detail" class="small-btn bg-slate-600 hover:bg-slate-700">بستن</button>
+            </div>
+            <div id="detail_content" class="mt-2 text-sm space-y-4"></div>
+            <div class="flex gap-2 mt-6 pt-4 border-t border-white/10">
+              <button id="edit_record_btn" class="small-btn bg-yellow-600 hover:bg-yellow-700 flex-1">ویرایش</button>
+              <button id="move_record_btn" class="small-btn bg-indigo-600 hover:bg-indigo-700 flex-1">انتقال تاریخ</button>
+              <button id="delete_record_btn" class="small-btn bg-rose-600 hover:bg-rose-700 flex-1">حذف</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- مودال آمار -->
+  <div id="stats_modal" class="hidden modal-overlay">
+    <div class="modal-content p-6 max-w-md">
+      <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
+        <h4 class="font-bold text-lg">📊 آمار و اطلاعات سیستم</h4>
+        <button id="close_stats" class="small-btn bg-slate-600 hover:bg-slate-700">✕</button>
+      </div>
+      <div id="stats_content" class="mt-2 text-sm space-y-4"></div>
+    </div>
+  </div>
+
+  <!-- مودال بک‌آپ -->
+  <div id="backups_modal" class="hidden modal-overlay">
+    <div class="modal-content p-6 max-w-2xl">
+      <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
+        <h4 class="font-bold text-lg">💾 مدیریت بک‌آپ‌ها</h4>
+        <button id="close_backups" class="small-btn bg-slate-600 hover:bg-slate-700">✕</button>
+      </div>
+      <div id="backups_content" class="mt-2 text-sm space-y-4"></div>
+    </div>
+  </div>
+
+  <div class="signature">طراحی و ساخت توسط ❤️ سعید شیخ احمد صفاری</div>
+  <br><br>
+
+<script>
+/* ============================================================
+   HELPERS
+============================================================ */
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const AUTO_PRUNE_ENABLED = false;
+const MAX_DAYS = 3650;
+function nowISO() { return new Date().toISOString(); }
+function formatGregorian(dtISO) {
+  const d = new Date(dtISO);
+  const pad = n => n.toString().padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+/* ============================================================
+   IndexedDB Wrapper
+============================================================ */
+const DB_NAME = 'CalcProDB_formula2';
+const DB_VERSION = 1;
+let db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = (e) => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('pairs')) d.createObjectStore('pairs', { keyPath: 'id' });
+      if (!d.objectStoreNames.contains('entries')) d.createObjectStore('entries', { keyPath: 'id' });
+      if (!d.objectStoreNames.contains('categories')) d.createObjectStore('categories', { keyPath: 'id' });
+    };
+    request.onsuccess = (e) => { db = e.target.result; resolve(db); };
+    request.onerror = (e) => { reject(e.target.error); };
+  });
+}
+
+function dbGetAll(storeName) {
+  return new Promise((resolve, reject) => {
+    if (!db) { reject(new Error('Database not open')); return; }
+    const tx = db.transaction(storeName, 'readonly');
+    const store = tx.objectStore(storeName);
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function dbPut(storeName, data) {
+  return new Promise((resolve, reject) => {
+    if (!db) { reject(new Error('Database not open')); return; }
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+    const request = store.put(data);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function dbClear(storeName) {
+  return new Promise((resolve, reject) => {
+    if (!db) { reject(new Error('Database not open')); return; }
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+    const request = store.clear();
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+let memoryCache = { pairs: [], entries: [], categories: [] };
+
+async function loadAllData() {
+  try {
+    const [pairs, entries, categories] = await Promise.all([
+      dbGetAll('pairs'), dbGetAll('entries'), dbGetAll('categories')
+    ]);
+    memoryCache.pairs = pairs || [];
+    memoryCache.entries = entries || [];
+    memoryCache.categories = categories || [];
+  } catch (e) { console.error('Error loading data from IndexedDB:', e); }
+}
+
+function storageGet(k) {
+  if (k === 'pairs') return memoryCache.pairs;
+  if (k === 'entries') return memoryCache.entries;
+  if (k === 'categories') return memoryCache.categories;
+  return null;
+}
+
+function storageSet(k, v) {
+  if (k === 'pairs') { memoryCache.pairs = v; syncStoreToDB('pairs', v); }
+  else if (k === 'entries') { memoryCache.entries = v; syncStoreToDB('entries', v); }
+  else if (k === 'categories') { memoryCache.categories = v; syncStoreToDB('categories', v); }
+}
+
+async function syncStoreToDB(storeName, data) {
+  try {
+    await dbClear(storeName);
+    for (const item of data) {
+      await dbPut(storeName, item);
+    }
+  } catch (e) { console.error('Error syncing store to IndexedDB:', e); }
+}
+
+function ensureDefaults() {
+  if (!storageGet('pairs') || storageGet('pairs').length === 0) storageSet('pairs', []);
+  if (!storageGet('entries') || storageGet('entries').length === 0) storageSet('entries', []);
+  if (!storageGet('categories') || storageGet('categories').length === 0) {
+    storageSet('categories', [
+      { id: 'default', name: 'اصلی' },
+      { id: 'forex', name: 'فارکس' },
+      { id: 'crypto', name: 'ارز دیجیتال' }
+    ]);
+  }
+}
+
+function isMobileOrTablet() { return window.innerWidth <= 1024; }
+function initializeBoxStates() {
+  const boxPairs = document.getElementById('box_pairs');
+  const boxCalc = document.getElementById('box_calc');
+  const boxHistory = document.getElementById('box_history');
+  if (isMobileOrTablet()) {
+    if (boxPairs) boxPairs.classList.add('hidden');
+    if (boxCalc) boxCalc.classList.add('hidden');
+    if (boxHistory) boxHistory.classList.add('hidden');
+  } else {
+    if (boxPairs) boxPairs.classList.remove('hidden');
+    if (boxCalc) boxCalc.classList.remove('hidden');
+    if (boxHistory) boxHistory.classList.remove('hidden');
+  }
+}
+
+/* ============================================================
+   DOM refs
+============================================================ */
+const $ = id => document.getElementById(id);
+const pairSelect = $('pair_select');
+const historyPairFilter = $('history_pair_filter');
+const newPairName = $('new_pair_name');
+const addPairBtn = $('add_pair_btn');
+const clearPairsBtn = $('clear_pairs_btn');
+const categoriesContainer = $('categories_container');
+const categorySelect = $('category_select');
+const newCategoryName = $('new_category_name');
+const addCategoryBtn = $('add_category_btn');
+const deleteCategoryBtn = $('delete_category_btn');
+const categoriesList = $('categories_list');
+
+const inputCeiling = $('input_ceiling');
+const inputFloor = $('input_floor');
+const noteInput = $('note_input');
+const datePicker = $('date_picker');
+const calculateButton = $('calculate_button');
+const resetButton = $('reset_button');
+const outputsArea = $('outputs_area');
+const errorMessage = $('error_message');
+const voiceStatus = $('voice_status');
+
+const exportBtn = $('export_btn');
+const importFile = $('import_file');
+const importBtn = $('import_btn');
+
+const historyDate = $('history_date');
+const historyList = $('history_list');
+const entriesCount = $('entries_count');
+
+const toggleHistoryBtn = $('toggle_history_btn');
+const historyPanel = $('history_panel');
+const quickPrune = $('quick_prune');
+
+const detailModal = $('detail_modal');
+const detailContent = $('detail_content');
+const closeDetail = $('close_detail');
+const editRecordBtn = $('edit_record_btn');
+const moveRecordBtn = $('move_record_btn');
+const deleteRecordBtn = $('delete_record_btn');
+
+const togglePairsHdr = $('hdr_pairs');
+const boxPairs = $('box_pairs');
+const toggleCalcHdr = $('hdr_calc');
+const boxCalc = $('box_calc');
+const toggleHistoryHdr = $('hdr_history');
+const boxHistory = $('box_history');
+
+const microToggle = $('micro_toggle');
+const toggleMultiDateBtn = $('toggle_multi_date');
+const singleDateSection = $('single_date_section');
+const multiDateSection = $('multi_date_section');
+const multiDatePairFilter = $('multi_date_pair_filter');
+const dateRangesContainer = $('date_ranges_container');
+const addDateBtn = $('add_date_btn');
+const applyMultiDateBtn = $('apply_multi_date_btn');
+
+const statsModal = $('stats_modal');
+const backupsModal = $('backups_modal');
+const statsContent = $('stats_content');
+const backupsContent = $('backups_content');
+
+const fixedNum1 = $('fixed_num_1');
+const fixedNum2 = $('fixed_num_2');
+const fixedPairName = $('fixed_pair_name');
+
+/* ============================================================
+   Multi-date state
+============================================================ */
+let isMultiDate = false;
+let dateRanges = [];
+
+function resetMultiDateUI() {
+  if (dateRangesContainer) dateRangesContainer.innerHTML = '';
+  dateRanges = [];
+}
+
+function addMultiDateRangeUI() {
+  if (!dateRangesContainer) return;
+  const id = Date.now().toString() + '_' + Math.random().toString(16).slice(2);
+  dateRanges.push({ id, date: null });
+  const div = document.createElement('div');
+  div.className = 'date-range-item';
+  div.id = 'range_' + id;
+  div.innerHTML = `
+    <div class="flex gap-2 items-center">
+      <input type="date" class="multi-date-input flex-1" data-id="${id}">
+      <button class="small-btn bg-rose-600 hover:bg-rose-700 remove-range" data-id="${id}">✕</button>
+    </div>`;
+  dateRangesContainer.appendChild(div);
+  const input = div.querySelector('.multi-date-input');
+  const removeBtn = div.querySelector('.remove-range');
+  if (input) {
+    input.addEventListener('change', (e) => {
+      const rid = e.target.dataset.id;
+      const item = dateRanges.find(r => r.id === rid);
+      if (item) item.date = e.target.value;
+    });
+  }
+  if (removeBtn) {
+    removeBtn.addEventListener('click', (e) => {
+      const rid = e.target.dataset.id;
+      dateRanges = dateRanges.filter(r => r.id !== rid);
+      const row = document.getElementById('range_' + rid);
+      if (row && row.parentNode) row.parentNode.removeChild(row);
+      renderHistory();
+    });
+  }
+}
+
+if (toggleMultiDateBtn) {
+  toggleMultiDateBtn.addEventListener('click', () => {
+    isMultiDate = !isMultiDate;
+    if (isMultiDate) {
+      toggleMultiDateBtn.textContent = 'غیرفعال کردن چندتاریخی';
+      if (singleDateSection) singleDateSection.classList.add('hidden');
+      if (multiDateSection) multiDateSection.classList.remove('hidden');
+      if (historyDate) historyDate.value = '';
+      if (dateRanges.length === 0) addMultiDateRangeUI();
+    } else {
+      toggleMultiDateBtn.textContent = 'فعال کردن حالت چندتاریخی';
+      if (singleDateSection) singleDateSection.classList.remove('hidden');
+      if (multiDateSection) multiDateSection.classList.add('hidden');
+      resetMultiDateUI();
+      renderHistory();
+    }
+  });
+}
+if (addDateBtn) addDateBtn.addEventListener('click', (e) => { e.preventDefault(); addMultiDateRangeUI(); });
+if (applyMultiDateBtn) applyMultiDateBtn.addEventListener('click', (e) => { e.preventDefault(); renderHistory(); });
+
+/* ============================================================
+   UI utils
+============================================================ */
+function safeForEach(arr, fn) { if (!Array.isArray(arr)) return; arr.forEach(fn); }
+
+function showNotification(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg z-50 animate-bounce ${type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`;
+  toast.innerHTML = message;
+  document.body.appendChild(toast);
+  setTimeout(() => { if (document.body.contains(toast)) document.body.removeChild(toast); }, 3000);
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showNotification(`✅ عدد <strong>${text}</strong> کپی شد`);
+  }).catch(err => {
+    console.error('خطا در کپی کردن: ', err);
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    showNotification(`✅ عدد <strong>${text}</strong> کپی شد`);
+  });
+}
+
+/* ============================================================
+   توابع پردازش فرمت
+============================================================ */
+function parseFormattedInteger(str) {
+  if (!str) return { rawNumber: NaN, format: { hasDot: false } };
+  const original = str.toString().trim();
+  const hasDot = original.includes('.');
+  if (!hasDot) {
+    const cleaned = original.replace(/[^\d-]/g, '');
+    return { rawNumber: cleaned ? parseInt(cleaned, 10) : NaN, format: { hasDot: false } };
+  }
+  const parts = original.split('.');
+  if (parts.length !== 2) {
+    const cleaned = original.replace(/[^\d-]/g, '');
+    return { rawNumber: cleaned ? parseInt(cleaned, 10) : NaN, format: { hasDot: false } };
+  }
+  const [leftPart, rightPart] = parts;
+  const leftDigits = leftPart.replace(/[^\d]/g, '');
+  const rightDigits = rightPart.replace(/[^\d]/g, '');
+  if (!leftDigits && !rightDigits) return { rawNumber: NaN, format: { hasDot: false } };
+  const fullNumberStr = (leftDigits + rightDigits) || '0';
+  const totalLength = fullNumberStr.length;
+  const rawNumber = parseInt(fullNumberStr, 10);
+  return { rawNumber, format: { hasDot: true, left: leftDigits.length, right: rightDigits.length, total: totalLength } };
+}
+
+function formatOutputByInputFormat(number, inputFormat) {
+  if (isNaN(number)) return '';
+  const numStr = Math.abs(number).toString();
+  const isNegative = number < 0;
+  if (!inputFormat || !inputFormat.hasDot) return isNegative ? '-' + numStr : numStr;
+  const { left, right, total } = inputFormat;
+  let padded = numStr.padStart(total, '0');
+  if (padded.length > total) padded = padded.slice(-total);
+  const leftPart = padded.slice(0, left);
+  const rightPart = padded.slice(left);
+  const finalLeft = leftPart === '' ? '0' : parseInt(leftPart || '0', 10).toString();
+  let result = finalLeft + '.' + rightPart;
+  if (isNegative) result = '-' + result;
+  return result;
+}
+
+/* ============================================================
+   فرمول کد ۲
+   سقف (صعودی): (√num + 0.618)²
+   کف (نزولی): (√num − 0.618)²
+============================================================ */
+function calcCeiling(num) {
+  const sqrt = Math.sqrt(num);
+  const step2 = sqrt + 0.618;
+  return { sqrt, step2, finalResult: Math.pow(step2, 2) };
+}
+function calcFloor(num) {
+  const sqrt = Math.sqrt(num);
+  const step2 = sqrt - 0.618;
+  return { sqrt, step2, finalResult: Math.pow(step2, 2) };
+}
+
+/* ============================================================
+   نمایش خروجی‌های سقف و کف (فقط عدد صحیح)
+============================================================ */
+function renderOutputs(ceilingData, floorData) {
+  if (!outputsArea) return;
+  outputsArea.innerHTML = '';
+
+  const ceilingIntValue = Math.floor(ceilingData.finalResult).toString();
+  const floorIntValue = Math.floor(floorData.finalResult).toString();
+
+  // کارت سقف
+  const ceilingCard = document.createElement('div');
+  ceilingCard.className = 'output-card ceiling';
+  ceilingCard.innerHTML = `
+    <div class="output-title">🔺 خروجی سقف (صعودی + ۰.۶۱۸)</div>
+    <div class="output-value" title="کلیک برای کپی">${ceilingIntValue}</div>
+    <div class="output-steps">
+      √ = <span>${ceilingData.sqrt.toFixed(6)}</span> →
+      + ۰.۶۱۸ = <span>${ceilingData.step2.toFixed(6)}</span> →
+      ² = <span>${ceilingData.finalResult.toFixed(6)}</span>
+    </div>
+  `;
+  ceilingCard.querySelector('.output-value').addEventListener('click', () => copyToClipboard(ceilingIntValue));
+  outputsArea.appendChild(ceilingCard);
+
+  // کارت کف
+  const floorCard = document.createElement('div');
+  floorCard.className = 'output-card floor';
+  floorCard.innerHTML = `
+    <div class="output-title">🔻 خروجی کف (نزولی − ۰.۶۱۸)</div>
+    <div class="output-value" title="کلیک برای کپی">${floorIntValue}</div>
+    <div class="output-steps">
+      √ = <span>${floorData.sqrt.toFixed(6)}</span> →
+      − ۰.۶۱۸ = <span>${floorData.step2.toFixed(6)}</span> →
+      ² = <span>${floorData.finalResult.toFixed(6)}</span>
+    </div>
+  `;
+  floorCard.querySelector('.output-value').addEventListener('click', () => copyToClipboard(floorIntValue));
+  outputsArea.appendChild(floorCard);
+}
+
+/* ============================================================
+   مدیریت جفت‌ارزها
+============================================================ */
+function getNextSortOrder() {
+  const pairs = storageGet('pairs') || [];
+  if (pairs.length === 0) return 0;
+  return Math.max(...pairs.map(p => p.sortOrder !== undefined ? p.sortOrder : 0)) + 1;
+}
+function sortPairsByOrder(pairs) {
+  return pairs.slice().sort((a, b) => {
+    const oa = a.sortOrder !== undefined ? a.sortOrder : 0;
+    const ob = b.sortOrder !== undefined ? b.sortOrder : 0;
+    return oa - ob;
+  });
+}
+function upgradePairsWithSortOrder() {
+  const pairs = storageGet('pairs') || [];
+  let changed = false;
+  pairs.forEach((p, i) => { if (p.sortOrder === undefined) { p.sortOrder = i; changed = true; } });
+  if (changed) storageSet('pairs', pairs);
+}
+
+function renderPairs() {
+  const pairs = storageGet('pairs') || [];
+  const sortedPairs = sortPairsByOrder(pairs);
+  if (pairSelect) { pairSelect.innerHTML = ''; pairSelect.setAttribute('autocomplete', 'off'); }
+  if (historyPairFilter) { historyPairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>'; historyPairFilter.setAttribute('autocomplete', 'off'); }
+  if (multiDatePairFilter) { multiDatePairFilter.innerHTML = '<option value="">همه جفت‌ارزها</option>'; multiDatePairFilter.setAttribute('autocomplete', 'off'); }
+  sortedPairs.forEach(p => {
+    if (pairSelect) { const o = document.createElement('option'); o.value = p.id; o.textContent = p.name; pairSelect.appendChild(o); }
+    if (historyPairFilter) { const o = document.createElement('option'); o.value = p.id; o.textContent = p.name; historyPairFilter.appendChild(o); }
+    if (multiDatePairFilter) { const o = document.createElement('option'); o.value = p.id; o.textContent = p.name; multiDatePairFilter.appendChild(o); }
+  });
+  if (sortedPairs.length === 0 && pairSelect) {
+    const o = document.createElement('option'); o.value = ''; o.textContent = 'ابتدا یک جفت‌ارز اضافه کنید'; pairSelect.appendChild(o);
+  }
+  renderCategories();
+}
+
+function addPair(name) {
+  if (!name || !name.trim()) return;
+  const pairs = storageGet('pairs') || [];
+  const selectedCategory = categorySelect ? categorySelect.value : null;
+  pairs.push({ id: uid(), name: name.trim(), categoryId: selectedCategory || null, sortOrder: getNextSortOrder() });
+  storageSet('pairs', pairs);
+  renderPairs();
+}
+
+function swapPairs(i, j) {
+  const pairs = storageGet('pairs') || [];
+  if (!pairs[i] || !pairs[j]) return;
+  const oi = pairs[i].sortOrder !== undefined ? pairs[i].sortOrder : i;
+  const oj = pairs[j].sortOrder !== undefined ? pairs[j].sortOrder : j;
+  pairs[i].sortOrder = oj; pairs[j].sortOrder = oi;
+  [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+  storageSet('pairs', pairs);
+  renderPairs();
+}
+
+function movePairToCategory(pairId, newCategoryId) {
+  const pairs = storageGet('pairs') || [];
+  const pair = pairs.find(p => p.id === pairId);
+  if (pair) { pair.categoryId = newCategoryId || null; storageSet('pairs', pairs); renderPairs(); }
+}
+
+if (addPairBtn) addPairBtn.addEventListener('click', () => { addPair(newPairName ? newPairName.value : ''); if (newPairName) newPairName.value = ''; });
+if (clearPairsBtn) clearPairsBtn.addEventListener('click', () => { if (confirm('آیا همه جفت‌ارزها حذف شوند؟')) { storageSet('pairs', []); renderPairs(); } });
+
+/* ============================================================
+   مدیریت دسته‌بندی‌ها
+============================================================ */
+function renderCategories() {
+  const categories = storageGet('categories') || [];
+  const pairs = storageGet('pairs') || [];
+  const sortedPairs = sortPairsByOrder(pairs);
+  if (categorySelect) {
+    categorySelect.innerHTML = '<option value="">بدون دسته‌بندی</option>';
+    categories.forEach(cat => {
+      const opt = document.createElement('option'); opt.value = cat.id; opt.textContent = cat.name; categorySelect.appendChild(opt);
+    });
+  }
+  if (categoriesList) {
+    categoriesList.innerHTML = '';
+    if (categories.length === 0) {
+      categoriesList.innerHTML = '<div class="text-xs muted text-center py-1">دسته‌بندی‌ای وجود ندارد</div>';
+    } else {
+      categories.forEach(cat => {
+        const div = document.createElement('div');
+        div.className = 'flex justify-between items-center p-1 px-2 rounded category-item';
+        div.innerHTML = `<span class="text-xs">${cat.name}</span><span class="text-xs muted">${sortedPairs.filter(p => p.categoryId === cat.id).length} جفت‌ارز</span>`;
+        categoriesList.appendChild(div);
+      });
+    }
+  }
+  if (categoriesContainer) {
+    categoriesContainer.innerHTML = '';
+    const uncategorizedPairs = sortedPairs.filter(p => !p.categoryId);
+    if (uncategorizedPairs.length > 0) renderCategorySection(null, 'بدون دسته‌بندی', uncategorizedPairs);
+    categories.forEach(category => {
+      const categoryPairs = sortedPairs.filter(p => p.categoryId === category.id);
+      if (categoryPairs.length > 0) renderCategorySection(category.id, category.name, categoryPairs);
+    });
+  }
+}
+
+function renderCategorySection(categoryId, categoryName, pairs) {
+  const section = document.createElement('div');
+  section.className = 'category-section';
+  section.innerHTML = `
+    <div class="category-header flex justify-between items-center" data-category="${categoryId || ''}">
+      <div class="font-semibold text-sm">${categoryName} (${pairs.length})</div>
+      <div class="muted text-xs">▼</div>
+    </div>
+    <div class="category-content">
+      <ul class="space-y-2 pairs-list-${categoryId || 'uncategorized'}"></ul>
+    </div>
+  `;
+  categoriesContainer.appendChild(section);
+  const pairsList = section.querySelector(`.pairs-list-${categoryId || 'uncategorized'}`);
+  pairs.forEach(p => {
+    const li = document.createElement('li');
+    li.className = 'flex items-center justify-between gap-2 p-2 rounded bg-white/5';
+    const categories = storageGet('categories') || [];
+    const categoryOptions = categories.map(cat => `<option value="${cat.id}" ${p.categoryId === cat.id ? 'selected' : ''}>${cat.name}</option>`).join('');
+    li.innerHTML = `
+      <div class="flex-1 text-sm">${p.name}</div>
+      <div class="flex gap-1">
+        <select class="small-btn bg-slate-600 text-xs move-category" data-id="${p.id}">
+          <option value="">انتقال به...</option>
+          ${categoryOptions}
+          <option value="" ${!p.categoryId ? 'selected' : ''}>بدون دسته‌بندی</option>
+        </select>
+        <button data-action="up" data-id="${p.id}" class="small-btn bg-slate-600">▲</button>
+        <button data-action="down" data-id="${p.id}" class="small-btn bg-slate-600">▼</button>
+        <button data-action="edit" data-id="${p.id}" class="small-btn bg-yellow-600">✎</button>
+        <button data-action="delete" data-id="${p.id}" class="small-btn bg-rose-600">🗑</button>
+      </div>
+    `;
+    pairsList.appendChild(li);
+  });
+  const header = section.querySelector('.category-header');
+  header.addEventListener('click', () => {
+    const content = section.querySelector('.category-content');
+    content.classList.toggle('hidden');
+  });
+}
+
+function addCategory(name) {
+  if (!name || !name.trim()) return;
+  const categories = storageGet('categories') || [];
+  if (categories.some(cat => cat.name === name.trim())) { alert('این نام دسته‌بندی قبلاً وجود دارد!'); return; }
+  categories.push({ id: uid(), name: name.trim() });
+  storageSet('categories', categories);
+  renderCategories();
+}
+
+function deleteCategory() {
+  const selectedCategoryId = categorySelect ? categorySelect.value : null;
+  if (!selectedCategoryId) { alert('لطفاً یک دسته‌بندی را انتخاب کنید!'); return; }
+  const categories = storageGet('categories') || [];
+  const category = categories.find(cat => cat.id === selectedCategoryId);
+  if (!category) return;
+  const pairs = storageGet('pairs') || [];
+  const pairsInCategory = pairs.filter(p => p.categoryId === selectedCategoryId);
+  if (pairsInCategory.length > 0) {
+    if (!confirm(`دسته‌بندی "${category.name}" دارای ${pairsInCategory.length} جفت‌ارز است. آیا می‌خواهید این دسته‌بندی حذف شود و جفت‌ارزهای آن به "بدون دسته‌بندی" منتقل شوند؟`)) return;
+    pairsInCategory.forEach(p => { p.categoryId = null; });
+    storageSet('pairs', pairs);
+  } else {
+    if (!confirm(`آیا از حذف دسته‌بندی "${category.name}" مطمئن هستید؟`)) return;
+  }
+  storageSet('categories', categories.filter(cat => cat.id !== selectedCategoryId));
+  renderCategories();
+  renderPairs();
+}
+
+if (addCategoryBtn) addCategoryBtn.addEventListener('click', () => { addCategory(newCategoryName ? newCategoryName.value : ''); if (newCategoryName) newCategoryName.value = ''; });
+if (deleteCategoryBtn) deleteCategoryBtn.addEventListener('click', deleteCategory);
+
+if (categoriesContainer) {
+  categoriesContainer.addEventListener('click', (e) => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    const action = btn.dataset.action; const id = btn.dataset.id;
+    const pairs = storageGet('pairs') || [];
+    const idx = pairs.findIndex(p => p.id === id);
+    if (action === 'up' && idx > 0) swapPairs(idx, idx - 1);
+    if (action === 'down' && idx < pairs.length - 1) swapPairs(idx, idx + 1);
+    if (action === 'delete') { if (!confirm('آیا حذف شود؟')) return; pairs.splice(idx, 1); storageSet('pairs', pairs); renderPairs(); }
+    if (action === 'edit') {
+      const newName = prompt('نام جدید:', pairs[idx].name);
+      if (newName && newName.trim()) { pairs[idx].name = newName.trim(); storageSet('pairs', pairs); renderPairs(); }
+    }
+  });
+  categoriesContainer.addEventListener('change', (e) => {
+    if (e.target.classList.contains('move-category')) {
+      movePairToCategory(e.target.dataset.id, e.target.value || null);
+    }
+  });
+}
+
+/* ============================================================
+   ذخیره‌سازی رکورد
+============================================================ */
+function saveEntry(pairId, inputs, outputs, note, dateISO) {
+  const entries = storageGet('entries') || [];
+  const si = dateISO || nowISO();
+  const entry = {
+    id: uid(),
+    pairId,
+    dateISO: si,
+    dateDisplay: formatGregorian(si),
+    inputs,
+    outputs,
+    note
+  };
+  entries.push(entry);
+  storageSet('entries', entries);
+  if (AUTO_PRUNE_ENABLED) pruneOldEntries();
+  renderHistory();
+}
+
+function pruneOldEntries() {
+  if (!AUTO_PRUNE_ENABLED) return;
+  const entries = storageGet('entries') || [];
+  const cutoff = Date.now() - (MAX_DAYS * 24 * 60 * 60 * 1000);
+  const kept = entries.filter(e => new Date(e.dateISO).getTime() >= cutoff);
+  if (kept.length !== entries.length) storageSet('entries', kept);
+}
+
+/* ============================================================
+   رویداد محاسبه
+============================================================ */
+if (calculateButton) {
+  calculateButton.addEventListener('click', () => {
+    if (!inputCeiling || !inputFloor) {
+      if (errorMessage) errorMessage.textContent = 'خطا: فیلدها موجود نیستند.';
+      return;
+    }
+    if (errorMessage) errorMessage.textContent = '';
+    try {
+      const parsedCeiling = parseFormattedInteger(inputCeiling.value);
+      const parsedFloor = parseFormattedInteger(inputFloor.value);
+      const ceilingNum = parsedCeiling.rawNumber;
+      const floorNum = parsedFloor.rawNumber;
+
+      if (isNaN(ceilingNum) || isNaN(floorNum)) throw new Error('لطفاً هر دو عدد سقف و کف را وارد کنید.');
+      if (ceilingNum < 0 || floorNum < 0) throw new Error('لطفاً فقط اعداد مثبت وارد کنید.');
+
+      const ceilingData = calcCeiling(ceilingNum);
+      const floorData = calcFloor(floorNum);
+
+      const ceilingIntValue = Math.floor(ceilingData.finalResult).toString();
+      const floorIntValue = Math.floor(floorData.finalResult).toString();
+
+      renderOutputs(ceilingData, floorData);
+
+      let chosenISO = null;
+      if (datePicker && datePicker.value) {
+        const now = new Date();
+        const tp = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+        const iso = new Date(datePicker.value + 'T' + tp);
+        if (!isNaN(iso)) chosenISO = iso.toISOString();
+      }
+      if (!chosenISO) chosenISO = nowISO();
+
+      const pairId = pairSelect ? pairSelect.value || null : null;
+      const note = noteInput ? noteInput.value || '' : '';
+
+      saveEntry(
+        pairId,
+        {
+          ceilingOriginal: inputCeiling.value,
+          floorOriginal: inputFloor.value,
+          ceilingRaw: ceilingNum,
+          floorRaw: floorNum
+        },
+        {
+          ceiling: {
+            value: ceilingData.finalResult,
+            formatted: ceilingIntValue,
+            sqrt: ceilingData.sqrt,
+            step2: ceilingData.step2
+          },
+          floor: {
+            value: floorData.finalResult,
+            formatted: floorIntValue,
+            sqrt: floorData.sqrt,
+            step2: floorData.step2
+          }
+        },
+        note,
+        chosenISO
+      );
+
+      showNotification('✅ محاسبه و ذخیره شد');
+    } catch (err) {
+      if (errorMessage) errorMessage.textContent = 'خطا: ' + err.message;
+    }
+  });
+}
+
+if (resetButton) {
+  resetButton.addEventListener('click', () => {
+    if (inputCeiling) inputCeiling.value = '';
+    if (inputFloor) inputFloor.value = '';
+    if (outputsArea) outputsArea.innerHTML = '';
+    if (errorMessage) errorMessage.textContent = '';
+    if (voiceStatus) voiceStatus.textContent = '';
+  });
+}
+
+/* ============================================================
+   باکس کپی سقف و کف (فقط ۲ عدد)
+============================================================ */
+function extractAndDisplayAllNumbers() {
+  if (!fixedNum1 || !fixedNum2) return;
+
+  let ceiling = '---';
+  let floor = '---';
+  let pairName = '---';
+  let pairId = null;
+
+  if (historyPairFilter && historyPairFilter.selectedIndex >= 0) {
+    const selectedOption = historyPairFilter.options[historyPairFilter.selectedIndex];
+    if (selectedOption && selectedOption.value) {
+      pairId = selectedOption.value;
+      const pair = (storageGet('pairs') || []).find(p => p.id === pairId);
+      if (pair) pairName = pair.name;
+    }
+  }
+  if (!pairId && pairSelect && pairSelect.selectedIndex >= 0) {
+    const selectedOption = pairSelect.options[pairSelect.selectedIndex];
+    if (selectedOption && selectedOption.value) {
+      pairId = selectedOption.value;
+      const pair = (storageGet('pairs') || []).find(p => p.id === pairId);
+      if (pair) pairName = pair.name;
+    }
+  }
+
+  let selectedDate = null;
+  if (historyDate && historyDate.value) selectedDate = historyDate.value;
+
+  const entries = storageGet('entries') || [];
+  let filteredEntries = entries;
+  if (pairId) filteredEntries = filteredEntries.filter(e => e.pairId === pairId);
+  if (selectedDate) {
+    filteredEntries = filteredEntries.filter(e => {
+      const entryDate = e.dateISO ? e.dateISO.split('T')[0] : null;
+      return entryDate === selectedDate;
+    });
+  }
+  filteredEntries.sort((a, b) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
+
+  if (filteredEntries.length > 0) {
+    const entry = filteredEntries[0];
+    if (entry.outputs) {
+      if (entry.outputs.ceiling && entry.outputs.ceiling.formatted) ceiling = entry.outputs.ceiling.formatted;
+      if (entry.outputs.floor && entry.outputs.floor.formatted) floor = entry.outputs.floor.formatted;
+    }
+  }
+
+  fixedNum1.textContent = ceiling;
+  fixedNum2.textContent = floor;
+  fixedNum1.dataset.value = ceiling;
+  fixedNum2.dataset.value = floor;
+  if (fixedPairName) fixedPairName.textContent = pairName !== '---' ? pairName : '---';
+}
+
+function copyNumber1() {
+  const val = fixedNum1.dataset.value || fixedNum1.textContent;
+  if (!val || val === '---') { showNotification('⚠️ عددی برای کپی وجود ندارد!', 'error'); return; }
+  copyToClipboard(val);
+}
+function copyNumber2() {
+  const val = fixedNum2.dataset.value || fixedNum2.textContent;
+  if (!val || val === '---') { showNotification('⚠️ عددی برای کپی وجود ندارد!', 'error'); return; }
+  copyToClipboard(val);
+}
+
+if (fixedNum1) fixedNum1.addEventListener('click', copyNumber1);
+if (fixedNum2) fixedNum2.addEventListener('click', copyNumber2);
+
+if (historyPairFilter) {
+  historyPairFilter.addEventListener('change', function () { setTimeout(extractAndDisplayAllNumbers, 200); });
+}
+if (historyDate) {
+  historyDate.addEventListener('change', function () { setTimeout(extractAndDisplayAllNumbers, 200); });
+}
+if (pairSelect) {
+  pairSelect.addEventListener('change', function () { setTimeout(extractAndDisplayAllNumbers, 200); });
+}
+
+/* ============================================================
+   نمایش تاریخچه
+============================================================ */
+function renderMultiDateHistory(selectedPair, selectedDates) {
+  const entries = (storageGet('entries') || []).slice();
+  if (!historyList) return;
+  historyList.innerHTML = '';
+  if (!selectedDates || selectedDates.length === 0) {
+    historyList.innerHTML = '<div class="muted text-sm text-center py-4">هیچ تاریخی انتخاب نشده است.</div>';
+    return;
+  }
+  const normDates = Array.from(new Set(selectedDates.map(d => {
+    if (!d) return null;
+    const dt = new Date(d);
+    return isNaN(dt.getTime()) ? null : dt.toISOString().split('T')[0];
+  }).filter(Boolean))).sort();
+  if (normDates.length === 0) {
+    historyList.innerHTML = '<div class="muted text-sm text-center py-4">هیچ تاریخ معتبری انتخاب نشده است.</div>';
+    return;
+  }
+  const header = document.createElement('div');
+  header.className = 'date-comparison-header';
+  header.textContent = 'مقایسه چند تاریخ انتخاب‌شده';
+  historyList.appendChild(header);
+  const pairs = storageGet('pairs') || [];
+  const categories = storageGet('categories') || [];
+  const entriesByDate = {};
+  normDates.forEach(d => { entriesByDate[d] = []; });
+  entries.forEach(e => {
+    const dt = new Date(e.dateISO);
+    if (isNaN(dt.getTime())) return;
+    const key = dt.toISOString().split('T')[0];
+    if (!entriesByDate[key]) return;
+    if (selectedPair && e.pairId !== selectedPair) return;
+    entriesByDate[key].push(e);
+  });
+  let hasAny = false;
+  normDates.forEach(dateKey => {
+    const groupEntries = entriesByDate[dateKey] || [];
+    const group = document.createElement('div');
+    group.className = 'comparison-group';
+    const title = document.createElement('div');
+    title.className = 'text-xs muted mb-2 font-semibold';
+    try { title.textContent = 'تاریخ: ' + new Date(dateKey).toLocaleDateString('en-CA'); } catch (_) { title.textContent = 'تاریخ: ' + dateKey; }
+    group.appendChild(title);
+    if (groupEntries.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'muted text-xs';
+      empty.textContent = 'رکوردی برای این تاریخ وجود ندارد.';
+      group.appendChild(empty);
+    } else {
+      hasAny = true;
+      groupEntries.sort((a, b) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
+      groupEntries.forEach(e => {
+        const pair = pairs.find(p => p.id === e.pairId);
+        const pairName = pair?.name || '—';
+        const category = pair ? categories.find(c => c.id === pair.categoryId) : null;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'history-entry-compact flex flex-col gap-3 hover:border-white/20 transition-colors';
+        const ceilingVal = e.outputs?.ceiling?.formatted || '---';
+        const floorVal = e.outputs?.floor?.formatted || '---';
+        wrapper.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="text-sm font-semibold">${pairName}</div>
+              ${category ? `<span class="text-xs bg-blue-600 px-2 py-1 rounded">${category.name}</span>` : ''}
+            </div>
+            <div class="text-xs muted">${e.dateDisplay}</div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-emerald-900/40 border border-emerald-500/40 rounded p-2 text-center">
+              <div class="text-xs text-emerald-300 mb-1">🔺 سقف</div>
+              <div class="font-mono font-bold text-emerald-400 cursor-pointer" style="direction:ltr" onclick="copyToClipboard('${ceilingVal}')">${ceilingVal}</div>
+            </div>
+            <div class="bg-rose-900/40 border border-rose-500/40 rounded p-2 text-center">
+              <div class="text-xs text-rose-300 mb-1">🔻 کف</div>
+              <div class="font-mono font-bold text-rose-400 cursor-pointer" style="direction:ltr" onclick="copyToClipboard('${floorVal}')">${floorVal}</div>
+            </div>
+          </div>
+        `;
+        const bottom = document.createElement('div');
+        bottom.className = 'flex gap-2 justify-end';
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'small-btn bg-indigo-600 hover:bg-indigo-700 rounded transition-colors';
+        viewBtn.textContent = 'نمایش جزئیات';
+        viewBtn.addEventListener('click', () => showDetail(e.id));
+        bottom.appendChild(viewBtn);
+        wrapper.appendChild(bottom);
+        group.appendChild(wrapper);
+      });
+    }
+    historyList.appendChild(group);
+  });
+  if (!hasAny) historyList.innerHTML = '<div class="muted text-sm text-center py-4">برای تاریخ‌های انتخاب‌شده رکوردی یافت نشد.</div>';
+  setTimeout(extractAndDisplayAllNumbers, 200);
+}
+
+function renderHistory() {
+  if (multiDateSection && !multiDateSection.classList.contains('hidden')) {
+    const selectedPair = multiDatePairFilter ? multiDatePairFilter.value : null;
+    const selectedDates = dateRanges.filter(r => r.date).map(r => r.date);
+    if (selectedDates.length > 0) { renderMultiDateHistory(selectedPair, selectedDates); return; }
+  }
+  const entries = (storageGet('entries') || []).slice();
+  entries.sort((a, b) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
+  if (entriesCount) entriesCount.textContent = entries.length;
+  const filterDate = historyDate && historyDate.value ? new Date(historyDate.value).toDateString() : null;
+  const filterPair = historyPairFilter && historyPairFilter.value ? historyPairFilter.value : null;
+  if (historyList) historyList.innerHTML = '';
+  let filtered = entries;
+  if (!filterDate) {
+    const today = new Date().toDateString();
+    filtered = entries.filter(e => new Date(e.dateISO).toDateString() === today);
+  } else {
+    filtered = entries.filter(e => new Date(e.dateISO).toDateString() === filterDate);
+  }
+  if (filterPair) filtered = filtered.filter(e => e.pairId === filterPair);
+  if (filtered.length === 0) {
+    if (historyList) historyList.innerHTML = '<div class="muted text-sm text-center py-4">رکوردی جهت نمایش وجود ندارد.</div>';
+    setTimeout(extractAndDisplayAllNumbers, 100);
+    return;
+  }
+  safeForEach(filtered, e => {
+    const pair = (storageGet('pairs') || []).find(p => p.id === e.pairId);
+    const pairName = pair?.name || '—';
+    const category = pair ? (storageGet('categories') || []).find(c => c.id === pair.categoryId) : null;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'history-entry-compact flex flex-col gap-3 hover:border-white/20 transition-colors';
+    const ceilingVal = e.outputs?.ceiling?.formatted || '---';
+    const floorVal = e.outputs?.floor?.formatted || '---';
+    wrapper.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="text-sm font-semibold">${pairName}</div>
+          ${category ? `<span class="text-xs bg-blue-600 px-2 py-1 rounded">${category.name}</span>` : ''}
+        </div>
+        <div class="text-xs muted">${e.dateDisplay}</div>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="bg-emerald-900/40 border border-emerald-500/40 rounded p-2 text-center">
+          <div class="text-xs text-emerald-300 mb-1">🔺 سقف</div>
+          <div class="font-mono font-bold text-emerald-400 cursor-pointer" style="direction:ltr" onclick="copyToClipboard('${ceilingVal}')">${ceilingVal}</div>
+        </div>
+        <div class="bg-rose-900/40 border border-rose-500/40 rounded p-2 text-center">
+          <div class="text-xs text-rose-300 mb-1">🔻 کف</div>
+          <div class="font-mono font-bold text-rose-400 cursor-pointer" style="direction:ltr" onclick="copyToClipboard('${floorVal}')">${floorVal}</div>
+        </div>
+      </div>
+    `;
+    const bottom = document.createElement('div');
+    bottom.className = 'flex gap-2 justify-end';
+    const viewBtn = document.createElement('button');
+    viewBtn.className = 'small-btn bg-indigo-600 hover:bg-indigo-700 rounded transition-colors';
+    viewBtn.textContent = 'نمایش جزئیات';
+    viewBtn.addEventListener('click', () => showDetail(e.id));
+    bottom.appendChild(viewBtn);
+    wrapper.appendChild(bottom);
+    historyList.appendChild(wrapper);
+  });
+  setTimeout(extractAndDisplayAllNumbers, 200);
+}
+
+function showDetail(entryId) {
+  const entries = storageGet('entries') || [];
+  const e = entries.find(x => x.id === entryId);
+  if (!e) return;
+  const pair = (storageGet('pairs') || []).find(p => p.id === e.pairId);
+  const pairName = pair?.name || '—';
+  const category = pair ? (storageGet('categories') || []).find(c => c.id === pair.categoryId) : null;
+  if (detailContent) detailContent.innerHTML = '';
+
+  const ceilingVal = e.outputs?.ceiling?.formatted || '---';
+  const floorVal = e.outputs?.floor?.formatted || '---';
+  const ceilingSqrt = e.outputs?.ceiling?.sqrt;
+  const ceilingStep2 = e.outputs?.ceiling?.step2;
+  const floorSqrt = e.outputs?.floor?.sqrt;
+  const floorStep2 = e.outputs?.floor?.step2;
+
+  detailContent.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="space-y-3">
+        <div class="bg-white/5 p-3 rounded">
+          <div class="text-xs muted mb-1">جفت‌ارز</div>
+          <div class="font-semibold flex items-center gap-2">
+            ${pairName}
+            ${category ? `<span class="text-xs bg-blue-600 px-2 py-1 rounded">${category.name}</span>` : ''}
+          </div>
+        </div>
+        <div class="bg-white/5 p-3 rounded">
+          <div class="text-xs muted mb-1">تاریخ (میلادی)</div>
+          <div class="font-semibold">${e.dateDisplay}</div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div class="bg-white/5 p-3 rounded">
+          <div class="text-xs muted mb-1">یادداشت</div>
+          <div class="font-semibold">${e.note || '---'}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white/5 p-4 rounded">
+      <div class="text-xs muted mb-3">ورودی‌ها</div>
+      <div class="grid grid-cols-2 gap-3 text-sm">
+        <div>عدد سقف: <span class="font-mono">${e.inputs?.ceilingOriginal || 'نامشخص'}</span></div>
+        <div>عدد کف: <span class="font-mono">${e.inputs?.floorOriginal || 'نامشخص'}</span></div>
+      </div>
+    </div>
+
+    <div class="bg-emerald-900/30 border border-emerald-500/40 rounded p-4">
+      <div class="text-sm text-emerald-300 font-bold mb-2">🔺 خروجی سقف (صعودی + ۰.۶۱۸)</div>
+      <div class="text-center font-mono font-bold text-emerald-400 text-xl mb-3" style="direction:ltr">${ceilingVal}</div>
+      <div class="text-xs muted" style="direction:ltr;text-align:left">
+        √ = <span class="font-mono">${ceilingSqrt !== undefined ? ceilingSqrt.toFixed(6) : '---'}</span><br>
+        + ۰.۶۱۸ = <span class="font-mono">${ceilingStep2 !== undefined ? ceilingStep2.toFixed(6) : '---'}</span><br>
+        ² = <span class="font-mono">${e.outputs?.ceiling?.value !== undefined ? e.outputs.ceiling.value.toFixed(6) : '---'}</span>
+      </div>
+    </div>
+
+    <div class="bg-rose-900/30 border border-rose-500/40 rounded p-4">
+      <div class="text-sm text-rose-300 font-bold mb-2">🔻 خروجی کف (نزولی − ۰.۶۱۸)</div>
+      <div class="text-center font-mono font-bold text-rose-400 text-xl mb-3" style="direction:ltr">${floorVal}</div>
+      <div class="text-xs muted" style="direction:ltr;text-align:left">
+        √ = <span class="font-mono">${floorSqrt !== undefined ? floorSqrt.toFixed(6) : '---'}</span><br>
+        − ۰.۶۱۸ = <span class="font-mono">${floorStep2 !== undefined ? floorStep2.toFixed(6) : '---'}</span><br>
+        ² = <span class="font-mono">${e.outputs?.floor?.value !== undefined ? e.outputs.floor.value.toFixed(6) : '---'}</span>
+      </div>
+    </div>
+  `;
+
+  if (detailModal) detailModal.classList.remove('hidden');
+  if (editRecordBtn) editRecordBtn.onclick = () => editRecord(e.id);
+  if (deleteRecordBtn) deleteRecordBtn.onclick = () => deleteRecord(e.id);
+  if (moveRecordBtn) moveRecordBtn.onclick = () => moveRecord(e.id);
+}
+
+if (closeDetail) closeDetail.addEventListener('click', () => { if (detailModal) detailModal.classList.add('hidden'); });
+
+function deleteRecord(id) {
+  if (!confirm('آیا از حذف این رکورد مطمئن هستید؟')) return;
+  const entries = storageGet('entries') || [];
+  const idx = entries.findIndex(x => x.id === id);
+  if (idx === -1) return;
+  entries.splice(idx, 1);
+  storageSet('entries', entries);
+  renderHistory();
+  if (detailModal) detailModal.classList.add('hidden');
+}
+
+function editRecord(id) {
+  const entries = storageGet('entries') || [];
+  const e = entries.find(x => x.id === id);
+  if (!e) return;
+  if (!confirm('مقادیر رکورد در فرم بارگذاری خواهد شد. پس از ویرایش دکمهٔ محاسبه را بزنید تا رکورد جدید ذخیره شود. رکورد قدیمی حذف می‌شود. ادامه می‌دهید؟')) return;
+  if (pairSelect) pairSelect.value = e.pairId || '';
+  if (inputCeiling) inputCeiling.value = e.inputs?.ceilingOriginal || '';
+  if (inputFloor) inputFloor.value = e.inputs?.floorOriginal || '';
+  if (noteInput) noteInput.value = e.note || '';
+  if (datePicker) datePicker.value = e.dateDisplay.split(' ')[0] || '';
+
+  const idx = entries.findIndex(x => x.id === id);
+  if (idx !== -1) { entries.splice(idx, 1); storageSet('entries', entries); }
+  renderHistory();
+  if (detailModal) detailModal.classList.add('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function moveRecord(id) {
+  const newDate = prompt('تاریخ جدید (YYYY-MM-DD) را وارد کنید:');
+  if (!newDate) return;
+  const d = new Date(newDate + 'T00:00:00');
+  if (isNaN(d)) { alert('تاریخ نامعتبر.'); return; }
+  const entries = storageGet('entries') || [];
+  const e = entries.find(x => x.id === id);
+  if (!e) return;
+  e.dateISO = d.toISOString();
+  e.dateDisplay = formatGregorian(e.dateISO);
+  storageSet('entries', entries);
+  renderHistory();
+  if (detailModal) detailModal.classList.add('hidden');
+}
+
+/* ============================================================
+   بک‌آپ و بازیابی
+============================================================ */
+if (exportBtn) {
+  exportBtn.addEventListener('click', () => {
+    try {
+      const payload = {
+        pairs: storageGet('pairs') || [],
+        entries: storageGet('entries') || [],
+        categories: storageGet('categories') || [],
+        meta: {
+          created: new Date().toISOString(),
+          version: '4.0',
+          entryCount: (storageGet('entries') || []).length,
+          pairCount: (storageGet('pairs') || []).length,
+          categoryCount: (storageGet('categories') || []).length,
+          backupId: uid()
+        }
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Calculator_pro_program_2-' + new Date().toISOString().slice(0, 10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showNotification('✅ فایل پشتیبان با موفقیت دانلود شد');
+    } catch (err) {
+      console.error('خطا در دانلود بک‌آپ:', err);
+      showNotification('❌ خطا در دانلود فایل پشتیبان: ' + err.message, 'error');
+    }
+  });
+}
+
+if (importBtn) importBtn.addEventListener('click', () => { if (importFile) importFile.click(); });
+
+if (importFile) {
+  importFile.addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const obj = JSON.parse(reader.result);
+        if (!obj) throw new Error('فایل نامعتبر');
+        const currentData = {
+          pairs: storageGet('pairs') || [],
+          entries: storageGet('entries') || [],
+          categories: storageGet('categories') || []
+        };
+        try {
+          if (Array.isArray(obj.pairs)) storageSet('pairs', obj.pairs); else storageSet('pairs', []);
+          if (Array.isArray(obj.entries)) storageSet('entries', obj.entries); else storageSet('entries', []);
+          if (Array.isArray(obj.categories)) storageSet('categories', obj.categories); else storageSet('categories', []);
+          renderPairs();
+          renderHistory();
+          showNotification('بک‌آپ با موفقیت بارگذاری شد', 'success');
+          let message = '✅ بک‌آپ با موفقیت بارگذاری شد!\n\n📊 اطلاعات بک‌آپ:\n';
+          message += `• ${obj.entries?.length || 0} رکورد تاریخی\n`;
+          message += `• ${obj.pairs?.length || 0} جفت‌ارز\n`;
+          message += `• ${obj.categories?.length || 0} دسته‌بندی`;
+          alert(message);
+        } catch (error) {
+          storageSet('pairs', currentData.pairs);
+          storageSet('entries', currentData.entries);
+          storageSet('categories', currentData.categories);
+          throw error;
+        }
+      } catch (err) {
+        alert('❌ خطا در بارگذاری فایل: ' + err.message);
+      }
+    };
+    reader.readAsText(f);
+    importFile.value = '';
+  });
+}
+
+/* ============================================================
+   کنترل پنل تاریخچه
+============================================================ */
+function updateToggleButton(isOpen) {
+  const toggleIcon = document.getElementById('toggle_icon');
+  const toggleText = document.getElementById('toggle_text');
+  const toggleBtn = document.getElementById('toggle_history_btn');
+  if (isOpen) {
+    toggleIcon.textContent = '📂';
+    toggleIcon.style.transform = 'rotate(0deg) scale(1.1)';
+    toggleText.textContent = 'بستن ذخیره‌ها';
+    toggleBtn.classList.remove('closed');
+    toggleBtn.classList.add('open');
+  } else {
+    toggleIcon.textContent = '📁';
+    toggleIcon.style.transform = 'rotate(0deg) scale(1)';
+    toggleText.textContent = 'نمایش ذخیره‌ها';
+    toggleBtn.classList.remove('open');
+    toggleBtn.classList.add('closed');
+  }
+}
+
+if (toggleHistoryBtn) {
+  toggleHistoryBtn.addEventListener('click', () => {
+    const isCurrentlyHidden = historyPanel.classList.contains('hidden');
+    if (isCurrentlyHidden) {
+      historyPanel.classList.remove('hidden');
+      updateToggleButton(true);
+      const today = new Date().toISOString().split('T')[0];
+      if (historyDate) historyDate.value = today;
+      renderHistory();
+    } else {
+      historyPanel.classList.add('hidden');
+      updateToggleButton(false);
+    }
+  });
+}
+
+if (historyDate) historyDate.addEventListener('change', renderHistory);
+if (historyPairFilter) historyPairFilter.addEventListener('change', renderHistory);
+if (togglePairsHdr) togglePairsHdr.addEventListener('click', () => { if (boxPairs) boxPairs.classList.toggle('hidden'); });
+if (toggleCalcHdr) toggleCalcHdr.addEventListener('click', () => { if (boxCalc) boxCalc.classList.toggle('hidden'); });
+if (toggleHistoryHdr) toggleHistoryHdr.addEventListener('click', () => { if (boxHistory) boxHistory.classList.toggle('hidden'); });
+
+/* ============================================================
+   ورود صوتی
+============================================================ */
+let recognition = null;
+let isRecording = false;
+let isVoiceActive = false;
+let currentField = null;
+const numericFields = [inputCeiling, inputFloor];
+
+function parseNumberFromTranscript(transcript) {
+  if (!transcript) return null;
+  const persianDigits = { '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4', '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9' };
+  let normalized = transcript.replace(/[۰-۹]/g, d => persianDigits[d]);
+  normalized = normalized.replace(/[^\d.-]/g, '');
+  const match = normalized.match(/-?\d*\.?\d+/);
+  return match ? match[0] : null;
+}
+
+function startVoiceRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { if (voiceStatus) voiceStatus.textContent = 'مرورگر شما از تشخیص صوت پشتیبانی نمی‌کند.'; return; }
+  recognition = new SpeechRecognition();
+  recognition.lang = 'fa-IR';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.continuous = false;
+  recognition.onstart = () => {
+    isRecording = true;
+    if (microToggle) microToggle.classList.add('recording');
+    if (voiceStatus && currentField) voiceStatus.textContent = `🎤 در حال گوش دادن...`;
+  };
+  recognition.onend = () => {
+    isRecording = false;
+    if (microToggle) microToggle.classList.remove('recording');
+    if (isVoiceActive && currentField) {
+      setTimeout(() => { if (!isRecording && isVoiceActive) startVoiceRecognition(); }, 300);
+    }
+  };
+  recognition.onerror = () => {
+    isRecording = false;
+    if (microToggle) microToggle.classList.remove('recording');
+    if (isVoiceActive && currentField) {
+      setTimeout(() => { if (!isRecording && isVoiceActive) startVoiceRecognition(); }, 1000);
+    }
+  };
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const numStr = parseNumberFromTranscript(transcript);
+    if (numStr && currentField) {
+      currentField.value = numStr;
+      if (voiceStatus) voiceStatus.textContent = `✅ عدد "${numStr}" وارد شد`;
+      const currentIndex = numericFields.indexOf(currentField);
+      if (currentIndex < numericFields.length - 1) {
+        setTimeout(() => { numericFields[currentIndex + 1].focus(); }, 500);
+      }
+    } else if (voiceStatus) voiceStatus.textContent = '❌ عدد تشخیص داده نشد. دوباره تلاش کنید.';
+  };
+  try { recognition.start(); } catch (e) { console.log('خطا در شروع ضبط:', e); }
+}
+
+function stopVoiceRecognition() {
+  isVoiceActive = false;
+  try { if (recognition) recognition.stop(); } catch (e) {}
+  recognition = null;
+  isRecording = false;
+  if (microToggle) { microToggle.classList.remove('recording'); microToggle.classList.remove('connected'); }
+  if (voiceStatus) voiceStatus.textContent = 'اتصال صوتی قطع شد';
+}
+
+safeForEach(numericFields, (field) => {
+  if (!field) return;
+  field.addEventListener('focus', () => {
+    currentField = field;
+    if (isVoiceActive && !isRecording) startVoiceRecognition();
+  });
+});
+
+if (microToggle) {
+  microToggle.addEventListener('click', () => {
+    if (isVoiceActive) {
+      stopVoiceRecognition();
+      microToggle.textContent = '🎙 فعال کردن صوت';
+    } else {
+      isVoiceActive = true;
+      microToggle.textContent = '🎙 قطع صوت';
+      microToggle.classList.add('connected');
+      if (voiceStatus) voiceStatus.textContent = 'اتصال صوتی فعال شد. روی فیلد مورد نظر کلیک کنید.';
+      const emptyField = numericFields.find(field => !field.value || field.value.trim() === '');
+      if (emptyField) emptyField.focus();
+      else numericFields[0].focus();
+    }
+  });
+}
+
+/* ============================================================
+   مودال آمار
+============================================================ */
+if ($('show_stats_btn')) {
+  $('show_stats_btn').addEventListener('click', () => {
+    if (statsModal) {
+      statsModal.classList.remove('hidden');
+      const pairs = storageGet('pairs') || [];
+      const entries = storageGet('entries') || [];
+      const categories = storageGet('categories') || [];
+      statsContent.innerHTML = `
+        <div class="stats-grid">
+          <div class="stat-item"><div class="text-lg font-bold">${pairs.length}</div><div class="text-xs muted">جفت‌ارز</div></div>
+          <div class="stat-item"><div class="text-lg font-bold">${entries.length}</div><div class="text-xs muted">رکورد تاریخی</div></div>
+          <div class="stat-item"><div class="text-lg font-bold">${categories.length}</div><div class="text-xs muted">دسته‌بندی</div></div>
+          <div class="stat-item"><div class="text-lg font-bold">${new Date().toLocaleDateString('fa-IR')}</div><div class="text-xs muted">تاریخ امروز</div></div>
+        </div>
+      `;
+    }
+  });
+}
+if ($('close_stats')) $('close_stats').addEventListener('click', () => { if (statsModal) statsModal.classList.add('hidden'); });
+
+/* ============================================================
+   مودال بک‌آپ
+============================================================ */
+if ($('manage_backups_btn')) {
+  $('manage_backups_btn').addEventListener('click', () => {
+    if (!backupsModal || !backupsContent) return;
+    backupsModal.classList.remove('hidden');
+    backupsContent.innerHTML = `
+      <div class="bg-white/5 p-4 rounded mb-3">
+        <div class="font-semibold mb-2">💾 بک‌آپ فعلی</div>
+        <div class="stats-grid">
+          <div class="stat-item"><div class="text-lg font-bold">${(storageGet('entries') || []).length}</div><div class="text-xs muted">رکورد</div></div>
+          <div class="stat-item"><div class="text-lg font-bold">${(storageGet('pairs') || []).length}</div><div class="text-xs muted">جفت‌ارز</div></div>
+          <div class="stat-item"><div class="text-lg font-bold">${(storageGet('categories') || []).length}</div><div class="text-xs muted">دسته‌بندی</div></div>
+          <div class="stat-item"><div class="text-lg font-bold">${(JSON.stringify({ p: storageGet('pairs'), e: storageGet('entries'), c: storageGet('categories') }).length / 1024).toFixed(1)} KB</div><div class="text-xs muted">حجم</div></div>
+        </div>
+        <button onclick="document.getElementById('export_btn').click()" class="small-btn bg-green-600 hover:bg-green-700 w-full mt-3">📥 دانلود بک‌آپ کامل</button>
+      </div>
+      <div class="bg-white/5 p-3 rounded text-xs space-y-2">
+        <div>✅ <strong>بارگذاری:</strong> از دکمه «بارگذاری بک‌آپ» در بخش مدیریت جفت‌ارز استفاده کنید.</div>
+        <div>⚠️ <strong>هشدار:</strong> بازیابی بک‌آپ، داده‌های فعلی را جایگزین می‌کند.</div>
+        <div>🔒 فایل‌های بک‌آپ حاوی تمام اطلاعات شما هستند، آنها را در مکان امن نگه دارید.</div>
+      </div>
+    `;
+  });
+}
+if ($('close_backups')) $('close_backups').addEventListener('click', () => { if (backupsModal) backupsModal.classList.add('hidden'); });
+
+/* ============================================================
+   حذف رکوردهای قدیمی
+============================================================ */
+if ($('manual_prune_btn')) {
+  $('manual_prune_btn').addEventListener('click', () => {
+    const days = parseInt($('manual_prune_days').value) || 365;
+    if (days < 1) { alert('تعداد روز باید بیشتر از ۰ باشد'); return; }
+    if (confirm(`آیا از حذف رکوردهای قدیمی‌تر از ${days} روز مطمئن هستید؟\nاین عمل غیرقابل بازگشت است.`)) {
+      const entries = storageGet('entries') || [];
+      const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
+      const kept = entries.filter(e => new Date(e.dateISO).getTime() >= cutoff);
+      const deleted = entries.length - kept.length;
+      if (deleted > 0) {
+        storageSet('entries', kept);
+        renderHistory();
+        alert(`✅ ${deleted} رکورد قدیمی حذف شد.`);
+      } else {
+        alert('ℹ️ هیچ رکورد قدیمی‌ای برای حذف یافت نشد.');
+      }
+    }
+  });
+}
+
+/* ============================================================
+   مودال بیرونی
+============================================================ */
+window.addEventListener('click', (e) => {
+  if (e.target === statsModal) statsModal.classList.add('hidden');
+  if (e.target === backupsModal) backupsModal.classList.add('hidden');
+  if (e.target === detailModal) detailModal.classList.add('hidden');
+});
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (statsModal) statsModal.classList.add('hidden');
+    if (backupsModal) backupsModal.classList.add('hidden');
+    if (detailModal) detailModal.classList.add('hidden');
+  }
+});
+
+/* ============================================================
+   راه‌اندازی اولیه
+============================================================ */
+initializeBoxStates();
+
+async function initApp() {
+  try {
+    await openDB();
+    await loadAllData();
+    ensureDefaults();
+    upgradePairsWithSortOrder();
+    if ((storageGet('pairs') || []).length === 0) {
+      storageSet('pairs', [
+        { id: uid(), name: 'EURUSD', categoryId: 'forex', sortOrder: 0 },
+        { id: uid(), name: 'GBPUSD', categoryId: 'forex', sortOrder: 1 },
+        { id: uid(), name: 'BTCUSD', categoryId: 'crypto', sortOrder: 2 },
+        { id: uid(), name: 'ETHUSD', categoryId: 'crypto', sortOrder: 3 }
+      ]);
+    }
+    renderPairs();
+    renderHistory();
+    const today = new Date().toISOString().split('T')[0];
+    if (historyDate) historyDate.value = today;
+    setTimeout(() => {
+      if (inputCeiling) inputCeiling.focus();
+      extractAndDisplayAllNumbers();
+    }, 800);
+    console.log('✅ Calculator pro program 2 - فرمول کد ۲ (سقف و کف) آماده است!');
+  } catch (e) {
+    console.error('Error initializing app:', e);
+    alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
+  }
+}
+initApp();
+</script>
+</body>
+</html>
