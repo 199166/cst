@@ -264,7 +264,7 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input[type="text"], input[type="date"], input[type="number"], select {
+        input[type="text"], input[type="date"], input[type="number"], select, textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid var(--input-border);
@@ -276,9 +276,13 @@
             transition: border-color 0.3s;
             font-family: 'Vazirmatn', sans-serif;
         }
-        input:focus, select:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--button-primary);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
         }
         .button-group {
             display: flex;
@@ -523,6 +527,24 @@
             padding: 4px;
             border-radius: 3px;
         }
+        .card-note {
+            grid-column: 1 / -1;
+            margin-top: 5px;
+            padding: 8px;
+            background-color: var(--container-bg);
+            border-radius: 4px;
+            border: 1px solid var(--input-border);
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .card-note-label {
+            font-size: 12px;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-bottom: 3px;
+        }
         .card-actions {
             margin-top: 10px;
             display: flex;
@@ -706,6 +728,17 @@
             background-color: var(--result-bg);
             border-radius: 5px;
             border: 1px solid var(--input-border);
+        }
+        .comparison-note {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: var(--container-bg);
+            border-radius: 4px;
+            border: 1px solid var(--input-border);
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
         .comparison-dates-container {
             margin: 15px 0;
@@ -1193,6 +1226,10 @@
                     </div>
                 </div>
             </div>
+            <div class="form-group">
+                <label for="input_note">یادداشت:</label>
+                <textarea id="input_note" placeholder="متن یادداشت خود را اینجا بنویسید..."></textarea>
+            </div>
             <div class="button-group">
                 <button id="calculateBtn">محاسبه و ذخیره</button>
                 <button id="resetBtn">ریست</button>
@@ -1240,6 +1277,7 @@
                             <th>فرمول ۲</th>
                             <th>فرمول ۳</th>
                             <th>فرمول ۴</th>
+                            <th>یادداشت</th>
                             <th>عملیات</th>
                         </tr>
                     </thead>
@@ -2400,6 +2438,7 @@
                 const currentLowValue = document.getElementById('input_current_low').value.trim();
                 const currencyPair = document.getElementById('currencyPairSelect').value;
                 const calculationDate = document.getElementById('calculationDate').value;
+                const note = document.getElementById('input_note').value.trim();
                 
                 if (!y1Value || !y2Value || !currentHighValue || !currentLowValue) {
                     throw new Error("لطفاً تمام فیلدها را پر کنید!");
@@ -2486,6 +2525,7 @@
                     result2: result2,
                     result3: result3,
                     result4: result4,
+                    note: note,
                     createdAt: new Date().toISOString()
                 });
 
@@ -2510,6 +2550,8 @@
             document.getElementById('input_y2_mobile').value = '';
             document.getElementById('input_current_high_mobile').value = '';
             document.getElementById('input_current_low_mobile').value = '';
+            // ریست یادداشت
+            document.getElementById('input_note').value = '';
             const resultsList = document.getElementById('results_list');
             const errorMessage = document.getElementById('error_message');
             resultsList.innerHTML = '';
@@ -2531,6 +2573,9 @@
             document.getElementById('input_y2_mobile').value = formatNumberBasedOnInput(calculation.inputY2, calculation.inputFormatY2);
             document.getElementById('input_current_high_mobile').value = formatNumberBasedOnInput(calculation.inputCurrentHigh, calculation.inputFormatY1);
             document.getElementById('input_current_low_mobile').value = formatNumberBasedOnInput(calculation.inputCurrentLow, calculation.inputFormatY2);
+            
+            // تنظیم یادداشت
+            document.getElementById('input_note').value = calculation.note || '';
             
             switchTab('calculator');
             showNotification('داده‌ها به ماشین حساب منتقل شدند. پس از ویرایش، دکمه "محاسبه و ذخیره" را بزنید.', 'success', 5000);
@@ -2594,6 +2639,7 @@
                         <td class="table-cell" data-copy="${formattedResult2}">${formattedResult2}</td>
                         <td class="table-cell" data-copy="${formattedResult3}">${formattedResult3}</td>
                         <td class="table-cell" data-copy="${formattedResult4}">${formattedResult4}</td>
+                        <td class="table-cell note-cell" title="${calc.note || ''}">${calc.note || ''}</td>
                         <td class="action-buttons">
                             <button class="action-btn edit-calculation" data-id="${calc.id}">ویرایش</button>
                             <button class="action-btn danger delete-calculation" data-id="${calc.id}">حذف</button>
@@ -2606,7 +2652,12 @@
                 document.querySelectorAll('#calculationsTableBody .table-cell').forEach(cell => {
                     cell.addEventListener('click', function(e) {
                         if (e.target.tagName === 'BUTTON') return; // جلوگیری از تداخل با دکمه‌ها
-                        copyToClipboard(this, this.dataset.copy);
+                        if (this.classList.contains('note-cell')) {
+                            // برای سلول یادداشت، کل متن را کپی کن
+                            copyToClipboard(this, this.textContent.trim());
+                        } else {
+                            copyToClipboard(this, this.dataset.copy);
+                        }
                     });
                 });
 
@@ -2660,6 +2711,10 @@
                             <div class="card-item">
                                 <div class="card-label">فرمول ۴</div>
                                 <div class="card-value" data-value="${formattedResult4}">${formattedResult4}</div>
+                            </div>
+                            <div class="card-note">
+                                <div class="card-note-label">یادداشت:</div>
+                                <div>${calc.note || '—'}</div>
                             </div>
                         </div>
                         <div class="card-actions">
@@ -2941,6 +2996,9 @@
                             <p><strong>فرمول ۲:</strong> ${formattedResult2}</p>
                             <p><strong>فرمول ۳:</strong> ${formattedResult3}</p>
                             <p><strong>فرمول ۴:</strong> ${formattedResult4}</p>
+                            <div class="comparison-note">
+                                <strong>یادداشت:</strong> ${calc.note || '—'}
+                            </div>
                         `;
                     } else {
                         comparisonItem.innerHTML = `
