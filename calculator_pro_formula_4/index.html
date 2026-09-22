@@ -527,10 +527,11 @@
             padding: 4px;
             border-radius: 3px;
         }
+        /* کادر یادداشت کارت موبایل: بدون کلمه یادداشت، اندازه متناسب با محتوا */
         .card-note {
             grid-column: 1 / -1;
             margin-top: 5px;
-            padding: 8px;
+            padding: 6px 8px;
             background-color: var(--container-bg);
             border-radius: 4px;
             border: 1px solid var(--input-border);
@@ -538,12 +539,9 @@
             line-height: 1.5;
             white-space: pre-wrap;
             word-break: break-word;
-        }
-        .card-note-label {
-            font-size: 12px;
-            color: var(--text-color);
-            opacity: 0.7;
-            margin-bottom: 3px;
+            display: inline-block;
+            width: fit-content;
+            max-width: 100%;
         }
         .card-actions {
             margin-top: 10px;
@@ -729,9 +727,10 @@
             border-radius: 5px;
             border: 1px solid var(--input-border);
         }
+        /* کادر یادداشت مقایسه: بدون کلمه یادداشت، اندازه متناسب با محتوا */
         .comparison-note {
             margin-top: 10px;
-            padding: 8px;
+            padding: 6px 8px;
             background-color: var(--container-bg);
             border-radius: 4px;
             border: 1px solid var(--input-border);
@@ -739,6 +738,9 @@
             line-height: 1.5;
             white-space: pre-wrap;
             word-break: break-word;
+            display: inline-block;
+            width: fit-content;
+            max-width: 100%;
         }
         .comparison-dates-container {
             margin: 15px 0;
@@ -2712,10 +2714,7 @@
                                 <div class="card-label">فرمول ۴</div>
                                 <div class="card-value" data-value="${formattedResult4}">${formattedResult4}</div>
                             </div>
-                            <div class="card-note">
-                                <div class="card-note-label">یادداشت:</div>
-                                <div>${calc.note || '—'}</div>
-                            </div>
+                            ${calc.note ? `<div class="card-note">${calc.note}</div>` : ''}
                         </div>
                         <div class="card-actions">
                             <button class="action-btn edit-calculation" data-id="${calc.id}">ویرایش</button>
@@ -2996,9 +2995,7 @@
                             <p><strong>فرمول ۲:</strong> ${formattedResult2}</p>
                             <p><strong>فرمول ۳:</strong> ${formattedResult3}</p>
                             <p><strong>فرمول ۴:</strong> ${formattedResult4}</p>
-                            <div class="comparison-note">
-                                <strong>یادداشت:</strong> ${calc.note || '—'}
-                            </div>
+                            ${calc.note ? `<div class="comparison-note">${calc.note}</div>` : ''}
                         `;
                     } else {
                         comparisonItem.innerHTML = `
