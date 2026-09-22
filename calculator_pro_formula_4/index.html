@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator Pro Formula 4</title>
-    <!-- لینک فونت وزیرمتن اضافه شد -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <style>
         :root {
@@ -32,14 +31,6 @@
             --category-bg: #e8f4fd;
             --category-border: #3498db;
         }
-        /* اعمال فونت وزیرمتن روی تمام المان‌ها */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Vazirmatn', sans-serif; /* فونت جدید جایگزین شد */
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
         .dark-mode {
             --bg-color: #1a1a1a;
             --container-bg: #2d2d2d;
@@ -64,6 +55,13 @@
             --menu-border: #555;
             --category-bg: #2a4d6e;
             --category-border: #3498db;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
         body {
             font-family: 'Vazirmatn', sans-serif;
@@ -94,7 +92,7 @@
         h1, h2, h3 {
             color: var(--header-color);
             margin: 0 0 15px 0;
-            font-weight: 700; /* کمی ضخیم‌تر برای تیترها */
+            font-weight: 700;
         }
         .theme-toggle {
             background: none;
@@ -270,7 +268,7 @@
             border: 1px solid var(--input-border);
             border-radius: 4px;
             box-sizing: border-box;
-            font-size: 16px; /* سایز استاندارد برای موبایل */
+            font-size: 16px;
             background-color: var(--container-bg);
             color: var(--text-color);
             transition: border-color 0.3s;
@@ -527,7 +525,6 @@
             padding: 4px;
             border-radius: 3px;
         }
-        /* کادر یادداشت کارت موبایل: بدون کلمه یادداشت، اندازه متناسب با محتوا */
         .card-note {
             grid-column: 1 / -1;
             margin-top: 5px;
@@ -548,6 +545,130 @@
             display: flex;
             justify-content: flex-end;
             gap: 5px;
+        }
+        .calc-type-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--result-bg);
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+        }
+        .calc-type-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .calc-type-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .calc-type-btn {
+            padding: 8px 18px;
+            border: 2px solid var(--input-border);
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .calc-type-btn:hover {
+            border-color: var(--button-primary);
+        }
+        .calc-type-btn.active {
+            background-color: var(--button-primary);
+            color: white;
+            border-color: var(--button-primary);
+        }
+        .calc-type-manage-btn {
+            padding: 6px 12px;
+            font-size: 13px;
+            background-color: var(--button-primary);
+        }
+        .calc-type-manage-btn:hover {
+            background-color: var(--button-primary-hover);
+        }
+        .modal-list {
+            margin: 15px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .modal-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            background-color: var(--result-bg);
+            border-radius: 4px;
+            border: 1px solid var(--input-border);
+        }
+        .modal-list-item-name {
+            font-weight: 500;
+        }
+        .modal-list-item-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .modal-list-item-actions button {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        .formula-comparison-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: var(--category-bg);
+            border-radius: 8px;
+            border: 1px solid var(--category-border);
+        }
+        .formula-comparison-section h3 {
+            margin-bottom: 15px;
+            color: var(--header-color);
+        }
+        .formula-comparison-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            padding: 10px;
+            background-color: var(--container-bg);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px solid var(--input-border);
+        }
+        .formula-comparison-item {
+            flex: 1;
+            min-width: 200px;
+        }
+        .formula-comparison-label {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-bottom: 3px;
+        }
+        .formula-comparison-value {
+            font-weight: bold;
+            font-size: 15px;
+            color: var(--header-color);
+        }
+        .formula-comparison-result {
+            font-weight: bold;
+            padding: 6px 10px;
+            border-radius: 4px;
+            background-color: var(--success-bg);
+            color: var(--success-color);
+            display: inline-block;
+        }
+        .formula-comparison-result.closer {
+            background-color: var(--success-bg);
+            color: var(--success-color);
+        }
+        .formula-comparison-result.farther {
+            background-color: var(--error-bg);
+            color: var(--error-color);
         }
         .category-section {
             margin: 8px 0;
@@ -727,7 +848,6 @@
             border-radius: 5px;
             border: 1px solid var(--input-border);
         }
-        /* کادر یادداشت مقایسه: بدون کلمه یادداشت، اندازه متناسب با محتوا */
         .comparison-note {
             margin-top: 10px;
             padding: 6px 8px;
@@ -947,7 +1067,7 @@
             }
             .action-btn {
                 padding: 3px 6px;
-                font-size: 11px; /* افزایش سایز برای خوانایی بهتر در موبایل */
+                font-size: 11px;
                 min-width: 40px;
             }
             .move-buttons {
@@ -956,7 +1076,7 @@
             }
             .move-btn {
                 padding: 2px 3px;
-                font-size: 10px; /* افزایش سایز برای خوانایی بهتر در موبایل */
+                font-size: 10px;
                 min-width: 20px;
             }
             .icon-btn {
@@ -975,6 +1095,16 @@
             .theme-toggle {
                 left: 0;
                 padding: 8px 10px;
+            }
+            .calc-type-options {
+                justify-content: center;
+            }
+            .formula-comparison-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .formula-comparison-item {
+                min-width: auto;
             }
         }
         @media (max-width: 480px) {
@@ -1005,16 +1135,16 @@
                 padding: 4px 5px;
             }
             .currency-pair-name {
-                font-size: 12px; /* اصلاح شده برای خوانایی بهتر */
+                font-size: 12px;
             }
             .action-btn {
                 padding: 2px 4px;
-                font-size: 11px; /* اصلاح شده برای خوانایی بهتر */
+                font-size: 11px;
                 min-width: 35px;
             }
             .move-btn {
                 padding: 1px 2px;
-                font-size: 10px; /* اصلاح شده برای خوانایی بهتر */
+                font-size: 10px;
                 min-width: 18px;
             }
             .mobile-menu-toggle {
@@ -1111,7 +1241,7 @@
     font-family: 'Vazirmatn', sans-serif;
     border-radius: 10px;
     backdrop-filter: blur(5px);
-    font-size: 14px; /* دسکتاپ */
+    font-size: 14px;
     font-weight: 500;
     display: block;
     margin: 30px auto;
@@ -1125,11 +1255,10 @@
 }
 @media only screen and (max-width: 768px) {
     .signature {
-        font-size: 12px; /* موبایل */
+        font-size: 12px;
         padding: 15px;
     }
 }
-
     .dark-mode .signature {
         background: rgba(255, 255, 255, 0.1);
         color: white;
@@ -1190,6 +1319,14 @@
                 <label for="calculationDate">تاریخ محاسبه:</label>
                 <input type="date" id="calculationDate">
             </div>
+            <div class="calc-type-container">
+                <div class="calc-type-header">
+                    <label style="margin: 0;">نوع محاسبه:</label>
+                    <button type="button" class="calc-type-manage-btn" id="manageCalcTypesBtn">مدیریت انواع محاسبه</button>
+                </div>
+                <div class="calc-type-options" id="calcTypeOptions">
+                </div>
+            </div>
             <div class="input-group">
                 <div class="input-row desktop-input-order">
                     <div class="input-container">
@@ -1245,7 +1382,7 @@
                 <ul>
                     <li>برای کپی کردن نتیجه، روی آن کلیک کنید</li>
                     <li>برای تغییر حالت تاریک/روشن، روی آیکون ماه/خورشید، کلیک کنید</li>
-                    <li>حتماً جفت ارز و تاریخ را انتخاب کنید تا داده ذخیره شود</li>
+                    <li>حتماً جفت ارز، تاریخ و نوع محاسبه را انتخاب کنید تا داده ذخیره شود</li>
                     <li>نتایج به ترتیب از کوچک به بزرگ مرتب شده‌اند</li>
                     <li><span style="color: var(--error-color);">قرمز: زیر کف فعلی</span> - <span style="color: var(--success-color);">سبز: بالای سقف فعلی</span></li>
                 </ul>
@@ -1265,12 +1402,14 @@
                     <input type="date" id="filterDate">
                 </div>
             </div>
+            <div id="historyFormulaComparison"></div>
             <div class="table-container">
                 <table id="calculationsTable">
                     <thead>
                         <tr>
                             <th>تاریخ</th>
                             <th>جفت ارز</th>
+                            <th>نوع محاسبه</th>
                             <th>عدد سقف</th>
                             <th>عدد کف</th>
                             <th>سقف فعلی</th>
@@ -1318,6 +1457,7 @@
                 <button id="compareDataBtn">مقایسه داده‌ها</button>
                 <button id="clearComparisonBtn" class="danger">پاک کردن</button>
             </div>
+            <div id="comparisonFormulaComparison"></div>
             <div id="comparisonResults" class="comparison-container">
                 </div>
         </div>
@@ -1388,6 +1528,41 @@
         </div>
         <div class="signature">
             طراحی و ساخت توسط ❤️ سعید شیخ احمد صفاری
+        </div>
+    </div>
+    <div class="modal" id="manageCalcTypesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>مدیریت انواع محاسبه</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="newCalcTypeName">افزودن نوع محاسبه جدید:</label>
+                <input type="text" id="newCalcTypeName" placeholder="نام نوع محاسبه">
+                <button id="addCalcTypeBtn" class="success" style="margin-top: 5px;">افزودن</button>
+            </div>
+            <h4>انواع محاسبه موجود:</h4>
+            <div class="modal-list" id="calcTypesList">
+            </div>
+            <div class="button-group">
+                <button class="close-modal">بستن</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="editCalcTypeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>ویرایش نوع محاسبه</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="editCalcTypeInput">نام نوع محاسبه:</label>
+                <input type="text" id="editCalcTypeInput">
+            </div>
+            <div class="button-group">
+                <button id="saveCalcTypeEditBtn" class="success">ذخیره تغییرات</button>
+                <button class="close-modal danger">انصراف</button>
+            </div>
         </div>
     </div>
     <div class="modal" id="editCurrencyPairModal">
@@ -1508,17 +1683,20 @@
         // پایگاه داده
         let db;
         const DB_NAME = 'CurrencyCalculatorDB_V2';
-        const DB_VERSION = 2;
+        const DB_VERSION = 3; // افزایش نسخه برای ساخت جدول calc_types
         // نام جداول پایگاه داده
         const STORE_CALCULATIONS = 'calculations';
         const STORE_CURRENCY_PAIRS = 'currency_pairs';
         const STORE_CATEGORIES = 'categories';
         const STORE_SETTINGS = 'settings';
+        const STORE_CALC_TYPES = 'calc_types';
         // متغیرهای عمومی
         let currentEditId = null;
         let deleteCallback = null;
         let currentEditType = null;
         let currentDeleteCategoryId = null;
+        let currentEditCalcTypeId = null;
+        let selectedCalcType = null;
         // متغیرهای اسکرول پیشرفته
         let isDragging = false;
         let startX = 0;
@@ -1530,15 +1708,11 @@
             setupAdvancedScroll();
             setupTableScroll();
         });
-        // تابع تنظیم اسکرول پیشرفته برای تب‌ها
         function setupAdvancedScroll() {
-            // Wheel event برای اسکرول افقی با چرخ موس
             tabs.addEventListener('wheel', handleWheel, { passive: false });
-            // Drag events
             tabs.addEventListener('mousedown', startDrag);
             document.addEventListener('mousemove', doDrag);
             document.addEventListener('mouseup', endDrag);
-            // Hover روی تب‌ها برای تغییر cursor
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('mouseenter', () => {
                     if (isDesktopOrTablet) {
@@ -1551,7 +1725,6 @@
                     }
                 });
             });
-            // به‌روزرسانی تشخیص اندازه صفحه
             window.addEventListener('resize', () => {
                 isDesktopOrTablet = window.matchMedia('(min-width: 769px)').matches;
                 if (!isDesktopOrTablet) {
@@ -1562,15 +1735,12 @@
                 }
             });
         }
-        // تابع wheel برای تب‌ها
         function handleWheel(e) {
             if (!isDesktopOrTablet) return;
             e.preventDefault();
             const delta = e.deltaY > 0 ? 50 : -50;
-            // سرعت اسکرول
             tabs.scrollLeft += delta;
         }
-        // Drag functions برای تب‌ها
         function startDrag(e) {
             if (!isDesktopOrTablet) return;
             isDragging = true;
@@ -1584,7 +1754,6 @@
             e.preventDefault();
             const x = e.pageX - tabs.offsetLeft;
             const walk = (x - startX) * 2;
-            // سرعت drag
             tabs.scrollLeft = scrollLeft - walk;
         }
         function endDrag() {
@@ -1593,26 +1762,21 @@
                 tabs.style.cursor = 'grab';
             }
         }
-        // تابع تنظیم اسکرول پیشرفته برای جدول تاریخچه
         function setupTableScroll() {
             const tableContainer = document.querySelector('.table-container');
             if (!tableContainer) return;
             let isDraggingTable = false;
             let startXTable = 0;
             let scrollLeftTable = 0;
-            // Wheel event: هندل کردن هر دو جهت اسکرول (عمودی و افقی) بدون تداخل
             tableContainer.addEventListener('wheel', (e) => {
-                e.preventDefault(); // جلوگیری از اسکرول پیش‌فرض صفحه
+                e.preventDefault();
                 if (e.deltaY !== 0) {
-                    // اسکرول عمودی: مستقیم به scrollTop
                     tableContainer.scrollTop += e.deltaY;
                 }
                 if (e.deltaX !== 0) {
-                    // اسکرول افقی: مستقیم به scrollLeft
                     tableContainer.scrollLeft += e.deltaX;
                 }
             }, { passive: false });
-            // شروع drag برای اسکرول افقی
             tableContainer.addEventListener('mousedown', (e) => {
                 if (!isDesktopOrTablet) return;
                 isDraggingTable = true;
@@ -1621,15 +1785,13 @@
                 tableContainer.style.cursor = 'grabbing';
                 e.preventDefault();
             });
-            // در حین drag
             document.addEventListener('mousemove', (e) => {
                 if (!isDraggingTable) return;
                 e.preventDefault();
                 const x = e.pageX - tableContainer.offsetLeft;
-                const walk = (x - startXTable) * 2; // سرعت drag (قابل تنظیم)
+                const walk = (x - startXTable) * 2;
                 tableContainer.scrollLeft = scrollLeftTable - walk;
             });
-            // پایان drag
             document.addEventListener('mouseup', () => {
                 isDraggingTable = false;
                 if (isDesktopOrTablet) {
@@ -1642,7 +1804,6 @@
                     tableContainer.style.cursor = 'grab';
                 }
             });
-            // برای تبلت/لمس: swipe افقی طبیعی
             tableContainer.addEventListener('touchstart', (e) => {
                 startXTable = e.touches[0].pageX - tableContainer.offsetLeft;
                 scrollLeftTable = tableContainer.scrollLeft;
@@ -1651,9 +1812,8 @@
                 const x = e.touches[0].pageX - tableContainer.offsetLeft;
                 const walk = (x - startXTable) * 2;
                 tableContainer.scrollLeft = scrollLeftTable - walk;
-                e.preventDefault(); // جلوگیری از اسکرول صفحه
+                e.preventDefault();
             }, { passive: false });
-            // به‌روزرسانی cursor بر اساس اندازه صفحه
             window.addEventListener('resize', () => {
                 isDesktopOrTablet = window.matchMedia('(min-width: 769px)').matches;
                 tableContainer.style.cursor = isDesktopOrTablet ? 'grab' : 'default';
@@ -1662,9 +1822,7 @@
                 }
             });
         }
-        // تابع کپی کردن متن (بهبود یافته برای جدول و کارت‌ها)
         function copyToClipboard(element, text = null) {
-            // تغییر اولویت: اگر dataset.value موجود باشد، از آن استفاده کن (فقط عدد برای خروجی‌ها)
             const textToCopy = text || (element.dataset.value || element.textContent.trim());
             if (!textToCopy) return;
             navigator.clipboard.writeText(textToCopy).then(() => {
@@ -1687,7 +1845,6 @@
                 }, 1500);
             });
         }
-        // تابع نمایش اعلان
         function showNotification(message, type = 'success', duration = 3000) {
             const existingNotification = document.querySelector('.notification');
             if (existingNotification) {
@@ -1711,9 +1868,9 @@
                 }, duration);
             }
         }
-        // تابع مقداردهی اولیه برنامه
         async function initializeApp() {
             await initializeDatabase();
+            await loadCalcTypes();
             await loadCategories();
             await loadCurrencyPairs();
             setupEventListeners();
@@ -1721,39 +1878,32 @@
             loadCalculationsTable();
             document.getElementById('filterCurrencyPair').addEventListener('change', loadCalculationsTable);
             document.getElementById('filterDate').addEventListener('change', loadCalculationsTable);
-            // همگام‌سازی فیلدهای ورودی دسکتاپ و موبایل
             syncInputFields();
         }
-        // تابع همگام‌سازی فیلدهای ورودی دسکتاپ و موبایل
         function syncInputFields() {
-            // فیلدهای دسکتاپ
             const desktopFields = {
                 y1: document.getElementById('input_y1'),
                 y2: document.getElementById('input_y2'),
                 currentHigh: document.getElementById('input_current_high'),
                 currentLow: document.getElementById('input_current_low')
             };
-            // فیلدهای موبایل
             const mobileFields = {
                 y1: document.getElementById('input_y1_mobile'),
                 y2: document.getElementById('input_y2_mobile'),
                 currentHigh: document.getElementById('input_current_high_mobile'),
                 currentLow: document.getElementById('input_current_low_mobile')
             };
-            // همگام‌سازی از دسکتاپ به موبایل
             Object.keys(desktopFields).forEach(key => {
                 desktopFields[key].addEventListener('input', function() {
                     mobileFields[key].value = this.value;
                 });
             });
-            // همگام‌سازی از موبایل به دسکتاپ
             Object.keys(mobileFields).forEach(key => {
                 mobileFields[key].addEventListener('input', function() {
                     desktopFields[key].value = this.value;
                 });
             });
         }
-        // تابع راه‌اندازی پایگاه داده
         function initializeDatabase() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -1797,10 +1947,17 @@
                             keyPath: 'id'
                         });
                     }
+                    if (!db.objectStoreNames.contains(STORE_CALC_TYPES)) {
+                        const calcTypesStore = db.createObjectStore(STORE_CALC_TYPES, { 
+                            keyPath: 'id', 
+                            autoIncrement: true 
+                        });
+                        calcTypesStore.createIndex('name', 'name', { unique: true });
+                        calcTypesStore.createIndex('order', 'order', { unique: false });
+                    }
                 };
             });
         }
-        // تابع ذخیره داده در پایگاه داده
         function saveToDatabase(storeName, data) {
             return new Promise((resolve, reject) => {
                 const transaction = db.transaction([storeName], 'readwrite');
@@ -1810,7 +1967,15 @@
                 request.onerror = () => reject(request.error);
             });
         }
-        // تابع خواندن همه داده‌ها از پایگاه داده
+        function addToDatabase(storeName, data) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                const request = store.add(data);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
         function getAllFromDatabase(storeName, indexName = null, query = null) {
             return new Promise((resolve, reject) => {
                 const transaction = db.transaction([storeName], 'readonly');
@@ -1820,7 +1985,6 @@
                 request.onerror = () => reject(request.error);
             });
         }
-        // تابع حذف داده از پایگاه داده
         function deleteFromDatabase(storeName, id) {
             return new Promise((resolve, reject) => {
                 const transaction = db.transaction([storeName], 'readwrite');
@@ -1830,12 +1994,200 @@
                 request.onerror = () => reject(request.error);
             });
         }
-        // تابع تنظیم تاریخ پیش‌فرض به امروز (میلادی)
         function setDefaultDate() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('calculationDate').value = today;
         }
-        // تابع بارگذاری دسته‌بندی‌ها
+        // ==================== توابع مدیریت انواع محاسبه ====================
+        async function loadCalcTypes() {
+            try {
+                let calcTypes = await getAllFromDatabase(STORE_CALC_TYPES);
+                // اگر هیچ نوع محاسبه‌ای وجود نداشت، سه نوع پیش‌فرض اضافه کن
+                if (calcTypes.length === 0) {
+                    const defaultTypes = ['W/D', 'CENTER', 'CST'];
+                    for (let i = 0; i < defaultTypes.length; i++) {
+                        try {
+                            await addToDatabase(STORE_CALC_TYPES, {
+                                name: defaultTypes[i],
+                                order: i,
+                                createdAt: new Date().toISOString()
+                            });
+                        } catch (e) {
+                            // اگر قبلاً وجود داشت، نادیده بگیر
+                            console.warn('نوع محاسبه از قبل وجود دارد:', defaultTypes[i]);
+                        }
+                    }
+                    calcTypes = await getAllFromDatabase(STORE_CALC_TYPES);
+                }
+                calcTypes.sort((a, b) => (a.order || 0) - (b.order || 0));
+                renderCalcTypeOptions(calcTypes);
+                renderCalcTypesList(calcTypes);
+            } catch (error) {
+                console.error('خطا در بارگذاری انواع محاسبه:', error);
+            }
+        }
+        function renderCalcTypeOptions(calcTypes) {
+            const container = document.getElementById('calcTypeOptions');
+            container.innerHTML = '';
+            if (!selectedCalcType && calcTypes.length > 0) {
+                selectedCalcType = calcTypes[0].name;
+            }
+            calcTypes.forEach(ct => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'calc-type-btn' + (ct.name === selectedCalcType ? ' active' : '');
+                btn.textContent = ct.name;
+                btn.dataset.name = ct.name;
+                btn.addEventListener('click', function() {
+                    selectedCalcType = this.dataset.name;
+                    document.querySelectorAll('.calc-type-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+                container.appendChild(btn);
+            });
+        }
+        function renderCalcTypesList(calcTypes) {
+            const list = document.getElementById('calcTypesList');
+            list.innerHTML = '';
+            if (calcTypes.length === 0) {
+                list.innerHTML = '<p style="text-align: center; opacity: 0.7;">هیچ نوع محاسبه‌ای وجود ندارد.</p>';
+                return;
+            }
+            calcTypes.forEach(ct => {
+                const item = document.createElement('div');
+                item.className = 'modal-list-item';
+                item.innerHTML = `
+                    <span class="modal-list-item-name">${ct.name}</span>
+                    <div class="modal-list-item-actions">
+                        <button class="edit-calc-type" data-id="${ct.id}" data-name="${ct.name}">ویرایش</button>
+                        <button class="danger delete-calc-type" data-id="${ct.id}" data-name="${ct.name}">حذف</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+            list.querySelectorAll('.edit-calc-type').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const name = this.getAttribute('data-name');
+                    openEditCalcTypeModal(id, name);
+                });
+            });
+            list.querySelectorAll('.delete-calc-type').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const name = this.getAttribute('data-name');
+                    showConfirmDeleteModal(
+                        `آیا از حذف نوع محاسبه "${name}" مطمئن هستید؟`,
+                        () => deleteCalcType(id)
+                    );
+                });
+            });
+        }
+        async function addCalcType() {
+            const input = document.getElementById('newCalcTypeName');
+            const name = input.value.trim();
+            if (!name) {
+                showNotification('لطفاً نام نوع محاسبه را وارد کنید.', 'warning');
+                return;
+            }
+            try {
+                // بررسی وجود نام تکراری
+                const calcTypes = await getAllFromDatabase(STORE_CALC_TYPES);
+                const exists = calcTypes.some(ct => ct.name === name);
+                if (exists) {
+                    showNotification('این نوع محاسبه قبلاً وجود دارد.', 'error');
+                    return;
+                }
+                const maxOrder = calcTypes.length > 0 ? Math.max(...calcTypes.map(c => c.order || 0)) : -1;
+                await addToDatabase(STORE_CALC_TYPES, {
+                    name: name,
+                    order: maxOrder + 1,
+                    createdAt: new Date().toISOString()
+                });
+                input.value = '';
+                await loadCalcTypes();
+                showNotification('نوع محاسبه با موفقیت اضافه شد.');
+            } catch (error) {
+                console.error('خطا در اضافه کردن نوع محاسبه:', error);
+                if (error.name === 'ConstraintError') {
+                    showNotification('این نوع محاسبه قبلاً وجود دارد.', 'error');
+                } else {
+                    showNotification('خطا در اضافه کردن نوع محاسبه: ' + error.message, 'error');
+                }
+            }
+        }
+        function openEditCalcTypeModal(id, name) {
+            currentEditCalcTypeId = id;
+            document.getElementById('editCalcTypeInput').value = name;
+            document.getElementById('editCalcTypeModal').style.display = 'flex';
+        }
+        async function saveCalcTypeEdit() {
+            const newName = document.getElementById('editCalcTypeInput').value.trim();
+            if (!newName) {
+                showNotification('لطفاً نام نوع محاسبه را وارد کنید.', 'warning');
+                return;
+            }
+            try {
+                const calcTypes = await getAllFromDatabase(STORE_CALC_TYPES);
+                const existing = calcTypes.find(c => c.id === parseInt(currentEditCalcTypeId));
+                if (!existing) {
+                    showNotification('نوع محاسبه یافت نشد.', 'error');
+                    return;
+                }
+                // بررسی تکراری بودن نام جدید (به جز خود رکورد)
+                const duplicate = calcTypes.find(c => c.name === newName && c.id !== parseInt(currentEditCalcTypeId));
+                if (duplicate) {
+                    showNotification('این نام قبلاً استفاده شده است.', 'error');
+                    return;
+                }
+                const oldName = existing.name;
+                await saveToDatabase(STORE_CALC_TYPES, {
+                    ...existing,
+                    name: newName
+                });
+                // به‌روزرسانی رکوردهای محاسباتی که از این نوع استفاده می‌کردند
+                const calculations = await getAllFromDatabase(STORE_CALCULATIONS);
+                for (const calc of calculations) {
+                    if (calc.calcType === oldName) {
+                        await saveToDatabase(STORE_CALCULATIONS, {
+                            ...calc,
+                            calcType: newName
+                        });
+                    }
+                }
+                if (selectedCalcType === oldName) {
+                    selectedCalcType = newName;
+                }
+                closeModals();
+                await loadCalcTypes();
+                await loadCalculationsTable();
+                showNotification('نوع محاسبه با موفقیت ویرایش شد.');
+            } catch (error) {
+                console.error('خطا در ویرایش نوع محاسبه:', error);
+                if (error.name === 'ConstraintError') {
+                    showNotification('این نوع محاسبه قبلاً وجود دارد.', 'error');
+                } else {
+                    showNotification('خطا در ویرایش نوع محاسبه: ' + error.message, 'error');
+                }
+            }
+        }
+        async function deleteCalcType(id) {
+            try {
+                const calcTypes = await getAllFromDatabase(STORE_CALC_TYPES);
+                const target = calcTypes.find(c => c.id === parseInt(id));
+                await deleteFromDatabase(STORE_CALC_TYPES, parseInt(id));
+                if (target && selectedCalcType === target.name) {
+                    selectedCalcType = null;
+                }
+                await loadCalcTypes();
+                showNotification('نوع محاسبه با موفقیت حذف شد.');
+            } catch (error) {
+                console.error('خطا در حذف نوع محاسبه:', error);
+                showNotification('خطا در حذف نوع محاسبه.', 'error');
+            }
+        }
+        // ==================== پایان توابع مدیریت انواع محاسبه ====================
+
         async function loadCategories() {
             try {
                 let categories = await getAllFromDatabase(STORE_CATEGORIES);
@@ -1862,7 +2214,6 @@
                 console.error('خطا در بارگذاری دسته‌بندی‌ها:', error);
             }
         }
-        // تابع اضافه کردن دسته‌بندی جدید
         async function addCategory() {
             const newCategoryInput = document.getElementById('newCategoryName');
             const categoryName = newCategoryInput.value.trim();
@@ -1891,14 +2242,12 @@
                 }
             }
         }
-        // تابع باز کردن مودال ویرایش دسته‌بندی
         function openEditCategoryModal(id, name) {
             currentEditId = id;
             currentEditType = 'category';
             document.getElementById('editCategoryInput').value = name;
             document.getElementById('editCategoryModal').style.display = 'flex';
         }
-        // تابع ذخیره ویرایش دسته‌بندی
         async function saveCategoryEdit() {
             const newName = document.getElementById('editCategoryInput').value.trim();
             if (!newName) {
@@ -1927,19 +2276,16 @@
                 }
             }
         }
-        // تابع باز کردن مودال حذف دسته‌بندی
         function openDeleteCategoryModal(id, name) {
             currentDeleteCategoryId = id;
             document.getElementById('deleteCategoryMessage').textContent = 
                 `لطفاً گزینه حذف را برای دسته‌بندی "${name}" انتخاب کنید:`;
             document.getElementById('deleteCategoryModal').style.display = 'flex';
         }
-        // تابع حذف دسته‌بندی
         async function deleteCategory() {
             const deleteOption = document.querySelector('input[name="deleteOption"]:checked').value;
             try {
                 if (deleteOption === 'categoryOnly') {
-                    // فقط دسته‌بندی حذف شود، جفت ارزها بدون دسته‌بندی می‌مانند
                     const currencyPairs = await getAllFromDatabase(STORE_CURRENCY_PAIRS);
                     const pairsInCategory = currencyPairs.filter(p => p.categoryId === parseInt(currentDeleteCategoryId));
                     for (const pair of pairsInCategory) {
@@ -1951,7 +2297,6 @@
                     await deleteFromDatabase(STORE_CATEGORIES, parseInt(currentDeleteCategoryId));
                     showNotification('دسته‌بندی حذف شد. جفت ارزها بدون دسته‌بندی باقی ماندند.');
                 } else if (deleteOption === 'categoryWithPairs') {
-                    // دسته‌بندی و تمام جفت ارزهای داخل آن حذف شوند
                     const currencyPairs = await getAllFromDatabase(STORE_CURRENCY_PAIRS);
                     const pairsInCategory = currencyPairs.filter(p => p.categoryId === parseInt(currentDeleteCategoryId));
                     for (const pair of pairsInCategory) {
@@ -1968,7 +2313,6 @@
                 showNotification('خطا در حذف دسته‌بندی.', 'error');
             }
         }
-        // تابع بارگذاری جفت ارزها با مرتب‌سازی
         async function loadCurrencyPairs() {
             try {
                 let currencyPairs = await getAllFromDatabase(STORE_CURRENCY_PAIRS);
@@ -1987,7 +2331,6 @@
                 while (comparisonCurrencyPair.children.length > 1) {
                     comparisonCurrencyPair.removeChild(comparisonCurrencyPair.lastChild);
                 }
-                // فقط نام جفت ارز بدون دسته‌بندی نمایش داده می‌شود
                 currencyPairs.forEach(pair => {
                     const option1 = document.createElement('option');
                     option1.value = pair.name;
@@ -2007,7 +2350,6 @@
                 console.error('خطا در بارگذاری جفت ارزها:', error);
             }
         }
-        // تابع به‌روزرسانی لیست جفت ارزها با قابلیت‌های جدید
         function updateCurrencyPairsList(currencyPairs, categories) {
             const currencyPairsList = document.getElementById('currencyPairsList');
             currencyPairsList.innerHTML = '';
@@ -2015,7 +2357,6 @@
                 currencyPairsList.innerHTML = '<p>هیچ دسته‌بندی یا جفت ارزی وجود ندارد.</p>';
                 return;
             }
-            // نمایش دسته‌بندی‌ها
             categories.forEach(category => {
                 const categoryPairs = currencyPairs.filter(p => p.categoryId === category.id);
                 const categorySection = document.createElement('div');
@@ -2058,11 +2399,9 @@
                         </div>
                     `;
                     categoryPairsContainer.appendChild(pairElement);
-                    // اضافه کردن event listeners برای درگ اند دراپ
                     setupDragAndDrop(pairElement);
                 });
             });
-            // نمایش جفت ارزهای بدون دسته‌بندی
             const uncategorizedPairs = currencyPairs.filter(p => !p.categoryId);
             if (uncategorizedPairs.length > 0) {
                 const uncategorizedSection = document.createElement('div');
@@ -2103,7 +2442,6 @@
             }
             setupAllEventListeners();
         }
-        // تابع تنظیم درگ اند دراپ برای یک آیتم
         function setupDragAndDrop(element) {
             let dragItem = null;
             element.addEventListener('dragstart', function(e) {
@@ -2138,22 +2476,17 @@
                 await reorderPairs(draggedId, targetId, categoryId);
             });
         }
-        // تابع مرتب‌سازی مجدد جفت ارزها
         async function reorderPairs(draggedId, targetId, categoryId) {
             try {
                 let currencyPairs = await getAllFromDatabase(STORE_CURRENCY_PAIRS);
-                // پیدا کردن موقعیت‌ها
                 const draggedIndex = currencyPairs.findIndex(p => p.id === draggedId);
                 const targetIndex = currencyPairs.findIndex(p => p.id === targetId);
                 if (draggedIndex === -1 || targetIndex === -1) return;
-                // حذف آیتم کشیده شده و قرار دادن آن در موقعیت جدید
                 const [draggedItem] = currencyPairs.splice(draggedIndex, 1);
                 currencyPairs.splice(targetIndex, 0, draggedItem);
-                // به‌روزرسانی order برای همه آیتم‌ها
                 currencyPairs.forEach((pair, index) => {
                     pair.order = index;
                 });
-                // ذخیره تغییرات
                 for (const pair of currencyPairs) {
                     await saveToDatabase(STORE_CURRENCY_PAIRS, pair);
                 }
@@ -2164,7 +2497,6 @@
                 showNotification('خطا در مرتب‌سازی جفت ارزها.', 'error');
             }
         }
-        // تابع نمایش/مخفی کردن دسته‌بندی
         function toggleCategory(categoryId) {
             const pairsContainer = document.getElementById(`category-${categoryId}`);
             const collapseIcon = pairsContainer.parentElement.querySelector('.collapse-icon');
@@ -2176,7 +2508,6 @@
                 collapseIcon.textContent = '▶';
             }
         }
-        // تابع جابجایی جفت ارز با دکمه‌ها
         async function moveCurrencyPair(id, direction) {
             try {
                 let currencyPairs = await getAllFromDatabase(STORE_CURRENCY_PAIRS);
@@ -2184,13 +2515,11 @@
                 const currentIndex = currencyPairs.findIndex(p => p.id === id);
                 if (currentIndex === -1) return;
                 if (direction === 'up' && currentIndex > 0) {
-                    const tempOrder = currencyPairs[currentIndex].order ||
-                        currentIndex;
+                    const tempOrder = currencyPairs[currentIndex].order || currentIndex;
                     currencyPairs[currentIndex].order = currencyPairs[currentIndex - 1].order || currentIndex - 1;
                     currencyPairs[currentIndex - 1].order = tempOrder;
                 } else if (direction === 'down' && currentIndex < currencyPairs.length - 1) {
-                    const tempOrder = currencyPairs[currentIndex].order ||
-                        currentIndex;
+                    const tempOrder = currencyPairs[currentIndex].order || currentIndex;
                     currencyPairs[currentIndex].order = currencyPairs[currentIndex + 1].order || currentIndex + 1;
                     currencyPairs[currentIndex + 1].order = tempOrder;
                 } else {
@@ -2206,7 +2535,6 @@
                 showNotification('خطا در جابجایی جفت ارز.', 'error');
             }
         }
-        // تابع اضافه کردن جفت ارز جدید
         async function addCurrencyPair() {
             const newCurrencyPairInput = document.getElementById('newCurrencyPair');
             const categorySelect = document.getElementById('currencyPairCategory');
@@ -2238,7 +2566,6 @@
                 }
             }
         }
-        // تابع باز کردن مودال ویرایش جفت ارز
         function openEditCurrencyPairModal(id, name, categoryId) {
             currentEditId = id;
             currentEditType = 'currencyPair';
@@ -2246,7 +2573,6 @@
             document.getElementById('editCurrencyPairCategory').value = categoryId || '';
             document.getElementById('editCurrencyPairModal').style.display = 'flex';
         }
-        // تابع ذخیره ویرایش جفت ارز
         async function saveCurrencyPairEdit() {
             const newName = document.getElementById('editCurrencyPairInput').value.trim();
             const categoryId = document.getElementById('editCurrencyPairCategory').value ? parseInt(document.getElementById('editCurrencyPairCategory').value) : null;
@@ -2276,7 +2602,6 @@
                 }
             }
         }
-        // تابع حذف جفت ارز
         async function deleteCurrencyPair(id) {
             try {
                 await deleteFromDatabase(STORE_CURRENCY_PAIRS, parseInt(id));
@@ -2287,7 +2612,6 @@
                 showNotification('خطا در حذف جفت ارز.', 'error');
             }
         }
-        // تابع تنظیم event listenerها برای بخش مدیریت جفت ارزها
         function setupAllEventListeners() {
             document.querySelectorAll('.edit-category').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -2335,16 +2659,12 @@
             });
         }
 
-        // تابع جدید: تجزیه و تحلیل ساختار نقطه‌گذاری ورودی
         function analyzeInputFormat(input) {
             if (!input) {
                 return { hasDot: false, leftPart: '', rightPart: '', totalLength: 0 };
             }
-            
             const dotIndex = input.indexOf('.');
-            
             if (dotIndex === -1) {
-                // بدون نقطه
                 return { 
                     hasDot: false, 
                     leftPart: input, 
@@ -2354,56 +2674,42 @@
                     rightLength: 0
                 };
             } else {
-                // با نقطه
                 const leftPart = input.substring(0, dotIndex);
                 const rightPart = input.substring(dotIndex + 1);
                 return { 
                     hasDot: true, 
                     leftPart: leftPart, 
                     rightPart: rightPart, 
-                    totalLength: input.length - 1, // بدون نقطه
+                    totalLength: input.length - 1,
                     leftLength: leftPart.length,
                     rightLength: rightPart.length
                 };
             }
         }
-
-        // تابع جدید: تبدیل عدد به فرمت نقطه‌گذاری مشخص
         function formatNumberWithDotPattern(number, format) {
             if (!format.hasDot) {
                 return number.toString();
             }
-            
             const decimals = format.rightLength || 0;
             if (decimals === 0) {
                 return number.toString();
             }
-            
             let numStr = number.toString();
-            // اطمینان از اینکه حداقل به اندازه تعداد اعشار، رقم داریم
             if (numStr.length <= decimals) {
                 numStr = numStr.padStart(decimals + 1, '0');
             }
-            
             const intPart = numStr.slice(0, -decimals);
             const fracPart = numStr.slice(-decimals);
-            
             return intPart + '.' + fracPart;
         }
-
-        // تابع جدید: تجزیه عدد ورودی با حفظ ساختار نقطه
         function parseNumberInput(input) {
             const format = analyzeInputFormat(input);
             const numericValue = parseInt(input.replace('.', '')) || 0;
             return { numericValue, format };
         }
-
-        // تابع جدید: فرمت کردن عدد خروجی بر اساس ساختار ورودی
         function formatNumberBasedOnInput(number, inputFormat) {
             return formatNumberWithDotPattern(number, inputFormat);
         }
-
-        // تابع ایجاد خروجی قابل کلیک - بازنویسی شده
         function createClickableOutput(label, value, currentLow, currentHigh, inputFormat) {
             let colorClass = '';
             let suffix = '';
@@ -2414,11 +2720,9 @@
                 colorClass = 'above-high';
                 suffix = ' ↑ بالای سقف فعلی';
             }
-            
             const displayValue = formatNumberBasedOnInput(value, inputFormat);
             const fullDisplayText = `${label}: ${displayValue}${suffix}`;
             const textToCopy = displayValue;
-            
             const div = document.createElement('div');
             div.className = `result ${colorClass}`;
             div.textContent = fullDisplayText;
@@ -2429,11 +2733,8 @@
             });
             return div;
         }
-
-        // تابع محاسبه و ذخیره - منطق جدید
         async function calculateAndSave() {
             try {
-                // استفاده از فیلدهای دسکتاپ برای محاسبه
                 const y1Value = document.getElementById('input_y1').value.trim();
                 const y2Value = document.getElementById('input_y2').value.trim();
                 const currentHighValue = document.getElementById('input_current_high').value.trim();
@@ -2451,8 +2752,10 @@
                 if (!calculationDate) {
                     throw new Error("لطفاً تاریخ را انتخاب کنید!");
                 }
+                if (!selectedCalcType) {
+                    throw new Error("لطفاً نوع محاسبه را انتخاب کنید!");
+                }
 
-                // تجزیه اعداد ورودی با حفظ ساختار نقطه
                 const y1Parsed = parseNumberInput(y1Value);
                 const y2Parsed = parseNumberInput(y2Value);
                 const currentHighParsed = parseNumberInput(currentHighValue);
@@ -2463,7 +2766,6 @@
                 const currentHigh = currentHighParsed.numericValue;
                 const currentLow = currentLowParsed.numericValue;
 
-                // پاک کردن نتایج قبلی
                 const resultsList = document.getElementById('results_list');
                 const errorMessage = document.getElementById('error_message');
                 resultsList.innerHTML = '';
@@ -2476,13 +2778,11 @@
                     throw new Error("لطفاً فقط اعداد مثبت وارد کنید.");
                 }
 
-                // محاسبه فرمول‌ها - منطق جدید
                 const result1 = Math.floor((Math.sqrt(y1) - 1) ** 2);
                 const result2 = Math.floor((Math.sqrt(y1) - 0.5) ** 2);
                 const result3 = Math.floor((Math.sqrt(y2) + 1) ** 2);
                 const result4 = Math.floor((Math.sqrt(y2) + 0.5) ** 2);
 
-                // ایجاد آرایه نتایج و مرتب‌سازی
                 const results = [
                     { label: "فرمول ۱", value: result1 },
                     { label: "فرمول ۲", value: result2 },
@@ -2490,10 +2790,8 @@
                     { label: "فرمول ۴", value: result4 }
                 ];
 
-                // مرتب‌سازی از کوچک به بزرگ
                 results.sort((a, b) => a.value - b.value);
 
-                // نمایش نتایج مرتب‌شده با حفظ ساختار نقطه‌گذاری
                 results.forEach((result, index) => {
                     const newLabel = `${index + 1}. (از ${result.label})`;
                     const inputFormat = index < 2 ? y1Parsed.format : y2Parsed.format;
@@ -2507,16 +2805,15 @@
                     resultsList.appendChild(resultElement);
                 });
 
-                // اگر در حال ویرایش هستیم، رکورد قدیم را حذف می‌کنیم
                 if (currentEditId) {
                     await deleteFromDatabase(STORE_CALCULATIONS, currentEditId);
                     currentEditId = null;
                 }
 
-                // ذخیره در پایگاه داده
                 await saveToDatabase(STORE_CALCULATIONS, {
                     date: calculationDate,
                     currencyPair: currencyPair,
+                    calcType: selectedCalcType,
                     inputY1: y1,
                     inputY2: y2,
                     inputCurrentHigh: currentHigh,
@@ -2539,52 +2836,154 @@
                 showNotification(error.message, 'error');
             }
         }
-
-        // تابع ریست کردن فیلدها
         function resetFields() {
-            // ریست فیلدهای دسکتاپ
             document.getElementById('input_y1').value = '';
             document.getElementById('input_current_high').value = '';
             document.getElementById('input_y2').value = '';
             document.getElementById('input_current_low').value = '';
-            // ریست فیلدهای موبایل
             document.getElementById('input_y1_mobile').value = '';
             document.getElementById('input_y2_mobile').value = '';
             document.getElementById('input_current_high_mobile').value = '';
             document.getElementById('input_current_low_mobile').value = '';
-            // ریست یادداشت
             document.getElementById('input_note').value = '';
             const resultsList = document.getElementById('results_list');
             const errorMessage = document.getElementById('error_message');
             resultsList.innerHTML = '';
             errorMessage.style.display = 'none';
         }
-
-        // تابع باز کردن مودال ویرایش محاسبه
         function openEditCalculationModal(calculation) {
-            // فرمت کردن اعداد برای نمایش در فیلدها
             document.getElementById('currencyPairSelect').value = calculation.currencyPair;
             document.getElementById('calculationDate').value = calculation.date;
             document.getElementById('input_y1').value = formatNumberBasedOnInput(calculation.inputY1, calculation.inputFormatY1);
             document.getElementById('input_y2').value = formatNumberBasedOnInput(calculation.inputY2, calculation.inputFormatY2);
             document.getElementById('input_current_high').value = formatNumberBasedOnInput(calculation.inputCurrentHigh, calculation.inputFormatY1);
             document.getElementById('input_current_low').value = formatNumberBasedOnInput(calculation.inputCurrentLow, calculation.inputFormatY2);
-            
-            // همگام‌سازی با فیلدهای موبایل
             document.getElementById('input_y1_mobile').value = formatNumberBasedOnInput(calculation.inputY1, calculation.inputFormatY1);
             document.getElementById('input_y2_mobile').value = formatNumberBasedOnInput(calculation.inputY2, calculation.inputFormatY2);
             document.getElementById('input_current_high_mobile').value = formatNumberBasedOnInput(calculation.inputCurrentHigh, calculation.inputFormatY1);
             document.getElementById('input_current_low_mobile').value = formatNumberBasedOnInput(calculation.inputCurrentLow, calculation.inputFormatY2);
-            
-            // تنظیم یادداشت
             document.getElementById('input_note').value = calculation.note || '';
-            
+            if (calculation.calcType) {
+                selectedCalcType = calculation.calcType;
+                document.querySelectorAll('.calc-type-btn').forEach(b => {
+                    b.classList.toggle('active', b.dataset.name === calculation.calcType);
+                });
+            }
             switchTab('calculator');
             showNotification('داده‌ها به ماشین حساب منتقل شدند. پس از ویرایش، دکمه "محاسبه و ذخیره" را بزنید.', 'success', 5000);
             currentEditId = calculation.id;
         }
 
-        // تابع بارگذاری جدول محاسبات - به‌روزرسانی شده
+        async function computeFormula1Comparison(currencyPair, date) {
+            try {
+                const calculations = await getAllFromDatabase(STORE_CALCULATIONS);
+                const filtered = calculations.filter(c => 
+                    c.currencyPair === currencyPair && c.date === date
+                );
+                const wd = filtered.find(c => c.calcType === 'W/D');
+                const center = filtered.find(c => c.calcType === 'CENTER');
+                const cst = filtered.find(c => c.calcType === 'CST');
+                
+                if (!wd) return null;
+                
+                const result = {
+                    wd: wd.result1,
+                    center: center ? center.result1 : null,
+                    cst: cst ? cst.result1 : null,
+                    diffCenter: null,
+                    diffCst: null,
+                    closerTo: null
+                };
+                
+                if (center) {
+                    result.diffCenter = wd.result1 - center.result1;
+                }
+                if (cst) {
+                    result.diffCst = wd.result1 - cst.result1;
+                }
+                
+                if (result.diffCenter !== null && result.diffCst !== null) {
+                    const absCenter = Math.abs(result.diffCenter);
+                    const absCst = Math.abs(result.diffCst);
+                    if (absCenter < absCst) {
+                        result.closerTo = 'CENTER';
+                    } else if (absCst < absCenter) {
+                        result.closerTo = 'CST';
+                    } else {
+                        result.closerTo = 'EQUAL';
+                    }
+                } else if (result.diffCenter !== null) {
+                    result.closerTo = 'CENTER';
+                } else if (result.diffCst !== null) {
+                    result.closerTo = 'CST';
+                }
+                
+                return result;
+            } catch (error) {
+                console.error('خطا در محاسبه مقایسه فرمول 1:', error);
+                return null;
+            }
+        }
+        
+        function renderFormulaComparison(containerId, comparison) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            if (!comparison) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let closerText = '';
+            let closerClass = '';
+            if (comparison.closerTo === 'CENTER') {
+                closerText = 'W/D به CENTER نزدیک‌تر است';
+                closerClass = 'closer';
+            } else if (comparison.closerTo === 'CST') {
+                closerText = 'W/D به CST نزدیک‌تر است';
+                closerClass = 'closer';
+            } else if (comparison.closerTo === 'EQUAL') {
+                closerText = 'فاصله W/D تا CENTER و CST برابر است';
+                closerClass = '';
+            } else {
+                closerText = 'داده کافی برای مقایسه موجود نیست';
+                closerClass = 'farther';
+            }
+            
+            container.innerHTML = `
+                <div class="formula-comparison-section">
+                    <h3>مقایسه فرمول ۱ (W/D با CENTER و CST)</h3>
+                    <div class="formula-comparison-row">
+                        <div class="formula-comparison-item">
+                            <div class="formula-comparison-label">فرمول ۱ - W/D</div>
+                            <div class="formula-comparison-value">${comparison.wd !== null ? comparison.wd : '—'}</div>
+                        </div>
+                        <div class="formula-comparison-item">
+                            <div class="formula-comparison-label">فرمول ۱ - CENTER</div>
+                            <div class="formula-comparison-value">${comparison.center !== null ? comparison.center : '—'}</div>
+                        </div>
+                        <div class="formula-comparison-item">
+                            <div class="formula-comparison-label">فرمول ۱ - CST</div>
+                            <div class="formula-comparison-value">${comparison.cst !== null ? comparison.cst : '—'}</div>
+                        </div>
+                    </div>
+                    <div class="formula-comparison-row">
+                        <div class="formula-comparison-item">
+                            <div class="formula-comparison-label">تفاضل W/D - CENTER</div>
+                            <div class="formula-comparison-value">${comparison.diffCenter !== null ? comparison.diffCenter : '—'}</div>
+                        </div>
+                        <div class="formula-comparison-item">
+                            <div class="formula-comparison-label">تفاضل W/D - CST</div>
+                            <div class="formula-comparison-value">${comparison.diffCst !== null ? comparison.diffCst : '—'}</div>
+                        </div>
+                        <div class="formula-comparison-item">
+                            <div class="formula-comparison-label">نتیجه</div>
+                            <div class="formula-comparison-result ${closerClass}">${closerText}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         async function loadCalculationsTable() {
             try {
                 const currencyPair = document.getElementById('filterCurrencyPair').value;
@@ -2595,7 +2994,6 @@
                     calculations = calculations.filter(c => c.currencyPair === currencyPair);
                 }
                 
-                // رفع مشکل: فقط زمانی که تاریخ مشخص شده باشد، داده‌ها نمایش داده می‌شوند
                 if (date) {
                     calculations = calculations.filter(c => c.date === date);
                 } else {
@@ -2611,6 +3009,13 @@
                 tableBody.innerHTML = '';
                 mobileCardsContainer.innerHTML = '';
                 
+                if (currencyPair && date) {
+                    const comparison = await computeFormula1Comparison(currencyPair, date);
+                    renderFormulaComparison('historyFormulaComparison', comparison);
+                } else {
+                    document.getElementById('historyFormulaComparison').innerHTML = '';
+                }
+                
                 if (calculations.length === 0) {
                     noDataMessage.style.display = 'block';
                     return;
@@ -2619,7 +3024,6 @@
                 noDataMessage.style.display = 'none';
                 
                 calculations.forEach(calc => {
-                    // فرمت کردن اعداد برای نمایش در جدول
                     const formattedY1 = formatNumberBasedOnInput(calc.inputY1, calc.inputFormatY1);
                     const formattedY2 = formatNumberBasedOnInput(calc.inputY2, calc.inputFormatY2);
                     const formattedCurrentHigh = formatNumberBasedOnInput(calc.inputCurrentHigh, calc.inputFormatY1);
@@ -2633,6 +3037,7 @@
                     row.innerHTML = `
                         <td class="table-cell" data-copy="${formatDate(calc.date)}">${formatDate(calc.date)}</td>
                         <td class="table-cell" data-copy="${calc.currencyPair}">${calc.currencyPair}</td>
+                        <td class="table-cell" data-copy="${calc.calcType || '—'}">${calc.calcType || '—'}</td>
                         <td class="table-cell" data-copy="${formattedY1}">${formattedY1}</td>
                         <td class="table-cell" data-copy="${formattedY2}">${formattedY2}</td>
                         <td class="table-cell" data-copy="${formattedCurrentHigh}">${formattedCurrentHigh}</td>
@@ -2650,12 +3055,10 @@
                     tableBody.appendChild(row);
                 });
 
-                // اضافه کردن event listener برای کپی در جدول
                 document.querySelectorAll('#calculationsTableBody .table-cell').forEach(cell => {
                     cell.addEventListener('click', function(e) {
-                        if (e.target.tagName === 'BUTTON') return; // جلوگیری از تداخل با دکمه‌ها
+                        if (e.target.tagName === 'BUTTON') return;
                         if (this.classList.contains('note-cell')) {
-                            // برای سلول یادداشت، کل متن را کپی کن
                             copyToClipboard(this, this.textContent.trim());
                         } else {
                             copyToClipboard(this, this.dataset.copy);
@@ -2664,7 +3067,6 @@
                 });
 
                 calculations.forEach(calc => {
-                    // فرمت کردن اعداد برای نمایش در کارت‌های موبایل
                     const formattedY1 = formatNumberBasedOnInput(calc.inputY1, calc.inputFormatY1);
                     const formattedY2 = formatNumberBasedOnInput(calc.inputY2, calc.inputFormatY2);
                     const formattedCurrentHigh = formatNumberBasedOnInput(calc.inputCurrentHigh, calc.inputFormatY1);
@@ -2679,7 +3081,7 @@
                     card.innerHTML = `
                         <div class="card-header">
                             <div class="card-date">${formatDate(calc.date)}</div>
-                            <div class="card-currency">${calc.currencyPair}</div>
+                            <div class="card-currency">${calc.currencyPair} - ${calc.calcType || '—'}</div>
                         </div>
                         <div class="card-content">
                             <div class="card-item">
@@ -2724,10 +3126,9 @@
                     mobileCardsContainer.appendChild(card);
                 });
 
-                // اضافه کردن event listener برای کپی در کارت‌ها
                 document.querySelectorAll('#mobileCardsContainer .card-value').forEach(value => {
                     value.addEventListener('click', function(e) {
-                        if (e.target.tagName === 'BUTTON') return; // جلوگیری از تداخل با دکمه‌ها
+                        if (e.target.tagName === 'BUTTON') return;
                         copyToClipboard(this);
                     });
                 });
@@ -2762,7 +3163,6 @@
             }
         }
 
-        // تابع حذف محاسبه
         async function deleteCalculation(id) {
             try {
                 await deleteFromDatabase(STORE_CALCULATIONS, parseInt(id));
@@ -2773,8 +3173,6 @@
                 showNotification('خطا در حذف محاسبه.', 'error');
             }
         }
-
-        // تابع حذف داده‌های بر اساس تاریخ
         async function deleteDataByDate() {
             const deleteBeforeDate = document.getElementById('deleteBeforeDate').value;
             if (!deleteBeforeDate) {
@@ -2800,8 +3198,6 @@
                 showNotification('خطا در حذف داده‌ها.', 'error');
             }
         }
-
-        // تابع حذف داده‌های بر اساس تعداد روز
         async function deleteDataByDays() {
             const deleteDays = document.getElementById('deleteDays').value;
             if (!deleteDays || deleteDays < 1 || deleteDays > 365) {
@@ -2830,24 +3226,22 @@
                 showNotification('خطا در حذف داده‌های قدیمی.', 'error');
             }
         }
-
-        // تابع فرمت تاریخ برای نمایش (میلادی)
         function formatDate(dateString) {
             return dateString;
         }
-
-        // تابع پشتیبان‌گیری از داده‌ها
         async function backupData() {
             try {
                 const calculations = await getAllFromDatabase(STORE_CALCULATIONS);
                 const currencyPairs = await getAllFromDatabase(STORE_CURRENCY_PAIRS);
                 const categories = await getAllFromDatabase(STORE_CATEGORIES);
                 const settings = await getAllFromDatabase(STORE_SETTINGS);
+                const calcTypes = await getAllFromDatabase(STORE_CALC_TYPES);
                 const backupData = {
                     calculations,
                     currencyPairs,
                     categories,
                     settings,
+                    calcTypes,
                     backupDate: new Date().toISOString(),
                     version: DB_VERSION
                 };
@@ -2867,8 +3261,6 @@
                 showNotification('خطا در پشتیبان‌گیری.', 'error');
             }
         }
-
-        // تابع بازیابی داده‌ها
         async function restoreData() {
             const fileInput = document.getElementById('restoreFileInput');
             fileInput.click();
@@ -2881,27 +3273,26 @@
                 try {
                     const fileText = await readFileAsText(file);
                     const backupData = JSON.parse(fileText);
-                    // بررسی ساختار فایل پشتیبان
                     if (!backupData.calculations || !backupData.currencyPairs || !backupData.categories) {
                         throw new Error('فایل پشتیبان معتبر نیست. ساختار داده‌ها ناقص است.');
                     }
                     await clearAllData();
-                    // بازیابی دسته‌بندی‌ها
                     for (const category of backupData.categories || []) {
                         await saveToDatabase(STORE_CATEGORIES, category);
                     }
-                    // بازیابی جفت ارزها
                     for (const pair of backupData.currencyPairs) {
                         await saveToDatabase(STORE_CURRENCY_PAIRS, pair);
                     }
-                    // بازیابی محاسبات
                     for (const calc of backupData.calculations) {
                         await saveToDatabase(STORE_CALCULATIONS, calc);
                     }
-                    // بازیابی تنظیمات
                     for (const setting of backupData.settings || []) {
                         await saveToDatabase(STORE_SETTINGS, setting);
                     }
+                    for (const ct of backupData.calcTypes || []) {
+                        await saveToDatabase(STORE_CALC_TYPES, ct);
+                    }
+                    await loadCalcTypes();
                     await loadCategories();
                     await loadCurrencyPairs();
                     await loadCalculationsTable();
@@ -2913,8 +3304,6 @@
                 fileInput.value = '';
             };
         }
-
-        // تابع خواندن فایل به صورت متن
         function readFileAsText(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -2923,13 +3312,12 @@
                 reader.readAsText(file);
             });
         }
-
-        // تابع حذف تمام داده‌ها
         async function clearAllData() {
             try {
                 const calculations = await getAllFromDatabase(STORE_CALCULATIONS);
                 const currencyPairs = await getAllFromDatabase(STORE_CURRENCY_PAIRS);
                 const categories = await getAllFromDatabase(STORE_CATEGORIES);
+                const calcTypes = await getAllFromDatabase(STORE_CALC_TYPES);
                 for (const calc of calculations) {
                     await deleteFromDatabase(STORE_CALCULATIONS, calc.id);
                 }
@@ -2939,6 +3327,10 @@
                 for (const category of categories) {
                     await deleteFromDatabase(STORE_CATEGORIES, category.id);
                 }
+                for (const ct of calcTypes) {
+                    await deleteFromDatabase(STORE_CALC_TYPES, ct.id);
+                }
+                await loadCalcTypes();
                 await loadCategories();
                 await loadCurrencyPairs();
                 await loadCalculationsTable();
@@ -2947,8 +3339,6 @@
                 throw error;
             }
         }
-
-        // تابع مقایسه داده‌ها
         async function compareData() {
             const currencyPair = document.getElementById('comparisonCurrencyPair').value;
             const dateInputs = document.querySelectorAll('.comparison-date');
@@ -2965,7 +3355,13 @@
                 const calculations = await getAllFromDatabase(STORE_CALCULATIONS);
                 const comparisonResults = document.getElementById('comparisonResults');
                 comparisonResults.innerHTML = '';
+                
+                const formulaComparisonContainer = document.getElementById('comparisonFormulaComparison');
+                formulaComparisonContainer.innerHTML = '';
+                
                 let foundAnyData = false;
+                let formulaComparisonHTML = '';
+                
                 for (const date of dates) {
                     const calc = calculations.find(c => 
                         c.currencyPair === currencyPair && c.date === date
@@ -2974,7 +3370,6 @@
                     comparisonItem.className = 'comparison-item';
                     if (calc) {
                         foundAnyData = true;
-                        // فرمت کردن اعداد برای نمایش در مقایسه
                         const formattedY1 = formatNumberBasedOnInput(calc.inputY1, calc.inputFormatY1);
                         const formattedY2 = formatNumberBasedOnInput(calc.inputY2, calc.inputFormatY2);
                         const formattedCurrentHigh = formatNumberBasedOnInput(calc.inputCurrentHigh, calc.inputFormatY1);
@@ -2987,6 +3382,7 @@
                         comparisonItem.innerHTML = `
                             <h3>${formatDate(date)}</h3>
                             <p><strong>جفت ارز:</strong> ${calc.currencyPair}</p>
+                            <p><strong>نوع محاسبه:</strong> ${calc.calcType || '—'}</p>
                             <p><strong>عدد سقف:</strong> ${formattedY1}</p>
                             <p><strong>عدد کف:</strong> ${formattedY2}</p>
                             <p><strong>سقف فعلی:</strong> ${formattedCurrentHigh}</p>
@@ -3004,6 +3400,14 @@
                         `;
                     }
                     comparisonResults.appendChild(comparisonItem);
+                    
+                    const comparison = await computeFormula1Comparison(currencyPair, date);
+                    if (comparison) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.id = 'tempComparison_' + date.replace(/-/g, '_');
+                        formulaComparisonContainer.appendChild(tempDiv);
+                        renderFormulaComparison(tempDiv.id, comparison);
+                    }
                 }
                 if (!foundAnyData) {
                     showNotification('هیچ داده‌ای برای تاریخ‌های انتخاب شده یافت نشد.', 'warning');
@@ -3013,8 +3417,6 @@
                 showNotification('خطا در مقایسه داده‌ها.', 'error');
             }
         }
-
-        // تابع افزودن فیلد تاریخ جدید برای مقایسه
         function addComparisonDate() {
             const datesContainer = document.getElementById('comparisonDatesContainer');
             const dateRow = document.createElement('div');
@@ -3028,8 +3430,6 @@
             datesContainer.appendChild(dateRow);
             updateRemoveButtonsVisibility();
         }
-
-        // تابع به‌روزرسانی نمایش دکمه‌های حذف
         function updateRemoveButtonsVisibility() {
             const dateRows = document.querySelectorAll('.comparison-date-row');
             dateRows.forEach((row, index) => {
@@ -3043,8 +3443,6 @@
                 });
             });
         }
-
-        // تابع تغییر حالت تاریک/روشن
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             const themeToggle = document.getElementById('themeToggle');
@@ -3056,8 +3454,6 @@
                 localStorage.setItem('theme_2', 'light');
             }
         }
-
-        // تابع تغییر تب
         function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.mobile-tab').forEach(t => t.classList.remove('active'));
@@ -3065,7 +3461,6 @@
             document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
             document.querySelector(`.mobile-tab[data-tab="${tabName}"]`).classList.add('active');
             document.getElementById(`${tabName}-tab`).classList.add('active');
-            // بستن منوی موبایل پس از انتخاب تب
             if (window.innerWidth <= 768) {
                 document.getElementById('mobileTabs').style.display = 'none';
                 document.getElementById('mobileMenuToggle').classList.remove('active');
@@ -3074,12 +3469,9 @@
                 loadCalculationsTable();
             }
         }
-
-        // تابع نمایش/مخفی کردن منوی موبایل
         function toggleMobileMenu() {
             const mobileTabs = document.getElementById('mobileTabs');
             const menuToggle = document.getElementById('mobileMenuToggle');
-            // بررسی وضعیت فعلی منو با استفاده از computedStyle
             const isVisible = window.getComputedStyle(mobileTabs).display === 'flex';
             if (isVisible) {
                 mobileTabs.style.display = 'none';
@@ -3089,15 +3481,11 @@
                 menuToggle.classList.add('active');
             }
         }
-
-        // تابع نمایش مودال تأیید حذف
         function showConfirmDeleteModal(message, callback) {
             document.getElementById('confirmDeleteMessage').textContent = message;
             deleteCallback = callback;
             document.getElementById('confirmDeleteModal').style.display = 'flex';
         }
-
-        // تابع بستن همه مودال‌ها
         function closeModals() {
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.style.display = 'none';
@@ -3106,38 +3494,31 @@
             currentEditType = null;
             deleteCallback = null;
             currentDeleteCategoryId = null;
+            currentEditCalcTypeId = null;
         }
-
-        // تابع تنظیم event listenerها
         function setupEventListeners() {
-            // تب‌های اصلی
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     const tabName = this.getAttribute('data-tab');
                     switchTab(tabName);
                 });
             });
-            // تب‌های موبایل
             document.querySelectorAll('.mobile-tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     const tabName = this.getAttribute('data-tab');
                     switchTab(tabName);
                 });
             });
-            // منوی همبرگری موبایل
             document.getElementById('mobileMenuToggle').addEventListener('click', toggleMobileMenu);
-            // دکمه‌های ماشین حساب
             document.getElementById('calculateBtn').addEventListener('click', calculateAndSave);
             document.getElementById('resetBtn').addEventListener('click', resetFields);
-            // دکمه‌های مدیریت جفت ارزها
             document.getElementById('addCurrencyPairBtn').addEventListener('click', addCurrencyPair);
-            // دکمه‌های مدیریت دسته‌بندی‌ها
             document.getElementById('addCategoryBtn').addEventListener('click', addCategory);
-            // دکمه‌های مقایسه
             document.getElementById('compareDataBtn').addEventListener('click', compareData);
             document.getElementById('addDateBtn').addEventListener('click', addComparisonDate);
             document.getElementById('clearComparisonBtn').addEventListener('click', function() {
                 document.getElementById('comparisonResults').innerHTML = '';
+                document.getElementById('comparisonFormulaComparison').innerHTML = '';
                 document.getElementById('comparisonDatesContainer').innerHTML = `
                     <div class="comparison-date-row">
                         <div class="comparison-date-input">
@@ -3148,15 +3529,17 @@
                 `;
                 updateRemoveButtonsVisibility();
             });
-            // دکمه‌های پشتیبان‌گیری
             document.getElementById('backupDataBtn').addEventListener('click', backupData);
             document.getElementById('restoreDataBtn').addEventListener('click', restoreData);
-            // دکمه‌های حذف رکورد
             document.getElementById('deleteByDateBtn').addEventListener('click', deleteDataByDate);
             document.getElementById('deleteByDaysBtn').addEventListener('click', deleteDataByDays);
-            // دکمه‌های مودال
             document.getElementById('saveCurrencyPairEditBtn').addEventListener('click', saveCurrencyPairEdit);
             document.getElementById('saveCategoryEditBtn').addEventListener('click', saveCategoryEdit);
+            document.getElementById('saveCalcTypeEditBtn').addEventListener('click', saveCalcTypeEdit);
+            document.getElementById('addCalcTypeBtn').addEventListener('click', addCalcType);
+            document.getElementById('manageCalcTypesBtn').addEventListener('click', function() {
+                document.getElementById('manageCalcTypesModal').style.display = 'flex';
+            });
             document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
                 if (deleteCallback) {
                     deleteCallback();
@@ -3167,13 +3550,11 @@
             document.querySelectorAll('.close-modal').forEach(btn => {
                 btn.addEventListener('click', closeModals);
             });
-            // کلیک خارج از مودال برای بستن آن
             window.addEventListener('click', function(event) {
                 if (event.target.classList.contains('modal')) {
                     closeModals();
                 }
             });
-            // امکان استفاده از کلید Enter در فیلدهای ورودی
             ['input_y1', 'input_current_high', 'input_y2', 'input_current_low', 
              'input_y1_mobile', 'input_y2_mobile', 'input_current_high_mobile', 'input_current_low_mobile'].forEach(id => {
                 const element = document.getElementById(id);
@@ -3185,11 +3566,8 @@
                     });
                 }
             });
-            // تغییر حالت تاریک/روشن
             document.getElementById('themeToggle').addEventListener('click', toggleTheme);
         }
-
-        // بارگذاری حالت ذخیره شده
         if (localStorage.getItem('theme_2') === 'dark') {
             document.body.classList.add('dark-mode');
             document.getElementById('themeToggle').textContent = '☀️';
