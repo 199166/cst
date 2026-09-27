@@ -906,7 +906,7 @@
             <option value="">همه بخش‌ها</option>
             ${sectionOptions}
           </select>
-          <button class="show-in-box-btn small-btn text-xs" data-id="${id}">📌 نمایش کف/سقف این تاریخ در باکس</button>
+          <button class="show-in-box-btn small-btn text-xs" data-id="${id}">📌 نمایش جزییات کف/سقف این تاریخ در باکس</button>
         </div>`;
       dateRangesContainer.appendChild(div);
       const input = div.querySelector('.multi-date-input');
@@ -920,12 +920,12 @@
         if (item && item.showInBox) {
           showBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
           showBtn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
-          showBtn.textContent = '📌 این تاریخ در باکس نمایش داده می‌شود';
+          showBtn.textContent = '📌 این تاریخ در باکس جزییات نمایش داده می‌شود';
           div.classList.add('show-in-box');
         } else {
           showBtn.classList.add('bg-slate-600', 'hover:bg-slate-700');
           showBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
-          showBtn.textContent = '📌 نمایش کف/سقف این تاریخ در باکس';
+          showBtn.textContent = '📌 نمایش جزییات کف/سقف این تاریخ در باکس';
           div.classList.remove('show-in-box');
         }
       }
@@ -961,12 +961,12 @@
             if (item && item.showInBox) {
               btn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
               btn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
-              btn.textContent = '📌 این تاریخ در باکس نمایش داده می‌شود';
+              btn.textContent = '📌 این تاریخ در باکس جزییات نمایش داده می‌شود';
               itemDiv.classList.add('show-in-box');
             } else {
               btn.classList.add('bg-slate-600', 'hover:bg-slate-700');
               btn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
-              btn.textContent = '📌 نمایش کف/سقف این تاریخ در باکس';
+              btn.textContent = '📌 نمایش جزییات کف/سقف این تاریخ در باکس';
               itemDiv.classList.remove('show-in-box');
             }
           });
@@ -993,12 +993,12 @@
             if (item && item.showInBox) {
               btn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
               btn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
-              btn.textContent = '📌 این تاریخ در باکس نمایش داده می‌شود';
+              btn.textContent = '📌 این تاریخ در باکس جزییات نمایش داده می‌شود';
               itemDiv.classList.add('show-in-box');
             } else {
               btn.classList.add('bg-slate-600', 'hover:bg-slate-700');
               btn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
-              btn.textContent = '📌 نمایش کف/سقف این تاریخ در باکس';
+              btn.textContent = '📌 نمایش جزییات کف/سقف این تاریخ در باکس';
               itemDiv.classList.remove('show-in-box');
             }
           });
