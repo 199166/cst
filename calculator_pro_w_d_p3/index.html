@@ -488,6 +488,17 @@
           </div>
           <select id="pair_select" autocomplete="off"></select>
         </div>
+
+        <!-- ===== بخش انتخاب بخش محاسباتی ===== -->
+        <div class="mb-3 p-3 rounded bg-[var(--input-bg)] border border-white/10">
+          <div class="flex items-center justify-between mb-2">
+            <label class="muted font-semibold">🧮 بخش محاسباتی</label>
+            <button id="manage_sections_btn" class="small-btn bg-indigo-600 hover:bg-indigo-700 text-xs" type="button">مدیریت بخش‌ها</button>
+          </div>
+          <select id="section_select" autocomplete="off"></select>
+          <p class="muted text-xs mt-1">محاسبات خود را در کدام بخش ذخیره می‌کنید؟</p>
+        </div>
+
         <div class="grid grid-cols-2 gap-3 mb-3">
           <div>
             <label class="muted">عدد سقف</label>
@@ -592,6 +603,11 @@
                   <option value="">همه جفت‌ارزها</option>
                 </select>
               </div>
+              <div class="mb-2">
+                <select id="history_section_filter" autocomplete="off">
+                  <option value="">همه بخش‌ها</option>
+                </select>
+              </div>
             </div>
             <div id="multi_date_section" class="hidden">
               <div class="mb-3">
@@ -645,6 +661,27 @@
       <div id="backups_content" class="mt-2 text-sm space-y-4"></div>
     </div>
   </div>
+  <!-- ===== Modal مدیریت بخش‌های محاسباتی ===== -->
+  <div id="sections_modal" class="hidden modal-overlay">
+    <div class="modal-content p-6 max-w-lg">
+      <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
+        <h4 class="font-bold text-lg">🧮 مدیریت بخش‌های محاسباتی</h4>
+        <button id="close_sections" class="small-btn bg-slate-600 hover:bg-slate-700">✕</button>
+      </div>
+      <div class="mb-3">
+        <label class="muted text-xs block mb-1">افزودن بخش جدید:</label>
+        <div class="flex gap-2">
+          <input id="new_section_name" type="text" placeholder="نام بخش جدید" class="flex-1"/>
+          <button id="add_section_btn" class="small-btn bg-emerald-600 hover:bg-emerald-700">افزودن</button>
+        </div>
+      </div>
+      <div>
+        <label class="muted text-xs block mb-1">بخش‌های موجود:</label>
+        <div id="sections_list" class="space-y-2 max-h-60 overflow-y-auto thin-scroll"></div>
+      </div>
+      <p class="muted text-xs mt-3">توجه: حذف بخش، رکوردهای آن را حذف نمی‌کند بلکه به بخش اول منتقل می‌کند.</p>
+    </div>
+  </div>
   <script>
     // ---------- helpers ----------
     const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -659,7 +696,7 @@
 
     // ---------- IndexedDB Wrapper ----------
     const DB_NAME = 'CalcProDB_v3';
-    const DB_VERSION = 1;
+    const DB_VERSION = 2;
     let db = null;
 
     function openDB() {
@@ -671,6 +708,7 @@
           if (!db.objectStoreNames.contains('entries')) db.createObjectStore('entries', { keyPath: 'id' });
           if (!db.objectStoreNames.contains('categories')) db.createObjectStore('categories', { keyPath: 'id' });
           if (!db.objectStoreNames.contains('backups')) db.createObjectStore('backups', { keyPath: 'id' });
+          if (!db.objectStoreNames.contains('sections')) db.createObjectStore('sections', { keyPath: 'id' });
         };
         request.onsuccess = (e) => { db = e.target.result; resolve(db); };
         request.onerror = (e) => { reject(e.target.error); };
@@ -711,17 +749,18 @@
     }
 
     // In-memory cache
-    let memoryCache = { pairs: [], entries: [], categories: [], backups: [] };
+    let memoryCache = { pairs: [], entries: [], categories: [], backups: [], sections: [] };
 
     async function loadAllData() {
       try {
-        const [pairs, entries, categories, backups] = await Promise.all([
-          dbGetAll('pairs'), dbGetAll('entries'), dbGetAll('categories'), dbGetAll('backups')
+        const [pairs, entries, categories, backups, sections] = await Promise.all([
+          dbGetAll('pairs'), dbGetAll('entries'), dbGetAll('categories'), dbGetAll('backups'), dbGetAll('sections')
         ]);
         memoryCache.pairs = pairs || [];
         memoryCache.entries = entries || [];
         memoryCache.categories = categories || [];
         memoryCache.backups = backups || [];
+        memoryCache.sections = sections || [];
       } catch (e) { console.error('Error loading data from IndexedDB:', e); }
     }
 
@@ -730,6 +769,7 @@
       if (k === 'entries') return memoryCache.entries;
       if (k === 'categories') return memoryCache.categories;
       if (k === 'backups') return memoryCache.backups;
+      if (k === 'sections') return memoryCache.sections;
       return null;
     }
 
@@ -738,6 +778,7 @@
       else if (k === 'entries') { memoryCache.entries = v; syncStoreToDB('entries', v); }
       else if (k === 'categories') { memoryCache.categories = v; syncStoreToDB('categories', v); }
       else if (k === 'backups') { memoryCache.backups = v; syncStoreToDB('backups', v); }
+      else if (k === 'sections') { memoryCache.sections = v; syncStoreToDB('sections', v); }
     }
 
     async function syncStoreToDB(storeName, data) {
@@ -761,6 +802,12 @@
           {id: 'crypto', name: 'ارز دیجیتال'}
         ]);
       }
+      if (!storageGet('sections') || storageGet('sections').length === 0) {
+        storageSet('sections', [
+          {id: 'section1', name: 'بخش اول'},
+          {id: 'section2', name: 'بخش دوم'}
+        ]);
+      }
     }
 
     function isMobileOrTablet() { return window.innerWidth <= 1024; }
@@ -782,7 +829,15 @@
     // ---------- DOM refs ----------
     const $ = id => document.getElementById(id);
     const pairSelect = $('pair_select');
+    const sectionSelect = $('section_select');
+    const manageSectionsBtn = $('manage_sections_btn');
+    const sectionsModal = $('sections_modal');
+    const closeSections = $('close_sections');
+    const newSectionName = $('new_section_name');
+    const addSectionBtn = $('add_section_btn');
+    const sectionsList = $('sections_list');
     const historyPairFilter = $('history_pair_filter');
+    const historySectionFilter = $('history_section_filter');
     const newPairName = $('new_pair_name');
     const addPairBtn = $('add_pair_btn');
     const clearPairsBtn = $('clear_pairs_btn');
@@ -852,7 +907,7 @@
 
     // ---------- Multi-date state ----------
     let isMultiDate = false;
-    let dateRanges = [];
+    let dateRanges = []; // { id, date, sectionId }
     function resetMultiDateUI() {
       if (dateRangesContainer) dateRangesContainer.innerHTML = '';
       dateRanges = [];
@@ -860,23 +915,39 @@
     function addMultiDateRangeUI() {
       if (!dateRangesContainer) return;
       const id = Date.now().toString() + '_' + Math.random().toString(16).slice(2);
-      dateRanges.push({ id, date: null });
+      dateRanges.push({ id, date: null, sectionId: '' });
       const div = document.createElement('div');
       div.className = 'date-range-item';
       div.id = 'range_' + id;
+      const sections = storageGet('sections') || [];
+      const sectionOptions = sections.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
       div.innerHTML = `
-        <div class="flex gap-2 items-center">
-          <input type="date" class="multi-date-input flex-1" data-id="${id}">
-          <button class="small-btn bg-rose-600 hover:bg-rose-700 remove-range" data-id="${id}">✕</button>
+        <div class="flex flex-col gap-2">
+          <div class="flex gap-2 items-center">
+            <input type="date" class="multi-date-input flex-1" data-id="${id}">
+            <button class="small-btn bg-rose-600 hover:bg-rose-700 remove-range" data-id="${id}">✕</button>
+          </div>
+          <select class="multi-section-select small-btn bg-slate-600 text-xs" data-id="${id}">
+            <option value="">همه بخش‌ها</option>
+            ${sectionOptions}
+          </select>
         </div>`;
       dateRangesContainer.appendChild(div);
       const input = div.querySelector('.multi-date-input');
+      const sectionSel = div.querySelector('.multi-section-select');
       const removeBtn = div.querySelector('.remove-range');
       if (input) {
         input.addEventListener('change', (e) => {
           const rid = e.target.dataset.id;
           const item = dateRanges.find(r => r.id === rid);
           if (item) item.date = e.target.value;
+        });
+      }
+      if (sectionSel) {
+        sectionSel.addEventListener('change', (e) => {
+          const rid = e.target.dataset.id;
+          const item = dateRanges.find(r => r.id === rid);
+          if (item) item.sectionId = e.target.value;
         });
       }
       if (removeBtn) {
@@ -1045,14 +1116,12 @@
     // === تابع کمکی: محاسبه نزدیک‌ترین فاصله از روی یک رکورد ===
     // ============================================================
     function computeClosestFromEntry(e) {
-      // تلاش برای استفاده از outputsDisplay در صورت وجود raw
       let formulaResults = [];
       if (Array.isArray(e.outputsDisplay) && e.outputsDisplay.length > 0) {
         formulaResults = e.outputsDisplay
           .filter(it => it && typeof it.raw === 'number' && !isNaN(it.raw))
           .map(it => ({ label: it.label || 'فرمول', value: it.raw }));
       }
-      // اگر raw نداشت یا کافی نبود، از inputs بازمحاسبه کن
       if (formulaResults.length < 2 && e.inputs) {
         const y1 = Number(e.inputs.y1);
         const y2 = Number(e.inputs.y2);
@@ -1076,7 +1145,6 @@
     // ============================================================
     function extractFormulasFromEntry(e) {
       const result = [];
-      // اگر outputsDisplay با raw موجود باشد
       if (Array.isArray(e.outputsDisplay) && e.outputsDisplay.length > 0) {
         e.outputsDisplay.forEach(it => {
           if (it && typeof it.raw === 'number' && !isNaN(it.raw)) {
@@ -1084,7 +1152,6 @@
           }
         });
       }
-      // اگر کافی نبود، از inputs بازمحاسبه کن
       if (result.length < 4 && e.inputs) {
         const y1 = Number(e.inputs.y1);
         const y2 = Number(e.inputs.y2);
@@ -1106,14 +1173,13 @@
     function extractAndDisplayAllNumbers() {
       if (!fixedNum1 || !fixedNum2 || !fixedNum3 || !fixedNum4) return;
 
-      let y1 = '---';    // سقف
-      let y2 = '---';    // کف
-      let high = '---';  // سقف فعلی
-      let low = '---';   // کف فعلی
+      let y1 = '---';
+      let y2 = '---';
+      let high = '---';
+      let low = '---';
       let pairName = '---';
       let pairId = null;
 
-      // 1. دریافت جفت‌ارز انتخاب‌شده از فیلتر تاریخچه
       if (historyPairFilter && historyPairFilter.selectedIndex >= 0) {
         const selectedOption = historyPairFilter.options[historyPairFilter.selectedIndex];
         if (selectedOption && selectedOption.value) {
@@ -1123,7 +1189,6 @@
         }
       }
 
-      // اگر جفت‌ارزی انتخاب نشده، از جفت‌ارز فعال در ماشین حساب استفاده کن
       if (!pairId && pairSelect && pairSelect.selectedIndex >= 0) {
         const selectedOption = pairSelect.options[pairSelect.selectedIndex];
         if (selectedOption && selectedOption.value) {
@@ -1133,13 +1198,11 @@
         }
       }
 
-      // 2. دریافت تاریخ انتخاب‌شده
       let selectedDate = null;
       if (historyDate && historyDate.value) {
         selectedDate = historyDate.value;
       }
 
-      // 3. جستجوی رکوردها در دیتابیس
       const entries = storageGet('entries') || [];
       let filteredEntries = entries;
 
@@ -1151,33 +1214,26 @@
         });
       }
 
-      // مرتب‌سازی بر اساس تاریخ (جدیدترین اول)
       filteredEntries.sort((a, b) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
 
-      // 4. استخراج 4 عدد از اولین رکورد
       if (filteredEntries.length > 0) {
         const entry = filteredEntries[0];
         if (entry.inputs) {
-          // سقف (y1)
           if (entry.inputs.y1 !== undefined && entry.inputs.y1 !== null && !isNaN(entry.inputs.y1)) {
             y1 = formatOutputByInputFormat(entry.inputs.y1, entry.inputFormat);
           }
-          // کف (y2)
           if (entry.inputs.y2 !== undefined && entry.inputs.y2 !== null && !isNaN(entry.inputs.y2)) {
             y2 = formatOutputByInputFormat(entry.inputs.y2, entry.inputFormat);
           }
-          // سقف فعلی (currentHigh)
           if (entry.inputs.currentHigh !== undefined && entry.inputs.currentHigh !== null && !isNaN(entry.inputs.currentHigh)) {
             high = formatOutputByInputFormat(entry.inputs.currentHigh, entry.inputFormat);
           }
-          // کف فعلی (currentLow)
           if (entry.inputs.currentLow !== undefined && entry.inputs.currentLow !== null && !isNaN(entry.inputs.currentLow)) {
             low = formatOutputByInputFormat(entry.inputs.currentLow, entry.inputFormat);
           }
         }
       }
 
-      // 5. نمایش در باکس
       fixedNum1.textContent = y1;
       fixedNum2.textContent = y2;
       fixedNum3.textContent = high;
@@ -1192,9 +1248,6 @@
       }
     }
 
-    // ============================================================
-    // === تابع کپی اعداد (جداگانه) ===
-    // ============================================================
     function copyNumber1() {
       const val = fixedNum1.dataset.value || fixedNum1.textContent;
       if (!val || val === '---') { showNotification('⚠️ عددی برای کپی وجود ندارد!', 'error'); return; }
@@ -1216,17 +1269,11 @@
       copyToClipboard(val);
     }
 
-    // ============================================================
-    // === اتصال رویدادها به اعداد باکس ===
-    // ============================================================
     if (fixedNum1) fixedNum1.addEventListener('click', copyNumber1);
     if (fixedNum2) fixedNum2.addEventListener('click', copyNumber2);
     if (fixedNum3) fixedNum3.addEventListener('click', copyNumber3);
     if (fixedNum4) fixedNum4.addEventListener('click', copyNumber4);
 
-    // ============================================================
-    // === رویدادهای بروزرسانی باکس ===
-    // ============================================================
     if (historyPairFilter) {
       historyPairFilter.addEventListener('change', function() {
         setTimeout(extractAndDisplayAllNumbers, 200);
@@ -1245,13 +1292,136 @@
       });
     }
 
+    // ---------- مدیریت بخش‌های محاسباتی ----------
+    function renderSections() {
+      const sections = storageGet('sections') || [];
+      // پر کردن Select بخش در ماشین حساب
+      if (sectionSelect) {
+        const currentVal = sectionSelect.value;
+        sectionSelect.innerHTML = '';
+        sections.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = s.name;
+          sectionSelect.appendChild(opt);
+        });
+        // اگر مقدار قبلی وجود داشت، حفظ کن
+        if (currentVal && sections.some(s => s.id === currentVal)) sectionSelect.value = currentVal;
+        else if (sections.length > 0) sectionSelect.value = sections[0].id;
+      }
+      // پر کردن Select بخش در فیلتر تاریخچه
+      if (historySectionFilter) {
+        const currentVal = historySectionFilter.value;
+        historySectionFilter.innerHTML = '<option value="">همه بخش‌ها</option>';
+        sections.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = s.name;
+          historySectionFilter.appendChild(opt);
+        });
+        if (currentVal && sections.some(s => s.id === currentVal)) historySectionFilter.value = currentVal;
+      }
+    }
+
+    function renderSectionsList() {
+      const sections = storageGet('sections') || [];
+      const entries = storageGet('entries') || [];
+      if (!sectionsList) return;
+      sectionsList.innerHTML = '';
+      if (sections.length === 0) {
+        sectionsList.innerHTML = '<div class="muted text-xs text-center py-2">هیچ بخشی وجود ندارد</div>';
+        return;
+      }
+      sections.forEach(s => {
+        const count = entries.filter(e => (e.sectionId || 'section1') === s.id).length;
+        const div = document.createElement('div');
+        div.className = 'flex justify-between items-center p-2 rounded bg-white/5 border border-white/10';
+        div.innerHTML = `
+          <div class="flex-1">
+            <div class="text-sm font-semibold">${s.name}</div>
+            <div class="text-xs muted">${count} رکورد</div>
+          </div>
+          <div class="flex gap-1">
+            <button class="small-btn bg-yellow-600 hover:bg-yellow-700 text-xs" data-action="edit" data-id="${s.id}">✎</button>
+            <button class="small-btn bg-rose-600 hover:bg-rose-700 text-xs" data-action="delete" data-id="${s.id}">🗑</button>
+          </div>
+        `;
+        sectionsList.appendChild(div);
+      });
+    }
+
+    function addSection(name) {
+      if (!name || !name.trim()) return;
+      const sections = storageGet('sections') || [];
+      if (sections.some(s => s.name === name.trim())) { alert('این نام بخش قبلاً وجود دارد!'); return; }
+      sections.push({ id: uid(), name: name.trim() });
+      storageSet('sections', sections);
+      renderSections();
+      renderSectionsList();
+    }
+
+    function deleteSection(id) {
+      const sections = storageGet('sections') || [];
+      if (sections.length <= 1) { alert('حداقل یک بخش باید وجود داشته باشد.'); return; }
+      const section = sections.find(s => s.id === id);
+      if (!section) return;
+      if (!confirm(`آیا از حذف بخش "${section.name}" مطمئن هستید؟ تمام رکوردهای این بخش به بخش اول منتقل می‌شوند.`)) return;
+      // انتقال رکوردها به بخش اول
+      const firstSection = sections.find(s => s.id !== id) || sections[0];
+      const entries = storageGet('entries') || [];
+      let movedCount = 0;
+      entries.forEach(e => {
+        if ((e.sectionId || 'section1') === id) {
+          e.sectionId = firstSection.id;
+          movedCount++;
+        }
+      });
+      storageSet('entries', entries);
+      const updatedSections = sections.filter(s => s.id !== id);
+      storageSet('sections', updatedSections);
+      renderSections();
+      renderSectionsList();
+      renderHistory();
+      if (movedCount > 0) showNotification(`✅ ${movedCount} رکورد به بخش "${firstSection.name}" منتقل شد`, 'success');
+    }
+
+    function editSection(id) {
+      const sections = storageGet('sections') || [];
+      const s = sections.find(x => x.id === id);
+      if (!s) return;
+      const newName = prompt('نام جدید:', s.name);
+      if (newName && newName.trim() && newName.trim() !== s.name) {
+        if (sections.some(x => x.id !== id && x.name === newName.trim())) { alert('این نام بخش قبلاً وجود دارد!'); return; }
+        s.name = newName.trim();
+        storageSet('sections', sections);
+        renderSections();
+        renderSectionsList();
+      }
+    }
+
+    if (addSectionBtn) addSectionBtn.addEventListener('click', () => { addSection(newSectionName.value); newSectionName.value = ''; });
+    if (manageSectionsBtn) manageSectionsBtn.addEventListener('click', () => { sectionsModal.classList.remove('hidden'); renderSectionsList(); });
+    if (closeSections) closeSections.addEventListener('click', () => { sectionsModal.classList.add('hidden'); });
+
+    if (sectionsList) {
+      sectionsList.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const action = btn.dataset.action;
+        const id = btn.dataset.id;
+        if (action === 'edit') editSection(id);
+        if (action === 'delete') deleteSection(id);
+      });
+    }
+
     // ---------- مدیریت داده‌ها ----------
-    function saveEntry(pairId, inputs, outputsDisplay, note = '', dateISO = null, inputFormat = null, closestInfoData = null) {
+    function saveEntry(pairId, inputs, outputsDisplay, note = '', dateISO = null, inputFormat = null, closestInfoData = null, sectionId = null) {
       const entries = storageGet('entries') || [];
       const si = dateISO || nowISO();
       const entry = { 
         id: uid(), pairId, dateISO: si, dateDisplay: formatGregorian(si), 
-        inputs, outputsDisplay, note, inputFormat: inputFormat, closestInfo: closestInfoData || null
+        inputs, outputsDisplay, note, inputFormat: inputFormat, closestInfo: closestInfoData || null,
+        sectionId: sectionId || 'section1'
       };
       entries.push(entry); 
       storageSet('entries', entries);
@@ -1269,7 +1439,6 @@
 
     initializeBoxStates();
 
-    // ---------- event listeners ----------
     if (calculateButton) {
       calculateButton.addEventListener('click', () => {
         if (!inputY1 || !inputY2 || !inputCurrentHigh || !inputCurrentLow) {
@@ -1308,6 +1477,7 @@
           }
           if (!chosenISO) chosenISO = nowISO();
           const pairId = pairSelect ? pairSelect.value || null : null;
+          const sectionId = sectionSelect ? sectionSelect.value || 'section1' : 'section1';
           const note = noteInput ? noteInput.value || '' : '';
           saveEntry(pairId, {
             y1, y2, currentLow, currentHigh,
@@ -1315,7 +1485,7 @@
             originalCurrentHigh: inputCurrentHigh.value,
             originalY2: inputY2.value,
             originalCurrentLow: inputCurrentLow.value
-          }, displays, note, chosenISO, parsedY1.format, { closestPairs, minDistance });
+          }, displays, note, chosenISO, parsedY1.format, { closestPairs, minDistance }, sectionId);
         } catch (err) {
           if (errorMessage) errorMessage.textContent = 'خطا: ' + err.message;
         }
@@ -1547,19 +1717,21 @@
     // ============================================================
     // === تابع کمکی: مقایسه جواب‌های فرمول‌ها بین چند تاریخ ===
     // ============================================================
-    function buildMultiDateComparisonHTML(entriesByDate, normDates, pairs) {
-      // ساخت لیستی از همه جواب‌های فرمول‌ها با برچسب تاریخ و فرمول
+    function buildMultiDateComparisonHTML(entriesByDate, normDates, pairs, sections) {
       const allFormulas = [];
       normDates.forEach(dateKey => {
         const dayEntries = entriesByDate[dateKey] || [];
         dayEntries.forEach(entry => {
           const pair = pairs.find(p => p.id === entry.pairId);
           const pairName = pair?.name || '—';
+          const sec = sections.find(s => s.id === (entry.sectionId || 'section1'));
+          const sectionName = sec?.name || 'بخش اول';
           const formulas = extractFormulasFromEntry(entry);
           formulas.forEach(f => {
             allFormulas.push({
               dateKey,
               pairName,
+              sectionName,
               label: f.label,
               value: f.value,
               display: f.display,
@@ -1570,11 +1742,9 @@
       });
       if (allFormulas.length < 2) return '';
 
-      // === ۱) نزدیک‌ترین فاصله بین همه جواب‌ها در همه تاریخ‌ها ===
       const { pairs: globalClosest, minDistance: globalMin } = findClosestNumbers(allFormulas);
       let html = '';
       if (globalClosest.length > 0) {
-        // فرمت‌دهی فاصله با اولین inputFormat موجود
         const sampleEntry = (entriesByDate[normDates[0]] || [])[0];
         const fmt = sampleEntry ? sampleEntry.inputFormat : null;
         const displayDist = formatOutputByInputFormat(globalMin, fmt);
@@ -1583,29 +1753,29 @@
             <div class="text-sm font-semibold mb-2">🎯 نزدیک‌ترین فاصله بین جواب‌های همه تاریخ‌های انتخاب‌شده: <span class="text-yellow-300">${displayDist}</span></div>
             <div class="text-xs space-y-1">
               ${globalClosest.map(pair => `
-                <div>• <span class="text-blue-300">${pair[0].pairName}</span> / ${pair[0].label} (${pair[0].dateDisplay}) ⟷ <span class="text-blue-300">${pair[1].pairName}</span> / ${pair[1].label} (${pair[1].dateDisplay})</div>
+                <div>• <span class="text-blue-300">${pair[0].pairName}</span> [${pair[0].sectionName}] / ${pair[0].label} (${pair[0].dateDisplay}) ⟷ <span class="text-blue-300">${pair[1].pairName}</span> [${pair[1].sectionName}] / ${pair[1].label} (${pair[1].dateDisplay})</div>
               `).join('')}
             </div>
           </div>
         `;
       }
 
-      // === ۲) مقایسه هر فرمول بین تاریخ‌های مختلف ===
-      // گروه‌بندی بر اساس label فرمول
       const formulasByLabel = {};
       allFormulas.forEach(f => {
-        if (!formulasByLabel[f.label]) formulasByLabel[f.label] = [];
-        formulasByLabel[f.label].push(f);
+        const key = f.sectionName + '||' + f.label;
+        if (!formulasByLabel[key]) formulasByLabel[key] = [];
+        formulasByLabel[key].push(f);
       });
-      const formulaLabels = Object.keys(formulasByLabel);
-      if (formulaLabels.length > 0 && normDates.length > 1) {
+      const formulaKeys = Object.keys(formulasByLabel);
+      if (formulaKeys.length > 0 && normDates.length > 1) {
         html += `<div class="bg-white/5 p-3 rounded mb-3">`;
-        html += `<div class="text-sm font-semibold mb-2">📊 مقایسه هر فرمول بین تاریخ‌های مختلف</div>`;
-        formulaLabels.forEach(label => {
-          const list = formulasByLabel[label].sort((a, b) => a.dateKey.localeCompare(b.dateKey));
+        html += `<div class="text-sm font-semibold mb-2">📊 مقایسه هر فرمول بین تاریخ‌های مختلف (به تفکیک بخش)</div>`;
+        formulaKeys.forEach(key => {
+          const list = formulasByLabel[key].sort((a, b) => a.dateKey.localeCompare(b.dateKey));
           if (list.length < 2) return;
+          const parts = key.split('||');
           html += `<div class="mb-2 p-2 bg-white/5 rounded">`;
-          html += `<div class="text-xs font-semibold text-yellow-300 mb-1">${label}</div>`;
+          html += `<div class="text-xs font-semibold text-yellow-300 mb-1">[${parts[0]}] ${parts[1]}</div>`;
           html += `<div class="text-xs space-y-1">`;
           for (let i = 0; i < list.length; i++) {
             for (let j = i + 1; j < list.length; j++) {
@@ -1622,33 +1792,84 @@
         html += `</div>`;
       }
 
+      // === مقایسه بین بخش‌های مختلف در همان تاریخ ===
+      const sectionsPerDate = {};
+      normDates.forEach(dateKey => {
+        const dayEntries = entriesByDate[dateKey] || [];
+        dayEntries.forEach(entry => {
+          const sec = sections.find(s => s.id === (entry.sectionId || 'section1'));
+          const sectionName = sec?.name || 'بخش اول';
+          if (!sectionsPerDate[dateKey]) sectionsPerDate[dateKey] = {};
+          if (!sectionsPerDate[dateKey][sectionName]) sectionsPerDate[dateKey][sectionName] = [];
+          const formulas = extractFormulasFromEntry(entry);
+          sectionsPerDate[dateKey][sectionName].push(...formulas.map(f => ({ ...f, sectionName, dateDisplay: entry.dateDisplay, pairName: pairs.find(p => p.id === entry.pairId)?.name || '—' })));
+        });
+      });
+      let hasCrossSection = false;
+      let crossSectionHTML = '';
+      Object.keys(sectionsPerDate).forEach(dateKey => {
+        const sectionsInDate = Object.keys(sectionsPerDate[dateKey]);
+        if (sectionsInDate.length < 2) return;
+        sectionsInDate.forEach((secA, idxA) => {
+          for (let idxB = idxA + 1; idxB < sectionsInDate.length; idxB++) {
+            const secB = sectionsInDate[idxB];
+            const listA = sectionsPerDate[dateKey][secA];
+            const listB = sectionsPerDate[dateKey][secB];
+            const allCross = [...listA, ...listB];
+            const { pairs: crossClosest, minDistance: crossMin } = findClosestNumbers(allCross);
+            if (crossClosest.length > 0) {
+              hasCrossSection = true;
+              const sampleEntry = (entriesByDate[dateKey] || [])[0];
+              const fmt = sampleEntry ? sampleEntry.inputFormat : null;
+              const displayDist = formatOutputByInputFormat(crossMin, fmt);
+              crossSectionHTML += `<div class="mb-2 p-2 bg-white/5 rounded">`;
+              crossSectionHTML += `<div class="text-xs font-semibold text-yellow-300 mb-1">تاریخ: ${new Date(dateKey).toLocaleDateString('en-CA')} — ${secA} ⟷ ${secB}</div>`;
+              crossSectionHTML += `<div class="text-xs">نزدیک‌ترین فاصله: <span class="text-yellow-300">${displayDist}</span></div>`;
+              crossSectionHTML += `<div class="text-xs space-y-1 mt-1">`;
+              crossClosest.forEach(pair => {
+                crossSectionHTML += `<div>• ${pair[0].pairName} [${pair[0].sectionName}] / ${pair[0].label} (${pair[0].display}) ⟷ ${pair[1].pairName} [${pair[1].sectionName}] / ${pair[1].label} (${pair[1].display})</div>`;
+              });
+              crossSectionHTML += `</div></div>`;
+            }
+          }
+        });
+      });
+      if (hasCrossSection) {
+        html += `<div class="bg-white/5 p-3 rounded mb-3">`;
+        html += `<div class="text-sm font-semibold mb-2">🔀 مقایسه بین بخش‌های مختلف در هر تاریخ</div>`;
+        html += crossSectionHTML;
+        html += `</div>`;
+      }
+
       return html;
     }
 
     // ---------- تاریخچه ----------
-    function renderMultiDateHistory(selectedPair, selectedDates) {
+    function renderMultiDateHistory(selectedPair, dateRangesArr) {
       const entries = (storageGet('entries') || []).slice();
       if (!historyList) return;
       historyList.innerHTML = '';
-      if (!selectedDates || selectedDates.length === 0) {
+      if (!dateRangesArr || dateRangesArr.length === 0) {
         historyList.innerHTML = '<div class="muted text-sm text-center py-4">هیچ تاریخی انتخاب نشده است.</div>';
         return;
       }
-      const normDates = Array.from(new Set(selectedDates.map(d => {
-        if (!d) return null;
-        const dt = new Date(d);
-        return isNaN(dt.getTime()) ? null : dt.toISOString().split('T')[0];
-      }).filter(Boolean))).sort();
-      if (normDates.length === 0) {
+      // ساخت دیکشنری برای هر تاریخ+بخش
+      const dateSectionPairs = dateRangesArr.filter(r => r.date).map(r => ({
+        dateKey: new Date(r.date).toISOString().split('T')[0],
+        sectionId: r.sectionId || ''
+      }));
+      if (dateSectionPairs.length === 0) {
         historyList.innerHTML = '<div class="muted text-sm text-center py-4">هیچ تاریخ معتبری انتخاب نشده است.</div>';
         return;
       }
+      const normDates = Array.from(new Set(dateSectionPairs.map(p => p.dateKey))).sort();
       const header = document.createElement('div');
       header.className = 'date-comparison-header';
       header.textContent = 'مقایسه چند تاریخ انتخاب‌شده';
       historyList.appendChild(header);
       const pairs = storageGet('pairs') || [];
       const categories = storageGet('categories') || [];
+      const sections = storageGet('sections') || [];
       const entriesByDate = {};
       normDates.forEach(d => { entriesByDate[d] = []; });
       entries.forEach(e => {
@@ -1657,11 +1878,16 @@
         const key = dt.toISOString().split('T')[0];
         if (!entriesByDate[key]) return;
         if (selectedPair && e.pairId !== selectedPair) return;
+        // فیلتر بخش: اگر برای این تاریخ بخشی انتخاب شده باشد، فقط همان بخش
+        const relevantSelections = dateSectionPairs.filter(p => p.dateKey === key);
+        if (relevantSelections.length > 0) {
+          const allowedSections = relevantSelections.map(s => s.sectionId || 'section1');
+          if (!allowedSections.includes(e.sectionId || 'section1')) return;
+        }
         entriesByDate[key].push(e);
       });
 
-      // === نمایش مقایسه بین تاریخ‌ها در بالای لیست ===
-      const comparisonHTML = buildMultiDateComparisonHTML(entriesByDate, normDates, pairs);
+      const comparisonHTML = buildMultiDateComparisonHTML(entriesByDate, normDates, pairs, sections);
       if (comparisonHTML) {
         const cmpBox = document.createElement('div');
         cmpBox.innerHTML = comparisonHTML;
@@ -1689,9 +1915,10 @@
             const pair = pairs.find(p => p.id === e.pairId);
             const pairName = pair?.name || '—';
             const category = pair ? categories.find(c => c.id === pair.categoryId) : null;
+            const sec = sections.find(s => s.id === (e.sectionId || 'section1'));
+            const sectionName = sec?.name || 'بخش اول';
             const wrapper = document.createElement('div');
             wrapper.className = 'history-entry-compact flex flex-col gap-3 hover:border-white/20 transition-colors';
-            // === محاسبه نزدیک‌ترین فاصله (با پشتیبانی از رکوردهای قدیمی) ===
             let closestHTML = '';
             const closestData = computeClosestFromEntry(e);
             if (closestData) {
@@ -1707,9 +1934,10 @@
             }
             wrapper.innerHTML = `
               <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                   <div class="text-sm font-semibold">${pairName}</div>
                   ${category ? `<span class="text-xs bg-blue-600 px-2 py-1 rounded">${category.name}</span>` : ''}
+                  <span class="text-xs bg-indigo-600 px-2 py-1 rounded">${sectionName}</span>
                 </div>
                 <div class="text-xs muted">${e.dateDisplay}</div>
               </div>
@@ -1737,7 +1965,7 @@
     function renderHistory() {
       if (multiDateSection && !multiDateSection.classList.contains('hidden')) {
         const selectedPair = multiDatePairFilter ? multiDatePairFilter.value : null;
-        const selectedDates = dateRanges.filter(r => r.date).map(r => r.date);
+        const selectedDates = dateRanges.filter(r => r.date);
         if (selectedDates.length > 0) { renderMultiDateHistory(selectedPair, selectedDates); return; }
       }
       const entries = (storageGet('entries') || []).slice();
@@ -1745,6 +1973,7 @@
       if (entriesCount) entriesCount.textContent = entries.length;
       const filterDate = historyDate && historyDate.value ? new Date(historyDate.value).toDateString() : null;
       const filterPair = historyPairFilter && historyPairFilter.value ? historyPairFilter.value : null;
+      const filterSection = historySectionFilter && historySectionFilter.value ? historySectionFilter.value : null;
       if (historyList) historyList.innerHTML = '';
       let filtered = entries;
       if (!filterDate) {
@@ -1754,18 +1983,21 @@
         filtered = entries.filter(e => new Date(e.dateISO).toDateString() === filterDate);
       }
       if (filterPair) filtered = filtered.filter(e => e.pairId === filterPair);
+      if (filterSection) filtered = filtered.filter(e => (e.sectionId || 'section1') === filterSection);
       if (filtered.length === 0) {
         if (historyList) historyList.innerHTML = '<div class="muted text-sm text-center py-4">رکوردی جهت نمایش وجود ندارد.</div>';
         setTimeout(extractAndDisplayAllNumbers, 100);
         return;
       }
+      const sections = storageGet('sections') || [];
       safeForEach(filtered, e => {
         const pair = (storageGet('pairs') || []).find(p => p.id === e.pairId);
         const pairName = pair?.name || '—';
         const category = pair ? (storageGet('categories') || []).find(c => c.id === pair.categoryId) : null;
+        const sec = sections.find(s => s.id === (e.sectionId || 'section1'));
+        const sectionName = sec?.name || 'بخش اول';
         const wrapper = document.createElement('div');
         wrapper.className = 'history-entry-compact flex flex-col gap-3 hover:border-white/20 transition-colors';
-        // === محاسبه نزدیک‌ترین فاصله (با پشتیبانی از رکوردهای قدیمی) ===
         let closestHTML = '';
         const closestData = computeClosestFromEntry(e);
         if (closestData) {
@@ -1781,9 +2013,10 @@
         }
         wrapper.innerHTML = `
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <div class="text-sm font-semibold">${pairName}</div>
               ${category ? `<span class="text-xs bg-blue-600 px-2 py-1 rounded">${category.name}</span>` : ''}
+              <span class="text-xs bg-indigo-600 px-2 py-1 rounded">${sectionName}</span>
             </div>
             <div class="text-xs muted">${e.dateDisplay}</div>
           </div>
@@ -1812,8 +2045,9 @@
       const pair = (storageGet('pairs') || []).find(p => p.id === e.pairId);
       const pairName = pair?.name || '—';
       const category = pair ? (storageGet('categories') || []).find(c => c.id === pair.categoryId) : null;
+      const sec = (storageGet('sections') || []).find(s => s.id === (e.sectionId || 'section1'));
+      const sectionName = sec?.name || 'بخش اول';
       if (detailContent) detailContent.innerHTML = '';
-      // === محاسبه نزدیک‌ترین فاصله (با پشتیبانی از رکوردهای قدیمی) ===
       let closestHTML = '';
       const closestData = computeClosestFromEntry(e);
       if (closestData) {
@@ -1833,7 +2067,7 @@
           <div class="space-y-3">
             <div class="bg-white/5 p-3 rounded">
               <div class="text-xs muted mb-1">جفت‌ارز</div>
-              <div class="font-semibold flex items-center gap-2">${pairName}${category ? `<span class="text-xs bg-blue-600 px-2 py-1 rounded">${category.name}</span>` : ''}</div>
+              <div class="font-semibold flex items-center gap-2 flex-wrap">${pairName}${category ? `<span class="text-xs bg-blue-600 px-2 py-1 rounded">${category.name}</span>` : ''}<span class="text-xs bg-indigo-600 px-2 py-1 rounded">${sectionName}</span></div>
             </div>
             <div class="bg-white/5 p-3 rounded">
               <div class="text-xs muted mb-1">تاریخ (میلادی)</div>
@@ -1889,6 +2123,7 @@
       if (!e) return;
       if (!confirm('مقادیر رکورد در فرم بارگذاری خواهد شد. پس از ویرایش دکمه محاسبه را بزنید تا رکورد جدید ذخیره شود. رکورد قدیمی حذف می‌شود. ادامه می‌دهید؟')) return;
       if (pairSelect) pairSelect.value = e.pairId || '';
+      if (sectionSelect) sectionSelect.value = e.sectionId || 'section1';
       if (inputY1) inputY1.value = e.inputs.originalY1;
       if (inputCurrentHigh) inputCurrentHigh.value = e.inputs.originalCurrentHigh;
       if (inputY2) inputY2.value = e.inputs.originalY2;
@@ -1929,7 +2164,7 @@
     if (exportBtn) {
       exportBtn.addEventListener('click', () => {
         try {
-          const payload = { pairs: storageGet('pairs') || [], entries: storageGet('entries') || [], categories: storageGet('categories') || [], meta: { created: new Date().toISOString(), version: '3.0', entryCount: (storageGet('entries') || []).length, pairCount: (storageGet('pairs') || []).length, categoryCount: (storageGet('categories') || []).length, backupId: uid() } };
+          const payload = { pairs: storageGet('pairs') || [], entries: storageGet('entries') || [], categories: storageGet('categories') || [], sections: storageGet('sections') || [], meta: { created: new Date().toISOString(), version: '3.1', entryCount: (storageGet('entries') || []).length, pairCount: (storageGet('pairs') || []).length, categoryCount: (storageGet('categories') || []).length, sectionCount: (storageGet('sections') || []).length, backupId: uid() } };
           const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json;charset=utf-8'});
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
@@ -1952,16 +2187,21 @@
           try {
             const obj = JSON.parse(reader.result);
             if (!obj) throw new Error('فایل نامعتبر');
-            const currentData = { pairs: storageGet('pairs') || [], entries: storageGet('entries') || [], categories: storageGet('categories') || [] };
+            const currentData = { pairs: storageGet('pairs') || [], entries: storageGet('entries') || [], categories: storageGet('categories') || [], sections: storageGet('sections') || [] };
             try {
               if (Array.isArray(obj.pairs)) storageSet('pairs', obj.pairs); else storageSet('pairs', []);
-              if (Array.isArray(obj.entries)) storageSet('entries', obj.entries); else storageSet('entries', []);
+              if (Array.isArray(obj.entries)) {
+                // اطمینان از اینکه هر entry دارای sectionId است
+                const entriesWithSection = obj.entries.map(e => ({ ...e, sectionId: e.sectionId || 'section1' }));
+                storageSet('entries', entriesWithSection);
+              } else storageSet('entries', []);
               if (Array.isArray(obj.categories)) storageSet('categories', obj.categories); else storageSet('categories', []);
+              if (Array.isArray(obj.sections) && obj.sections.length > 0) storageSet('sections', obj.sections); else storageSet('sections', [{id:'section1', name:'بخش اول'}, {id:'section2', name:'بخش دوم'}]);
               showNotification('بک‌آپ با موفقیت بارگذاری شد', 'success');
-              renderPairs(); renderHistory();
-              let message = '✅ بک‌آپ با موفقیت بارگذاری شد!\n📊 اطلاعات بک‌آپ:\n• ' + (obj.entries?.length || 0) + ' رکورد تاریخی\n• ' + (obj.pairs?.length || 0) + ' جفت‌ارز\n• ' + (obj.categories?.length || 0) + ' دسته‌بندی';
+              renderPairs(); renderSections(); renderHistory();
+              let message = '✅ بک‌آپ با موفقیت بارگذاری شد!\n📊 اطلاعات بک‌آپ:\n• ' + (obj.entries?.length || 0) + ' رکورد تاریخی\n• ' + (obj.pairs?.length || 0) + ' جفت‌ارز\n• ' + (obj.categories?.length || 0) + ' دسته‌بندی\n• ' + (obj.sections?.length || 0) + ' بخش محاسباتی';
               alert(message);
-            } catch (error) { storageSet('pairs', currentData.pairs); storageSet('entries', currentData.entries); storageSet('categories', currentData.categories); throw error; }
+            } catch (error) { storageSet('pairs', currentData.pairs); storageSet('entries', currentData.entries); storageSet('categories', currentData.categories); storageSet('sections', currentData.sections); throw error; }
           } catch (err) { alert('خطا در بارگذاری بک‌آپ: ' + err.message); }
         };
         reader.readAsText(f);
@@ -2007,6 +2247,7 @@
 
     if (historyDate) historyDate.addEventListener('change', renderHistory);
     if (historyPairFilter) historyPairFilter.addEventListener('change', renderHistory);
+    if (historySectionFilter) historySectionFilter.addEventListener('change', renderHistory);
     if (togglePairsHdr) togglePairsHdr.addEventListener('click', () => { if (boxPairs) boxPairs.classList.toggle('hidden'); });
     if (toggleCalcHdr) toggleCalcHdr.addEventListener('click', () => { if (boxCalc) boxCalc.classList.toggle('hidden'); });
     if (toggleHistoryHdr) toggleHistoryHdr.addEventListener('click', () => { if (boxHistory) boxHistory.classList.toggle('hidden'); });
@@ -2118,12 +2359,17 @@
           const pairs = storageGet('pairs') || [];
           const entries = storageGet('entries') || [];
           const categories = storageGet('categories') || [];
+          const sections = storageGet('sections') || [];
           statsContent.innerHTML = `
             <div class="stats-grid">
               <div class="stat-item"><div class="text-lg font-bold">${pairs.length}</div><div class="text-xs muted">جفت‌ارز</div></div>
               <div class="stat-item"><div class="text-lg font-bold">${entries.length}</div><div class="text-xs muted">رکورد تاریخی</div></div>
               <div class="stat-item"><div class="text-lg font-bold">${categories.length}</div><div class="text-xs muted">دسته‌بندی</div></div>
-              <div class="stat-item"><div class="text-lg font-bold">${new Date().toLocaleDateString('fa-IR')}</div><div class="text-xs muted">تاریخ امروز</div></div>
+              <div class="stat-item"><div class="text-lg font-bold">${sections.length}</div><div class="text-xs muted">بخش محاسباتی</div></div>
+            </div>
+            <div class="mt-3 p-2 bg-white/5 rounded text-xs">
+              <div class="font-semibold mb-1">رکوردها به تفکیک بخش:</div>
+              ${sections.map(s => `<div>${s.name}: ${entries.filter(e => (e.sectionId || 'section1') === s.id).length} رکورد</div>`).join('')}
             </div>
           `;
         }
@@ -2176,7 +2422,7 @@
     }
 
     function buildCurrentPayload() {
-      return { pairs: storageGet('pairs') || [], entries: storageGet('entries') || [], categories: storageGet('categories') || [], meta: { created: new Date().toISOString(), version: '3.0', entryCount: (storageGet('entries') || []).length, pairCount: (storageGet('pairs') || []).length, categoryCount: (storageGet('categories') || []).length, backupId: uid() } };
+      return { pairs: storageGet('pairs') || [], entries: storageGet('entries') || [], categories: storageGet('categories') || [], sections: storageGet('sections') || [], meta: { created: new Date().toISOString(), version: '3.1', entryCount: (storageGet('entries') || []).length, pairCount: (storageGet('pairs') || []).length, categoryCount: (storageGet('categories') || []).length, sectionCount: (storageGet('sections') || []).length, backupId: uid() } };
     }
 
     function createBackup(type = 'manual', options = {}) {
@@ -2286,6 +2532,7 @@
               <span>رکوردها: ${b.meta?.entryCount || 0}</span>
               <span>جفت‌ارز: ${b.meta?.pairCount || 0}</span>
               <span>دسته‌بندی: ${b.meta?.categoryCount || 0}</span>
+              <span>بخش: ${b.meta?.sectionCount || 0}</span>
               ${b.note ? `<span class="bg-slate-700 px-2 py-0.5 rounded">یادداشت: ${b.note}</span>` : ''}
               ${b.passwordHint ? `<span class="bg-yellow-700 px-2 py-0.5 rounded">یادآور رمز: ${b.passwordHint}</span>` : ''}
             </div>
@@ -2366,7 +2613,7 @@
         payload = JSON.parse(jsonStr);
       } catch (err) { alert('خطا در خواندن محتوای بک‌آپ: ' + err.message); return; }
       const samplePairs = payload.pairs?.slice(0, 5).map(p => p.name).join('، ') || 'بدون جفت‌ارز';
-      alert(`نوع: ${b.type}\nتاریخ ایجاد: ${new Date(b.createdISO).toLocaleString('fa-IR')}\nرکوردها: ${payload.entries?.length || 0}\nجفت‌ارزها: ${payload.pairs?.length || 0}\nدسته‌بندی‌ها: ${payload.categories?.length || 0}\nنمونه جفت‌ارزها: ${samplePairs}`);
+      alert(`نوع: ${b.type}\nتاریخ ایجاد: ${new Date(b.createdISO).toLocaleString('fa-IR')}\nرکوردها: ${payload.entries?.length || 0}\nجفت‌ارزها: ${payload.pairs?.length || 0}\nدسته‌بندی‌ها: ${payload.categories?.length || 0}\nبخش‌ها: ${payload.sections?.length || 0}\nنمونه جفت‌ارزها: ${samplePairs}`);
     }
 
     function restoreBackup(id) {
@@ -2386,12 +2633,15 @@
       const m = mode.trim();
       if (!['1','2','3'].includes(m)) { alert('گزینه نامعتبر.'); return; }
       if (!confirm('آیا از بازیابی این بک‌آپ مطمئن هستید؟ داده‌های فعلی شما مطابق نوع بازیابی تغییر می‌کنند.')) return;
-      const currentData = { pairs: storageGet('pairs') || [], entries: storageGet('entries') || [], categories: storageGet('categories') || [] };
+      const currentData = { pairs: storageGet('pairs') || [], entries: storageGet('entries') || [], categories: storageGet('categories') || [], sections: storageGet('sections') || [] };
       try {
-        if (m === '1' || m === '2') { storageSet('pairs', Array.isArray(payload.pairs) ? payload.pairs : []); storageSet('categories', Array.isArray(payload.categories) ? payload.categories : []); }
-        if (m === '1' || m === '3') { storageSet('entries', Array.isArray(payload.entries) ? payload.entries : []); }
-        renderPairs(); renderHistory(); showNotification('✅ بازیابی بک‌آپ با موفقیت انجام شد', 'success');
-      } catch (err) { storageSet('pairs', currentData.pairs); storageSet('entries', currentData.entries); storageSet('categories', currentData.categories); alert('خطا در بازیابی بک‌آپ: ' + err.message); }
+        if (m === '1' || m === '2') { storageSet('pairs', Array.isArray(payload.pairs) ? payload.pairs : []); storageSet('categories', Array.isArray(payload.categories) ? payload.categories : []); if (Array.isArray(payload.sections) && payload.sections.length > 0) storageSet('sections', payload.sections); }
+        if (m === '1' || m === '3') { 
+          const entries = Array.isArray(payload.entries) ? payload.entries.map(e => ({ ...e, sectionId: e.sectionId || 'section1' })) : [];
+          storageSet('entries', entries); 
+        }
+        renderPairs(); renderSections(); renderHistory(); showNotification('✅ بازیابی بک‌آپ با موفقیت انجام شد', 'success');
+      } catch (err) { storageSet('pairs', currentData.pairs); storageSet('entries', currentData.entries); storageSet('categories', currentData.categories); storageSet('sections', currentData.sections); alert('خطا در بازیابی بک‌آپ: ' + err.message); }
     }
 
     function deleteBackup(id) {
@@ -2427,6 +2677,14 @@
         await loadAllData();
         ensureDefaults();
         upgradePairsWithSortOrder();
+        // انتقال رکوردهای قدیمی به بخش اول
+        const entries = storageGet('entries') || [];
+        let needsUpdate = false;
+        entries.forEach(e => {
+          if (!e.sectionId) { e.sectionId = 'section1'; needsUpdate = true; }
+        });
+        if (needsUpdate) storageSet('entries', entries);
+
         if ((storageGet('pairs') || []).length === 0) {
           storageSet('pairs', [
             {id: uid(), name: 'EURUSD', categoryId: 'forex', sortOrder: 0},
@@ -2440,9 +2698,10 @@
           if (historyDate) historyDate.value = today;
           setTimeout(() => { if (inputY1) inputY1.focus(); extractAndDisplayAllNumbers(); }, 1000);
         });
+        renderSections();
         renderPairs();
         renderHistory();
-        setTimeout(() => console.log('✅ سیستم Calculator PRO - برنامه سوم با باکس ۴ عددی آماده است!'), 1000);
+        setTimeout(() => console.log('✅ سیستم Calculator PRO - برنامه سوم با بخش‌های محاسباتی آماده است!'), 1000);
       } catch (e) { console.error('Error initializing app:', e); alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.'); }
     }
     initApp();
