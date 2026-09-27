@@ -1042,6 +1042,65 @@
     }
 
     // ============================================================
+    // === تابع کمکی: محاسبه نزدیک‌ترین فاصله از روی یک رکورد ===
+    // ============================================================
+    function computeClosestFromEntry(e) {
+      // تلاش برای استفاده از outputsDisplay در صورت وجود raw
+      let formulaResults = [];
+      if (Array.isArray(e.outputsDisplay) && e.outputsDisplay.length > 0) {
+        formulaResults = e.outputsDisplay
+          .filter(it => it && typeof it.raw === 'number' && !isNaN(it.raw))
+          .map(it => ({ label: it.label || 'فرمول', value: it.raw }));
+      }
+      // اگر raw نداشت یا کافی نبود، از inputs بازمحاسبه کن
+      if (formulaResults.length < 2 && e.inputs) {
+        const y1 = Number(e.inputs.y1);
+        const y2 = Number(e.inputs.y2);
+        if (!isNaN(y1) && !isNaN(y2)) {
+          const outs = computeOutputs(y1, y2, Number(e.inputs.currentLow) || 0, Number(e.inputs.currentHigh) || 0);
+          formulaResults = [];
+          if (!isNaN(outs[0])) formulaResults.push({ label: "فرمول ۱ (سقف)", value: outs[0] });
+          if (!isNaN(outs[1])) formulaResults.push({ label: "فرمول ۲ (سقف)", value: outs[1] });
+          if (!isNaN(outs[2])) formulaResults.push({ label: "فرمول ۳ (کف)", value: outs[2] });
+          if (!isNaN(outs[3])) formulaResults.push({ label: "فرمول ۴ (کف)", value: outs[3] });
+        }
+      }
+      if (formulaResults.length < 2) return null;
+      const { pairs: closestPairs, minDistance } = findClosestNumbers(formulaResults);
+      if (!closestPairs || closestPairs.length === 0) return null;
+      return { closestPairs, minDistance };
+    }
+
+    // ============================================================
+    // === تابع کمکی: استخراج جواب‌های ۴ فرمول از یک رکورد ===
+    // ============================================================
+    function extractFormulasFromEntry(e) {
+      const result = [];
+      // اگر outputsDisplay با raw موجود باشد
+      if (Array.isArray(e.outputsDisplay) && e.outputsDisplay.length > 0) {
+        e.outputsDisplay.forEach(it => {
+          if (it && typeof it.raw === 'number' && !isNaN(it.raw)) {
+            result.push({ label: it.label || 'فرمول', value: it.raw, order: it.order, display: it.display });
+          }
+        });
+      }
+      // اگر کافی نبود، از inputs بازمحاسبه کن
+      if (result.length < 4 && e.inputs) {
+        const y1 = Number(e.inputs.y1);
+        const y2 = Number(e.inputs.y2);
+        if (!isNaN(y1) && !isNaN(y2)) {
+          const outs = computeOutputs(y1, y2, Number(e.inputs.currentLow) || 0, Number(e.inputs.currentHigh) || 0);
+          result.length = 0;
+          if (!isNaN(outs[0])) result.push({ label: "فرمول ۱ (سقف)", value: outs[0], order: 1, display: formatOutputByInputFormat(outs[0], e.inputFormat) });
+          if (!isNaN(outs[1])) result.push({ label: "فرمول ۲ (سقف)", value: outs[1], order: 2, display: formatOutputByInputFormat(outs[1], e.inputFormat) });
+          if (!isNaN(outs[2])) result.push({ label: "فرمول ۳ (کف)", value: outs[2], order: 3, display: formatOutputByInputFormat(outs[2], e.inputFormat) });
+          if (!isNaN(outs[3])) result.push({ label: "فرمول ۴ (کف)", value: outs[3], order: 4, display: formatOutputByInputFormat(outs[3], e.inputFormat) });
+        }
+      }
+      return result;
+    }
+
+    // ============================================================
     // === تابع استخراج 4 عدد از آخرین رکورد ===
     // ============================================================
     function extractAndDisplayAllNumbers() {
@@ -1485,6 +1544,87 @@
       });
     }
 
+    // ============================================================
+    // === تابع کمکی: مقایسه جواب‌های فرمول‌ها بین چند تاریخ ===
+    // ============================================================
+    function buildMultiDateComparisonHTML(entriesByDate, normDates, pairs) {
+      // ساخت لیستی از همه جواب‌های فرمول‌ها با برچسب تاریخ و فرمول
+      const allFormulas = [];
+      normDates.forEach(dateKey => {
+        const dayEntries = entriesByDate[dateKey] || [];
+        dayEntries.forEach(entry => {
+          const pair = pairs.find(p => p.id === entry.pairId);
+          const pairName = pair?.name || '—';
+          const formulas = extractFormulasFromEntry(entry);
+          formulas.forEach(f => {
+            allFormulas.push({
+              dateKey,
+              pairName,
+              label: f.label,
+              value: f.value,
+              display: f.display,
+              dateDisplay: entry.dateDisplay
+            });
+          });
+        });
+      });
+      if (allFormulas.length < 2) return '';
+
+      // === ۱) نزدیک‌ترین فاصله بین همه جواب‌ها در همه تاریخ‌ها ===
+      const { pairs: globalClosest, minDistance: globalMin } = findClosestNumbers(allFormulas);
+      let html = '';
+      if (globalClosest.length > 0) {
+        // فرمت‌دهی فاصله با اولین inputFormat موجود
+        const sampleEntry = (entriesByDate[normDates[0]] || [])[0];
+        const fmt = sampleEntry ? sampleEntry.inputFormat : null;
+        const displayDist = formatOutputByInputFormat(globalMin, fmt);
+        html += `
+          <div class="closest-info mb-3">
+            <div class="text-sm font-semibold mb-2">🎯 نزدیک‌ترین فاصله بین جواب‌های همه تاریخ‌های انتخاب‌شده: <span class="text-yellow-300">${displayDist}</span></div>
+            <div class="text-xs space-y-1">
+              ${globalClosest.map(pair => `
+                <div>• <span class="text-blue-300">${pair[0].pairName}</span> / ${pair[0].label} (${pair[0].dateDisplay}) ⟷ <span class="text-blue-300">${pair[1].pairName}</span> / ${pair[1].label} (${pair[1].dateDisplay})</div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      // === ۲) مقایسه هر فرمول بین تاریخ‌های مختلف ===
+      // گروه‌بندی بر اساس label فرمول
+      const formulasByLabel = {};
+      allFormulas.forEach(f => {
+        if (!formulasByLabel[f.label]) formulasByLabel[f.label] = [];
+        formulasByLabel[f.label].push(f);
+      });
+      const formulaLabels = Object.keys(formulasByLabel);
+      if (formulaLabels.length > 0 && normDates.length > 1) {
+        html += `<div class="bg-white/5 p-3 rounded mb-3">`;
+        html += `<div class="text-sm font-semibold mb-2">📊 مقایسه هر فرمول بین تاریخ‌های مختلف</div>`;
+        formulaLabels.forEach(label => {
+          const list = formulasByLabel[label].sort((a, b) => a.dateKey.localeCompare(b.dateKey));
+          if (list.length < 2) return;
+          html += `<div class="mb-2 p-2 bg-white/5 rounded">`;
+          html += `<div class="text-xs font-semibold text-yellow-300 mb-1">${label}</div>`;
+          html += `<div class="text-xs space-y-1">`;
+          for (let i = 0; i < list.length; i++) {
+            for (let j = i + 1; j < list.length; j++) {
+              const a = list[i], b = list[j];
+              const dist = Math.abs(a.value - b.value);
+              const sampleEntry = (entriesByDate[a.dateKey] || [])[0];
+              const fmt = sampleEntry ? sampleEntry.inputFormat : null;
+              const displayDist = formatOutputByInputFormat(dist, fmt);
+              html += `<div>• <span class="text-blue-300">${a.dateDisplay}</span> (${a.display}) ⟷ <span class="text-blue-300">${b.dateDisplay}</span> (${b.display}) = فاصله: <span class="text-yellow-300">${displayDist}</span></div>`;
+            }
+          }
+          html += `</div></div>`;
+        });
+        html += `</div>`;
+      }
+
+      return html;
+    }
+
     // ---------- تاریخچه ----------
     function renderMultiDateHistory(selectedPair, selectedDates) {
       const entries = (storageGet('entries') || []).slice();
@@ -1519,6 +1659,15 @@
         if (selectedPair && e.pairId !== selectedPair) return;
         entriesByDate[key].push(e);
       });
+
+      // === نمایش مقایسه بین تاریخ‌ها در بالای لیست ===
+      const comparisonHTML = buildMultiDateComparisonHTML(entriesByDate, normDates, pairs);
+      if (comparisonHTML) {
+        const cmpBox = document.createElement('div');
+        cmpBox.innerHTML = comparisonHTML;
+        historyList.appendChild(cmpBox);
+      }
+
       let hasAny = false;
       normDates.forEach(dateKey => {
         const groupEntries = entriesByDate[dateKey] || [];
@@ -1542,14 +1691,16 @@
             const category = pair ? categories.find(c => c.id === pair.categoryId) : null;
             const wrapper = document.createElement('div');
             wrapper.className = 'history-entry-compact flex flex-col gap-3 hover:border-white/20 transition-colors';
+            // === محاسبه نزدیک‌ترین فاصله (با پشتیبانی از رکوردهای قدیمی) ===
             let closestHTML = '';
-            if (e.closestInfo && e.closestInfo.closestPairs && e.closestInfo.closestPairs.length > 0) {
-              const displayDist = formatOutputByInputFormat(e.closestInfo.minDistance, e.inputFormat);
+            const closestData = computeClosestFromEntry(e);
+            if (closestData) {
+              const displayDist = formatOutputByInputFormat(closestData.minDistance, e.inputFormat);
               closestHTML = `
                 <div class="mt-2 pt-2 border-t border-white/10">
                   <div class="text-xs muted mb-1">نزدیک‌ترین اعداد (فاصله: ${displayDist}):</div>
                   <div class="text-xs space-y-1">
-                    ${e.closestInfo.closestPairs.map(pair => `• ${pair[0].label} و ${pair[1].label}`).join('<br>')}
+                    ${closestData.closestPairs.map(pair => `• ${pair[0].label} و ${pair[1].label}`).join('<br>')}
                   </div>
                 </div>
               `;
@@ -1563,7 +1714,7 @@
                 <div class="text-xs muted">${e.dateDisplay}</div>
               </div>
               <div class="flex gap-2 flex-wrap justify-center">
-                ${e.outputsDisplay.map(it => `<span class="box-out ${it.color} cursor-pointer hover:opacity-80 transition-opacity" title="کلیک برای کپی: ${it.display}" onclick="copyToClipboard('${it.display}')"><span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}</span>`).join('')}
+                ${(e.outputsDisplay || []).map(it => `<span class="box-out ${it.color} cursor-pointer hover:opacity-80 transition-opacity" title="کلیک برای کپی: ${it.display}" onclick="copyToClipboard('${it.display}')"><span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}</span>`).join('')}
               </div>
               ${closestHTML}
             `;
@@ -1614,14 +1765,16 @@
         const category = pair ? (storageGet('categories') || []).find(c => c.id === pair.categoryId) : null;
         const wrapper = document.createElement('div');
         wrapper.className = 'history-entry-compact flex flex-col gap-3 hover:border-white/20 transition-colors';
+        // === محاسبه نزدیک‌ترین فاصله (با پشتیبانی از رکوردهای قدیمی) ===
         let closestHTML = '';
-        if (e.closestInfo && e.closestInfo.closestPairs && e.closestInfo.closestPairs.length > 0) {
-          const displayDist = formatOutputByInputFormat(e.closestInfo.minDistance, e.inputFormat);
+        const closestData = computeClosestFromEntry(e);
+        if (closestData) {
+          const displayDist = formatOutputByInputFormat(closestData.minDistance, e.inputFormat);
           closestHTML = `
             <div class="mt-2 pt-2 border-t border-white/10">
               <div class="text-xs muted mb-1">نزدیک‌ترین اعداد (فاصله: ${displayDist}):</div>
               <div class="text-xs space-y-1">
-                ${e.closestInfo.closestPairs.map(pair => `• ${pair[0].label} و ${pair[1].label}`).join('<br>')}
+                ${closestData.closestPairs.map(pair => `• ${pair[0].label} و ${pair[1].label}`).join('<br>')}
               </div>
             </div>
           `;
@@ -1635,7 +1788,7 @@
             <div class="text-xs muted">${e.dateDisplay}</div>
           </div>
           <div class="flex gap-2 flex-wrap justify-center">
-            ${e.outputsDisplay.map(it => `<span class="box-out ${it.color} cursor-pointer hover:opacity-80 transition-opacity" title="کلیک برای کپی: ${it.display}" onclick="copyToClipboard('${it.display}')"><span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}</span>`).join('')}
+            ${(e.outputsDisplay || []).map(it => `<span class="box-out ${it.color} cursor-pointer hover:opacity-80 transition-opacity" title="کلیک برای کپی: ${it.display}" onclick="copyToClipboard('${it.display}')"><span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}</span>`).join('')}
           </div>
           ${closestHTML}
         `;
@@ -1660,15 +1813,17 @@
       const pairName = pair?.name || '—';
       const category = pair ? (storageGet('categories') || []).find(c => c.id === pair.categoryId) : null;
       if (detailContent) detailContent.innerHTML = '';
+      // === محاسبه نزدیک‌ترین فاصله (با پشتیبانی از رکوردهای قدیمی) ===
       let closestHTML = '';
-      if (e.closestInfo && e.closestInfo.closestPairs && e.closestInfo.closestPairs.length > 0) {
-        const displayDist = formatOutputByInputFormat(e.closestInfo.minDistance, e.inputFormat);
+      const closestData = computeClosestFromEntry(e);
+      if (closestData) {
+        const displayDist = formatOutputByInputFormat(closestData.minDistance, e.inputFormat);
         closestHTML = `
           <div class="bg-white/5 p-4 rounded">
             <div class="text-xs muted mb-3">نزدیک‌ترین اعداد</div>
             <div class="text-sm space-y-2">
               <div class="font-semibold">فاصله: ${displayDist}</div>
-              ${e.closestInfo.closestPairs.map(pair => `<div class="flex justify-between items-center p-2 bg-white/5 rounded"><div>${pair[0].label} و ${pair[1].label}</div></div>`).join('')}
+              ${closestData.closestPairs.map(pair => `<div class="flex justify-between items-center p-2 bg-white/5 rounded"><div>${pair[0].label} و ${pair[1].label}</div></div>`).join('')}
             </div>
           </div>
         `;
@@ -1704,7 +1859,7 @@
         <div class="bg-white/5 p-4 rounded">
           <div class="text-xs muted mb-3">خروجی‌ها (مرتب‌شده)</div>
           <div class="flex flex-wrap gap-2 justify-center">
-            ${e.outputsDisplay.map(it => `<span class="box-out ${it.color} cursor-default text-sm"><span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}</span>`).join('')}
+            ${(e.outputsDisplay || []).map(it => `<span class="box-out ${it.color} cursor-default text-sm"><span class="num-label">${it.order}.</span> (${it.label}) ${it.display} ${it.suffix}</span>`).join('')}
           </div>
         </div>
         ${closestHTML}
