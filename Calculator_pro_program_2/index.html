@@ -857,17 +857,28 @@ function parseFormattedInteger(str) {
   return { rawNumber, format: { hasDot: true, left: leftDigits.length, right: rightDigits.length, total: totalLength } };
 }
 
-function formatOutputByInputFormat(number, inputFormat) {
-  if (isNaN(number)) return '';
-  const numStr = Math.abs(number).toString();
-  const isNegative = number < 0;
-  if (!inputFormat || !inputFormat.hasDot) return isNegative ? '-' + numStr : numStr;
-  const { left, right, total } = inputFormat;
-  let padded = numStr.padStart(total, '0');
-  if (padded.length > total) padded = padded.slice(-total);
-  const leftPart = padded.slice(0, left);
-  const rightPart = padded.slice(left);
-  const finalLeft = leftPart === '' ? '0' : parseInt(leftPart || '0', 10).toString();
+/**
+ * قالب‌بندی خروجی بر اساس فرمت ورودی
+ * @param {number} intNumber - عدد صحیح خروجی (مثلاً 92997)
+ * @param {object} inputFormat - فرمت ورودی شامل { hasDot, left, right, total }
+ * @returns {string} رشته قالب‌بندی شده
+ */
+function formatOutputByInputFormat(intNumber, inputFormat) {
+  if (isNaN(intNumber)) return '';
+  const numStr = Math.abs(intNumber).toString();
+  const isNegative = intNumber < 0;
+
+  if (!inputFormat || !inputFormat.hasDot) {
+    return isNegative ? '-' + numStr : numStr;
+  }
+
+  const { right } = inputFormat; // تعداد ارقام سمت راست نقطه در ورودی
+  if (right <= 0) return isNegative ? '-' + numStr : numStr;
+
+  let padded = numStr.padStart(right + 1, '0'); // حداقل یک رقم قبل از نقطه
+  const rightPart = padded.slice(-right);
+  const leftPart = padded.slice(0, -right);
+  const finalLeft = leftPart === '' ? '0' : parseInt(leftPart, 10).toString();
   let result = finalLeft + '.' + rightPart;
   if (isNegative) result = '-' + result;
   return result;
@@ -890,28 +901,30 @@ function calcFloor(num) {
 }
 
 /* ============================================================
-   نمایش خروجی‌های سقف و کف (فقط عدد صحیح)
+   نمایش خروجی‌های سقف و کف (با قالب‌بندی نقطه‌گذاری)
 ============================================================ */
-function renderOutputs(ceilingData, floorData) {
+function renderOutputs(ceilingData, floorData, ceilingFormat, floorFormat) {
   if (!outputsArea) return;
   outputsArea.innerHTML = '';
 
-  const ceilingIntValue = Math.floor(ceilingData.finalResult).toString();
-  const floorIntValue = Math.floor(floorData.finalResult).toString();
+  const ceilingIntValue = Math.floor(ceilingData.finalResult);
+  const floorIntValue = Math.floor(floorData.finalResult);
+  const ceilingFormatted = formatOutputByInputFormat(ceilingIntValue, ceilingFormat);
+  const floorFormatted = formatOutputByInputFormat(floorIntValue, floorFormat);
 
   // کارت سقف
   const ceilingCard = document.createElement('div');
   ceilingCard.className = 'output-card ceiling';
   ceilingCard.innerHTML = `
     <div class="output-title">🔺 خروجی سقف (صعودی + ۰.۶۱۸)</div>
-    <div class="output-value" title="کلیک برای کپی">${ceilingIntValue}</div>
+    <div class="output-value" title="کلیک برای کپی">${ceilingFormatted}</div>
     <div class="output-steps">
       √ = <span>${ceilingData.sqrt.toFixed(6)}</span> →
       + ۰.۶۱۸ = <span>${ceilingData.step2.toFixed(6)}</span> →
       ² = <span>${ceilingData.finalResult.toFixed(6)}</span>
     </div>
   `;
-  ceilingCard.querySelector('.output-value').addEventListener('click', () => copyToClipboard(ceilingIntValue));
+  ceilingCard.querySelector('.output-value').addEventListener('click', () => copyToClipboard(ceilingFormatted));
   outputsArea.appendChild(ceilingCard);
 
   // کارت کف
@@ -919,14 +932,14 @@ function renderOutputs(ceilingData, floorData) {
   floorCard.className = 'output-card floor';
   floorCard.innerHTML = `
     <div class="output-title">🔻 خروجی کف (نزولی − ۰.۶۱۸)</div>
-    <div class="output-value" title="کلیک برای کپی">${floorIntValue}</div>
+    <div class="output-value" title="کلیک برای کپی">${floorFormatted}</div>
     <div class="output-steps">
       √ = <span>${floorData.sqrt.toFixed(6)}</span> →
       − ۰.۶۱۸ = <span>${floorData.step2.toFixed(6)}</span> →
       ² = <span>${floorData.finalResult.toFixed(6)}</span>
     </div>
   `;
-  floorCard.querySelector('.output-value').addEventListener('click', () => copyToClipboard(floorIntValue));
+  floorCard.querySelector('.output-value').addEventListener('click', () => copyToClipboard(floorFormatted));
   outputsArea.appendChild(floorCard);
 }
 
@@ -1181,10 +1194,12 @@ if (calculateButton) {
       const ceilingData = calcCeiling(ceilingNum);
       const floorData = calcFloor(floorNum);
 
-      const ceilingIntValue = Math.floor(ceilingData.finalResult).toString();
-      const floorIntValue = Math.floor(floorData.finalResult).toString();
+      const ceilingIntValue = Math.floor(ceilingData.finalResult);
+      const floorIntValue = Math.floor(floorData.finalResult);
+      const ceilingFormatted = formatOutputByInputFormat(ceilingIntValue, parsedCeiling.format);
+      const floorFormatted = formatOutputByInputFormat(floorIntValue, parsedFloor.format);
 
-      renderOutputs(ceilingData, floorData);
+      renderOutputs(ceilingData, floorData, parsedCeiling.format, parsedFloor.format);
 
       let chosenISO = null;
       if (datePicker && datePicker.value) {
@@ -1204,18 +1219,20 @@ if (calculateButton) {
           ceilingOriginal: inputCeiling.value,
           floorOriginal: inputFloor.value,
           ceilingRaw: ceilingNum,
-          floorRaw: floorNum
+          floorRaw: floorNum,
+          ceilingFormat: parsedCeiling.format,
+          floorFormat: parsedFloor.format
         },
         {
           ceiling: {
             value: ceilingData.finalResult,
-            formatted: ceilingIntValue,
+            formatted: ceilingFormatted,
             sqrt: ceilingData.sqrt,
             step2: ceilingData.step2
           },
           floor: {
             value: floorData.finalResult,
-            formatted: floorIntValue,
+            formatted: floorFormatted,
             sqrt: floorData.sqrt,
             step2: floorData.step2
           }
@@ -1616,7 +1633,7 @@ if (exportBtn) {
         categories: storageGet('categories') || [],
         meta: {
           created: new Date().toISOString(),
-          version: '4.0',
+          version: '4.1',
           entryCount: (storageGet('entries') || []).length,
           pairCount: (storageGet('pairs') || []).length,
           categoryCount: (storageGet('categories') || []).length,
