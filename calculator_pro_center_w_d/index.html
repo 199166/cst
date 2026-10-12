@@ -111,6 +111,12 @@
       color:#fff; 
       border-color: #3730a3;
     }
+
+    .box-farthest {
+      background:#7c2d12;
+      color:#fff;
+      border-color: #9a3412;
+    }
     
     .num-label{ 
       font-weight:700; 
@@ -180,6 +186,9 @@
     
     .small-btn.bg-green-600 { background: #059669; border-color: #10b981; color: #fff; }
     .small-btn.bg-green-600:hover { background: #10b981; border-color: #34d399; }
+
+    .small-btn.bg-orange-600 { background: #ea580c; border-color: #f97316; color: #fff; }
+    .small-btn.bg-orange-600:hover { background: #f97316; border-color: #fb923c; }
     
     .small-btn:disabled {
       opacity: 0.5;
@@ -486,6 +495,22 @@
     }
     .date-range-item button{
       flex-shrink:0;
+    }
+
+    .analysis-box {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+
+    .analysis-box.closest {
+      border-right: 3px solid #10b981;
+    }
+
+    .analysis-box.farthest {
+      border-right: 3px solid #f97316;
     }
 </style>
 </head>
@@ -1687,12 +1712,10 @@
           }
         }
 
-        // ===== اصلاح اصلی: جابه‌جایی بالا/پایین با در نظر گرفتن دسته‌بندی =====
         if(action === 'up' || action === 'down') {
           const clickedPair = pairs.find(p => p.id === id);
           if(!clickedPair) return;
 
-          // ۱. فیلتر کردن جفت‌ارزهای هم‌دسته و مرتب‌سازی بر اساس sortOrder
           const categoryPairs = sortPairsByOrder(pairs.filter(p => p.categoryId === clickedPair.categoryId));
           const catIdx = categoryPairs.findIndex(p => p.id === id);
           
@@ -1700,24 +1723,18 @@
 
           if(action === 'up' && catIdx > 0) {
             const targetPair = categoryPairs[catIdx - 1];
-            
-            // جابه‌جایی sortOrder
             const tempOrder = clickedPair.sortOrder;
             clickedPair.sortOrder = targetPair.sortOrder;
             targetPair.sortOrder = tempOrder;
-            
             storageSet('pairs', pairs);
             renderPairs();
           }
 
           if(action === 'down' && catIdx < categoryPairs.length - 1) {
             const targetPair = categoryPairs[catIdx + 1];
-            
-            // جابه‌جایی sortOrder
             const tempOrder = clickedPair.sortOrder;
             clickedPair.sortOrder = targetPair.sortOrder;
             targetPair.sortOrder = tempOrder;
-            
             storageSet('pairs', pairs);
             renderPairs();
           }
@@ -1733,7 +1750,9 @@
       });
     }
 
-    /* ---------- فرمول‌های کد 02 ---------- */
+    /* ============================================================
+       ---------- فرمول‌های اصلی ----------
+       ============================================================ */
 
     function calculateForOneInput(yStr, outputContainer) {
       if(!outputContainer) return [];
@@ -1771,6 +1790,7 @@
       return sortedResults;
     }
 
+    /* ===== تابع نزدیک‌ترین ===== */
     function findClosestPairAcrossSets(set1, set2) {
       if (!set1 || !set2 || !Array.isArray(set1) || !Array.isArray(set2) || set1.length === 0 || set2.length === 0) {
         return null;
@@ -1805,9 +1825,48 @@
       return null;
     }
 
-    function renderResultsDisplay(results1, results2, closest) {
+    /* ===== تابع دورترین ===== */
+    function findFarthestPairAcrossSets(set1, set2) {
+      if (!set1 || !set2 || !Array.isArray(set1) || !Array.isArray(set2) || set1.length === 0 || set2.length === 0) {
+        return null;
+      }
+
+      let maxDifference = -Infinity;
+      let farthestPair = null;
+      let farthestIndexes = null;
+
+      for (let i = 0; i < set1.length; i++) {
+        for (let j = 0; j < set2.length; j++) {
+          if (typeof set1[i] !== 'number' || typeof set2[j] !== 'number') continue;
+          
+          const diff = Math.abs(set1[i] - set2[j]);
+          if (diff > maxDifference) {
+            maxDifference = diff;
+            farthestPair = [set1[i], set2[j]];
+            farthestIndexes = [i + 1, j + 1];
+          }
+        }
+      }
+      
+      if (farthestPair && Array.isArray(farthestPair) && farthestPair.length === 2 && 
+          farthestIndexes && Array.isArray(farthestIndexes) && farthestIndexes.length === 2) {
+        return { 
+          pair: farthestPair, 
+          difference: maxDifference,
+          indexes: farthestIndexes
+        };
+      }
+      
+      return null;
+    }
+
+    /* ===== رندر نتایج تحلیل (نزدیک‌ترین + دورترین) ===== */
+    function renderResultsDisplay(results1, results2, closest, farthest) {
       if (!analysisResult) return;
       
+      let html = '';
+      
+      // نزدیک‌ترین
       if (closest && closest.pair && Array.isArray(closest.pair) && closest.pair.length === 2 && 
           closest.indexes && Array.isArray(closest.indexes) && closest.indexes.length === 2) {
         
@@ -1815,26 +1874,58 @@
         const formattedDiff = closest.difference;
         const indexesText = `${closest.indexes[0]}/${closest.indexes[1]}`;
         
-        analysisResult.innerHTML = `
-          <div>نزدیک‌ترین زوج: <b class="text-green-400">${formattedPair}</b></div>
-          <div>اختلاف: <b class="text-green-400">${formattedDiff}</b></div>
-          <div>شماره نتایج نزدیک: <b class="text-yellow-400">${indexesText}</b></div>
-          <div class="text-xs muted mt-1">(عدد ${closest.indexes[0]} بخش ۱ با عدد ${closest.indexes[1]} بخش ۲)</div>
+        html += `
+          <div class="analysis-box closest">
+            <div class="text-xs muted mb-1">🟢 نزدیک‌ترین زوج</div>
+            <div>نزدیک‌ترین زوج: <b class="text-green-400">${formattedPair}</b></div>
+            <div>اختلاف: <b class="text-green-400">${formattedDiff}</b></div>
+            <div>شماره نتایج نزدیک: <b class="text-yellow-400">${indexesText}</b></div>
+            <div class="text-xs muted mt-1">(عدد ${closest.indexes[0]} بخش ۱ با عدد ${closest.indexes[1]} بخش ۲)</div>
+          </div>
         `;
-      } else if (inputY1 && inputY2 && inputY1.value && inputY2.value) {
-        analysisResult.textContent = 'تحلیل انجام شد ولی نزدیک‌ترین زوج یافت نشد.';
-      } else {
-        analysisResult.textContent = 'لطفاً اعداد را وارد کنید.';
       }
+      
+      // دورترین
+      if (farthest && farthest.pair && Array.isArray(farthest.pair) && farthest.pair.length === 2 && 
+          farthest.indexes && Array.isArray(farthest.indexes) && farthest.indexes.length === 2) {
+        
+        const formattedPair = `${farthest.pair[0]} (بخش ۱) و ${farthest.pair[1]} (بخش ۲)`;
+        const formattedDiff = farthest.difference;
+        const indexesText = `${farthest.indexes[0]}/${farthest.indexes[1]}`;
+        
+        html += `
+          <div class="analysis-box farthest">
+            <div class="text-xs muted mb-1">🟠 دورترین زوج</div>
+            <div>دورترین زوج: <b class="text-orange-400">${formattedPair}</b></div>
+            <div>اختلاف: <b class="text-orange-400">${formattedDiff}</b></div>
+            <div>شماره نتایج دور: <b class="text-yellow-400">${indexesText}</b></div>
+            <div class="text-xs muted mt-1">(عدد ${farthest.indexes[0]} بخش ۱ با عدد ${farthest.indexes[1]} بخش ۲)</div>
+          </div>
+        `;
+      }
+      
+      if (!html) {
+        if (inputY1 && inputY2 && inputY1.value && inputY2.value) {
+          analysisResult.textContent = 'تحلیل انجام شد ولی زوجی یافت نشد.';
+        } else {
+          analysisResult.textContent = 'لطفاً اعداد را وارد کنید.';
+        }
+        return;
+      }
+      
+      analysisResult.innerHTML = html;
     }
 
     /* ---------- entries save/prune ---------- */
-    function saveEntry(pairId, inputs, results1, results2, closest, note='', dateISO=null){
+    function saveEntry(pairId, inputs, results1, results2, closest, farthest, note='', dateISO=null){
       const entries = storageGet('entries')||[];
       const si = dateISO || nowISO();
       
       const safeClosest = (closest && closest.pair && Array.isArray(closest.pair) && closest.pair.length === 2 && 
                           closest.indexes && Array.isArray(closest.indexes) && closest.indexes.length === 2) ? closest : null;
+      
+      const safeFarthest = (farthest && farthest.pair && Array.isArray(farthest.pair) && farthest.pair.length === 2 && 
+                           farthest.indexes && Array.isArray(farthest.indexes) && farthest.indexes.length === 2) ? farthest : null;
       
       const entry = { 
         id: uid(), 
@@ -1845,6 +1936,7 @@
         results1: Array.isArray(results1) ? results1 : [], 
         results2: Array.isArray(results2) ? results2 : [], 
         closest: safeClosest,
+        farthest: safeFarthest,
         note,
         inputFormats: {
           y1: inputs.originalY1 || '',
@@ -1891,7 +1983,8 @@
         const results2 = calculateForOneInput(inputY2.value, resultsList2);
 
         const closest = findClosestPairAcrossSets(results1, results2);
-        renderResultsDisplay(results1, results2, closest);
+        const farthest = findFarthestPairAcrossSets(results1, results2);
+        renderResultsDisplay(results1, results2, closest, farthest);
 
         let chosenISO = null;
         if(datePicker && datePicker.value){
@@ -1913,7 +2006,7 @@
           originalY2: parsedY2.original,
           dotStructureY1: parsedY1.dotStructure,
           dotStructureY2: parsedY2.dotStructure
-        }, results1, results2, closest, note, chosenISO);
+        }, results1, results2, closest, farthest, note, chosenISO);
 
       }catch(err){ if(errorMessage) errorMessage.textContent = 'خطا: '+err.message; }
     });
@@ -2042,6 +2135,55 @@
       renderMultiDateHistory(selectedPair, selectedDates);
     }
 
+    /* ===== محاسبه پویای دورترین برای رکوردهای قدیمی ===== */
+    function getFarthestForEntry(e) {
+      // اگر رکورد جدید است و farthest دارد
+      if (e.farthest && e.farthest.pair && Array.isArray(e.farthest.pair) && e.farthest.pair.length === 2 &&
+          e.farthest.indexes && Array.isArray(e.farthest.indexes) && e.farthest.indexes.length === 2) {
+        return e.farthest;
+      }
+      // برای رکوردهای قدیمی، از روی results1 و results2 محاسبه کن
+      if (e.results1 && e.results2 && Array.isArray(e.results1) && Array.isArray(e.results2) &&
+          e.results1.length > 0 && e.results2.length > 0) {
+        return findFarthestPairAcrossSets(e.results1, e.results2);
+      }
+      return null;
+    }
+
+    /* ===== ساخت HTML تحلیل برای هر رکورد (نزدیک + دور) ===== */
+    function buildAnalysisHtmlForEntry(e) {
+      let html = '';
+      
+      // نزدیک‌ترین
+      if (e.closest && e.closest.pair && Array.isArray(e.closest.pair) && e.closest.pair.length === 2 &&
+          e.closest.indexes && Array.isArray(e.closest.indexes) && e.closest.indexes.length === 2) {
+        html += `
+        <div class="analysis-box closest">
+          <div class="text-xs muted mb-1">🟢 نزدیک‌ترین زوج</div>
+          <div class="text-sm font-semibold">${e.closest.pair[0]} و ${e.closest.pair[1]}</div>
+          <div class="text-xs muted">اختلاف: ${e.closest.difference}</div>
+          <div class="text-xs font-semibold text-yellow-400 mt-1">شماره نتایج: ${e.closest.indexes[0]}/${e.closest.indexes[1]}</div>
+        </div>
+        `;
+      }
+      
+      // دورترین (پویا برای رکوردهای قدیمی)
+      const farthest = getFarthestForEntry(e);
+      if (farthest && farthest.pair && Array.isArray(farthest.pair) && farthest.pair.length === 2 &&
+          farthest.indexes && Array.isArray(farthest.indexes) && farthest.indexes.length === 2) {
+        html += `
+        <div class="analysis-box farthest">
+          <div class="text-xs muted mb-1">🟠 دورترین زوج</div>
+          <div class="text-sm font-semibold">${farthest.pair[0]} و ${farthest.pair[1]}</div>
+          <div class="text-xs muted">اختلاف: ${farthest.difference}</div>
+          <div class="text-xs font-semibold text-yellow-400 mt-1">شماره نتایج: ${farthest.indexes[0]}/${farthest.indexes[1]}</div>
+        </div>
+        `;
+      }
+      
+      return html;
+    }
+
     function renderMultiDateHistory(pairFilter = null, dates = []) {
       const entries = (storageGet('entries')||[]).slice();
       entries.sort((a,b)=> new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime());
@@ -2112,18 +2254,7 @@
             </span>`;
           }).join('') : '<span class="text-xs muted">بدون داده</span>';
           
-          let closestHtml = '';
-          if (e.closest && e.closest.pair && Array.isArray(e.closest.pair) && e.closest.pair.length === 2 &&
-              e.closest.indexes && Array.isArray(e.closest.indexes) && e.closest.indexes.length === 2) {
-            closestHtml = `
-            <div class="bg-white/5 p-2 rounded text-center">
-              <div class="text-xs muted">نزدیک‌ترین زوج</div>
-              <div class="text-sm font-semibold">${e.closest.pair[0]} و ${e.closest.pair[1]}</div>
-              <div class="text-xs muted">اختلاف: ${e.closest.difference}</div>
-              <div class="text-xs font-semibold text-yellow-400 mt-1">شماره نتایج: ${e.closest.indexes[0]}/${e.closest.indexes[1]}</div>
-            </div>
-            `;
-          }
+          const analysisHtml = buildAnalysisHtmlForEntry(e);
           
           wrapper.innerHTML = `
             <div class="flex items-center justify-between">
@@ -2139,7 +2270,7 @@
                 <div class="flex flex-col gap-1">${results2Html}</div>
               </div>
             </div>
-            ${closestHtml}
+            ${analysisHtml}
           `;
           
           const bottom = document.createElement('div'); 
@@ -2220,18 +2351,7 @@
           </span>`;
         }).join('') : '<span class="text-xs muted">بدون داده</span>';
         
-        let closestHtml = '';
-        if (e.closest && e.closest.pair && Array.isArray(e.closest.pair) && e.closest.pair.length === 2 &&
-            e.closest.indexes && Array.isArray(e.closest.indexes) && e.closest.indexes.length === 2) {
-          closestHtml = `
-          <div class="bg-white/5 p-2 rounded text-center">
-            <div class="text-xs muted">نزدیک‌ترین زوج</div>
-            <div class="text-sm font-semibold">${e.closest.pair[0]} و ${e.closest.pair[1]}</div>
-            <div class="text-xs muted">اختلاف: ${e.closest.difference}</div>
-            <div class="text-xs font-semibold text-yellow-400 mt-1">شماره نتایج: ${e.closest.indexes[0]}/${e.closest.indexes[1]}</div>
-          </div>
-          `;
-        }
+        const analysisHtml = buildAnalysisHtmlForEntry(e);
         
         wrapper.innerHTML = `
           <div class="flex items-center justify-between">
@@ -2254,7 +2374,7 @@
             </div>
           </div>
           
-          ${closestHtml}
+          ${analysisHtml}
         `;
         
         const bottom = document.createElement('div'); 
@@ -2284,13 +2404,30 @@
       if (e.closest && e.closest.pair && Array.isArray(e.closest.pair) && e.closest.pair.length === 2 &&
           e.closest.indexes && Array.isArray(e.closest.indexes) && e.closest.indexes.length === 2) {
         closestHtml = `
-        <div class="bg-white/5 p-4 rounded">
-          <div class="text-xs muted mb-3">تحلیل نهایی</div>
-          <div class="text-center space-y-2">
+        <div class="analysis-box closest">
+          <div class="text-xs muted mb-2">🟢 نزدیک‌ترین زوج</div>
+          <div class="text-center space-y-1">
             <div class="text-sm font-semibold">نزدیک‌ترین زوج: ${e.closest.pair[0]} و ${e.closest.pair[1]}</div>
             <div class="text-xs muted">اختلاف: ${e.closest.difference}</div>
             <div class="text-sm font-semibold text-yellow-400">شماره نتایج نزدیک: ${e.closest.indexes[0]}/${e.closest.indexes[1]}</div>
             <div class="text-xs muted">(عدد ${e.closest.indexes[0]} بخش ۱ با عدد ${e.closest.indexes[1]} بخش ۲)</div>
+          </div>
+        </div>
+        `;
+      }
+      
+      const farthest = getFarthestForEntry(e);
+      let farthestHtml = '';
+      if (farthest && farthest.pair && Array.isArray(farthest.pair) && farthest.pair.length === 2 &&
+          farthest.indexes && Array.isArray(farthest.indexes) && farthest.indexes.length === 2) {
+        farthestHtml = `
+        <div class="analysis-box farthest">
+          <div class="text-xs muted mb-2">🟠 دورترین زوج</div>
+          <div class="text-center space-y-1">
+            <div class="text-sm font-semibold">دورترین زوج: ${farthest.pair[0]} و ${farthest.pair[1]}</div>
+            <div class="text-xs muted">اختلاف: ${farthest.difference}</div>
+            <div class="text-sm font-semibold text-yellow-400">شماره نتایج دور: ${farthest.indexes[0]}/${farthest.indexes[1]}</div>
+            <div class="text-xs muted">(عدد ${farthest.indexes[0]} بخش ۱ با عدد ${farthest.indexes[1]} بخش ۲)</div>
           </div>
         </div>
         `;
@@ -2354,6 +2491,7 @@
         </div>
         
         ${closestHtml}
+        ${farthestHtml}
       `;
 
       if(detailModal) {
@@ -2401,7 +2539,8 @@
         calculateForOneInput(e.inputFormats?.y2 || e.inputs.y2.toString(), resultsList2);
         
         const closest = findClosestPairAcrossSets(e.results1, e.results2);
-        renderResultsDisplay(e.results1, e.results2, closest);
+        const farthest = findFarthestPairAcrossSets(e.results1, e.results2);
+        renderResultsDisplay(e.results1, e.results2, closest, farthest);
       }
       
       const idx = entries.findIndex(x=>x.id===id); 
@@ -2711,7 +2850,7 @@
         }
         renderPairs(); 
         renderHistory();
-        console.log('✅ سیستم Calculator PRO - با IndexedDB و sortOrder آماده است!');
+        console.log('✅ سیستم Calculator PRO - با IndexedDB و sortOrder و دورترین/نزدیک‌ترین آماده است!');
       } catch (e) {
         console.error('Error initializing app:', e);
         alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
