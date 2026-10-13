@@ -897,11 +897,11 @@
     const fixedSectionTag = $('fixed_section_tag');
 
     // ---------- State برای انتخاب رکورد فعال در باکس آبی ----------
-    let activeDisplayEntryId = null; // id رکوردی که در باکس آبی نمایش داده می‌شود
+    let activeDisplayEntryId = null;
 
     // ---------- Multi-date state ----------
     let isMultiDate = false;
-    let dateRanges = []; // { id, date, sectionId, showInBox }
+    let dateRanges = []; // فقط { id, date, sectionId } - بدون showInBox
     function resetMultiDateUI() {
       if (dateRangesContainer) dateRangesContainer.innerHTML = '';
       dateRanges = [];
@@ -909,14 +909,13 @@
     function addMultiDateRangeUI() {
       if (!dateRangesContainer) return;
       const id = Date.now().toString() + '_' + Math.random().toString(16).slice(2);
-      // اگر هیچ تاریخی showInBox ندارد، این یکی را پیش‌فرض انتخاب کن
-      const anyShown = dateRanges.some(r => r.showInBox);
-      dateRanges.push({ id, date: null, sectionId: '', showInBox: !anyShown });
+      dateRanges.push({ id, date: null, sectionId: '' });
       const div = document.createElement('div');
       div.className = 'date-range-item';
       div.id = 'range_' + id;
       const sections = storageGet('sections') || [];
       const sectionOptions = sections.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      // فقط input تاریخ، دکمه حذف و select بخش - بدون دکمه show-in-box
       div.innerHTML = `
         <div class="flex flex-col gap-2">
           <div class="flex gap-2 items-center">
@@ -927,30 +926,11 @@
             <option value="">همه بخش‌ها</option>
             ${sectionOptions}
           </select>
-          <button class="show-in-box-btn small-btn text-xs" data-id="${id}">📌 نمایش جزییات سقف / کف این تاریخ در باکس</button>
         </div>`;
       dateRangesContainer.appendChild(div);
       const input = div.querySelector('.multi-date-input');
       const sectionSel = div.querySelector('.multi-section-select');
       const removeBtn = div.querySelector('.remove-range');
-      const showBtn = div.querySelector('.show-in-box-btn');
-
-      function updateShowBtnStyle() {
-        const item = dateRanges.find(r => r.id === id);
-        if (!showBtn) return;
-        if (item && item.showInBox) {
-          showBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
-          showBtn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
-          showBtn.textContent = '📌 این تاریخ در باکس جزییات سقف / کف نمایش داده می‌شود';
-          div.classList.add('show-in-box');
-        } else {
-          showBtn.classList.add('bg-slate-600', 'hover:bg-slate-700');
-          showBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
-          showBtn.textContent = '📌 نمایش جزییات سقف / کف این تاریخ در باکس';
-          div.classList.remove('show-in-box');
-        }
-      }
-      updateShowBtnStyle();
 
       if (input) {
         input.addEventListener('change', (e) => {
@@ -967,62 +947,12 @@
           if (item) item.sectionId = e.target.value;
         });
       }
-      if (showBtn) {
-        showBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          const rid = e.target.dataset.id;
-          // همه را false کن، این را true
-          dateRanges.forEach(r => { r.showInBox = (r.id === rid); });
-          // به‌روزرسانی UI همه دکمه‌ها
-          document.querySelectorAll('#date_ranges_container .date-range-item').forEach(itemDiv => {
-            const btn = itemDiv.querySelector('.show-in-box-btn');
-            const rid2 = btn ? btn.dataset.id : null;
-            if (!btn) return;
-            const item = dateRanges.find(r => r.id === rid2);
-            if (item && item.showInBox) {
-              btn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
-              btn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
-              btn.textContent = '📌 این تاریخ در باکس جزییات سقف / کف نمایش داده می‌شود';
-              itemDiv.classList.add('show-in-box');
-            } else {
-              btn.classList.add('bg-slate-600', 'hover:bg-slate-700');
-              btn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
-              btn.textContent = '📌 نمایش جزییات سقف / کف این تاریخ در باکس';
-              itemDiv.classList.remove('show-in-box');
-            }
-          });
-          setTimeout(extractAndDisplayAllNumbers, 100);
-        });
-      }
       if (removeBtn) {
         removeBtn.addEventListener('click', (e) => {
           const rid = e.target.dataset.id;
-          const wasShown = dateRanges.find(r => r.id === rid)?.showInBox;
           dateRanges = dateRanges.filter(r => r.id !== rid);
-          // اگر این آیتم showInBox داشت، اولین آیتم باقی‌مانده را انتخاب کن
-          if (wasShown && dateRanges.length > 0 && !dateRanges.some(r => r.showInBox)) {
-            dateRanges[0].showInBox = true;
-          }
           const row = document.getElementById('range_' + rid);
           if (row && row.parentNode) row.parentNode.removeChild(row);
-          // به‌روزرسانی UI دکمه‌های باقی‌مانده
-          document.querySelectorAll('#date_ranges_container .date-range-item').forEach(itemDiv => {
-            const btn = itemDiv.querySelector('.show-in-box-btn');
-            if (!btn) return;
-            const rid2 = btn.dataset.id;
-            const item = dateRanges.find(r => r.id === rid2);
-            if (item && item.showInBox) {
-              btn.classList.add('bg-yellow-600', 'hover:bg-yellow-700');
-              btn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
-              btn.textContent = '📌 این تاریخ در باکس جزییات نمایش داده می‌شود';
-              itemDiv.classList.add('show-in-box');
-            } else {
-              btn.classList.add('bg-slate-600', 'hover:bg-slate-700');
-              btn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700');
-              btn.textContent = '📌 نمایش جزییات کف/سقف این تاریخ در باکس';
-              itemDiv.classList.remove('show-in-box');
-            }
-          });
           renderHistory();
         });
       }
@@ -1227,9 +1157,6 @@
       return result;
     }
 
-    // ============================================================
-    // === تابع استخراج 4 عدد از یک رکورد مشخص یا آخرین رکورد ===
-    // ============================================================
     function updateFixedBoxFromEntry(entry) {
       if (!fixedNum1 || !fixedNum2 || !fixedNum3 || !fixedNum4) return;
       let y1 = '---';
@@ -1292,7 +1219,6 @@
     function extractAndDisplayAllNumbers() {
       if (!fixedNum1 || !fixedNum2 || !fixedNum3 || !fixedNum4) return;
 
-      // اگر رکورد فعال وجود دارد و در entries هست، همان را نمایش بده
       const entries = storageGet('entries') || [];
       if (activeDisplayEntryId) {
         const activeEntry = entries.find(e => e.id === activeDisplayEntryId);
@@ -1300,11 +1226,8 @@
           updateFixedBoxFromEntry(activeEntry);
           return;
         }
-        // اگر پیدا نشد، پاک کن
-        activeDisplayEntryId = null;
       }
 
-      // در غیر این صورت، رکورد اول را بر اساس فیلتر فعلی پیدا کن
       let pairId = null;
       let selectedDate = null;
 
@@ -1399,7 +1322,6 @@
       });
     }
 
-    // ---------- مدیریت بخش‌های محاسباتی ----------
     function renderSections() {
       const sections = storageGet('sections') || [];
       if (sectionSelect) {
@@ -1517,7 +1439,6 @@
       });
     }
 
-    // ---------- مدیریت داده‌ها ----------
     function saveEntry(pairId, inputs, outputsDisplay, note = '', dateISO = null, inputFormat = null, closestInfoData = null, sectionId = null) {
       const entries = storageGet('entries') || [];
       const si = dateISO || nowISO();
@@ -1529,7 +1450,6 @@
       entries.push(entry); 
       storageSet('entries', entries);
       if (AUTO_PRUNE_ENABLED) pruneOldEntries();
-      // رکورد جدید به عنوان رکورد فعال باکس آبی انتخاب شود
       activeDisplayEntryId = entry.id;
       renderHistory();
     }
@@ -1610,7 +1530,6 @@
       });
     }
 
-    // ---------- مدیریت جفت‌ارزها ----------
     function getNextSortOrder() {
       const pairs = storageGet('pairs') || [];
       if (pairs.length === 0) return 0;
@@ -1686,7 +1605,6 @@
     if (addPairBtn) addPairBtn.addEventListener('click', () => { addPair(newPairName ? newPairName.value : ''); if (newPairName) newPairName.value = ''; });
     if (clearPairsBtn) clearPairsBtn.addEventListener('click', () => { if (confirm('آیا همه جفت‌ارزها حذف شوند؟')) { storageSet('pairs', []); renderPairs(); } });
 
-    // ---------- مدیریت دسته‌بندی‌ها ----------
     function renderCategories() {
       const categories = storageGet('categories') || [];
       const pairs = storageGet('pairs') || [];
@@ -1819,9 +1737,6 @@
       });
     }
 
-    // ============================================================
-    // === تابع کمکی: مقایسه جواب‌های فرمول‌ها بین چند تاریخ ===
-    // ============================================================
     function buildMultiDateComparisonHTML(entriesByDate, normDates, pairs, sections) {
       const allFormulas = [];
       normDates.forEach(dateKey => {
@@ -1948,16 +1863,13 @@
       return html;
     }
 
-    // ============================================================
-    // === تابع کمکی: ساخت دکمه «نمایش در باکس» برای هر رکورد ===
-    // ============================================================
     function buildShowInBoxBtn(entryId, isActive) {
       const btn = document.createElement('button');
       if (isActive) {
-        btn.className = 'small-btn bg-yellow-600 hover:bg-yellow-700 rounded transition-colors show-in-box-btn';
+        btn.className = 'small-btn bg-yellow-600 hover:bg-yellow-700 rounded transition-colors';
         btn.innerHTML = '📌 در باکس نمایش داده می‌شود';
       } else {
-        btn.className = 'small-btn bg-slate-600 hover:bg-slate-700 rounded transition-colors show-in-box-btn';
+        btn.className = 'small-btn bg-slate-600 hover:bg-slate-700 rounded transition-colors';
         btn.innerHTML = '📌 نمایش در باکس';
       }
       btn.title = 'نمایش سقف و کف این رکورد در باکس بالای تاریخچه';
@@ -1968,7 +1880,14 @@
       return btn;
     }
 
-    // ---------- تاریخچه ----------
+    function buildDetailBtn(entryId) {
+      const btn = document.createElement('button');
+      btn.className = 'small-btn bg-indigo-600 hover:bg-indigo-700 rounded transition-colors';
+      btn.textContent = 'نمایش جزئیات';
+      btn.addEventListener('click', () => showDetail(entryId));
+      return btn;
+    }
+
     function renderMultiDateHistory(selectedPair, dateRangesArr) {
       const entries = (storageGet('entries') || []).slice();
       if (!historyList) return;
@@ -2071,13 +1990,9 @@
             `;
             const bottom = document.createElement('div');
             bottom.className = 'flex gap-2 justify-end flex-wrap';
-            // دکمه نمایش در باکس
             bottom.appendChild(buildShowInBoxBtn(e.id, isActive));
-            const viewBtn = document.createElement('button');
-            viewBtn.className = 'small-btn bg-indigo-600 hover:bg-indigo-700 rounded transition-colors';
-            viewBtn.textContent = 'نمایش جزئیات';
-            viewBtn.addEventListener('click', () => showDetail(e.id));
-            bottom.appendChild(viewBtn);
+            bottom.appendChild(buildDetailBtn(e.id));
+            wrapper.appendChild(bottom);
             group.appendChild(wrapper);
           });
         }
@@ -2153,13 +2068,8 @@
         `;
         const bottom = document.createElement('div');
         bottom.className = 'flex gap-2 justify-end flex-wrap';
-        // دکمه نمایش در باکس
         bottom.appendChild(buildShowInBoxBtn(e.id, isActive));
-        const viewBtn = document.createElement('button');
-        viewBtn.className = 'small-btn bg-indigo-600 hover:bg-indigo-700 rounded transition-colors';
-        viewBtn.textContent = 'نمایش جزئیات';
-        viewBtn.addEventListener('click', () => showDetail(e.id));
-        bottom.appendChild(viewBtn);
+        bottom.appendChild(buildDetailBtn(e.id));
         wrapper.appendChild(bottom);
         historyList.appendChild(wrapper);
       });
