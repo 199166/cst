@@ -707,10 +707,30 @@ function ensureDefaults() {
   }
   if (!storageGet('sections') || storageGet('sections').length === 0) {
     storageSet('sections', [
-      { id: 'section1', name: 'بخش اول' },
-      { id: 'section2', name: 'بخش دوم' }
+      { id: 'section1', name: 'بخش اول', sortOrder: 0 },
+      { id: 'section2', name: 'بخش دوم', sortOrder: 1 }
     ]);
   }
+}
+
+/* ============================================================
+   مرتب‌سازی بخش‌ها بر اساس sortOrder
+============================================================ */
+function sortSectionsByOrder(sections) {
+  return sections.slice().sort((a, b) => {
+    const oa = a.sortOrder !== undefined ? a.sortOrder : 0;
+    const ob = b.sortOrder !== undefined ? b.sortOrder : 0;
+    return oa - ob;
+  });
+}
+
+function upgradeSectionsWithSortOrder() {
+  const sections = storageGet('sections') || [];
+  let changed = false;
+  sections.forEach((s, i) => {
+    if (s.sortOrder === undefined) { s.sortOrder = i; changed = true; }
+  });
+  if (changed) storageSet('sections', sections);
 }
 
 function isMobileOrTablet() { return window.innerWidth <= 1024; }
@@ -832,7 +852,7 @@ function addMultiDateRangeUI() {
   const div = document.createElement('div');
   div.className = 'date-range-item';
   div.id = 'range_' + id;
-  const sections = storageGet('sections') || [];
+  const sections = sortSectionsByOrder(storageGet('sections') || []);
   const sectionOptions = sections.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
   div.innerHTML = `
     <div class="flex flex-col gap-2">
@@ -1226,7 +1246,7 @@ if (categoriesContainer) {
    مدیریت بخش‌های محاسباتی
 ============================================================ */
 function renderSections() {
-  const sections = storageGet('sections') || [];
+  const sections = sortSectionsByOrder(storageGet('sections') || []);
   if (sectionSelect) {
     const currentVal = sectionSelect.value;
     sectionSelect.innerHTML = '';
@@ -1253,7 +1273,7 @@ function renderSections() {
 }
 
 function renderSectionsList() {
-  const sections = storageGet('sections') || [];
+  const sections = sortSectionsByOrder(storageGet('sections') || []);
   const entries = storageGet('entries') || [];
   if (!sectionsList) return;
   sectionsList.innerHTML = '';
@@ -1261,16 +1281,20 @@ function renderSectionsList() {
     sectionsList.innerHTML = '<div class="muted text-xs text-center py-2">هیچ بخشی وجود ندارد</div>';
     return;
   }
-  sections.forEach(s => {
+  sections.forEach((s, index) => {
     const count = entries.filter(e => (e.sectionId || 'section1') === s.id).length;
     const div = document.createElement('div');
     div.className = 'flex justify-between items-center p-2 rounded bg-white/5 border border-white/10';
+    const isFirst = (index === 0);
+    const isLast = (index === sections.length - 1);
     div.innerHTML = `
       <div class="flex-1">
         <div class="text-sm font-semibold">${s.name}</div>
         <div class="text-xs muted">${count} رکورد</div>
       </div>
       <div class="flex gap-1">
+        <button class="small-btn bg-slate-600 hover:bg-slate-700 text-xs" data-action="up" data-id="${s.id}" ${isFirst ? 'disabled' : ''}>▲</button>
+        <button class="small-btn bg-slate-600 hover:bg-slate-700 text-xs" data-action="down" data-id="${s.id}" ${isLast ? 'disabled' : ''}>▼</button>
         <button class="small-btn bg-yellow-600 hover:bg-yellow-700 text-xs" data-action="edit" data-id="${s.id}">✎</button>
         <button class="small-btn bg-rose-600 hover:bg-rose-700 text-xs" data-action="delete" data-id="${s.id}">🗑</button>
       </div>
@@ -1283,7 +1307,8 @@ function addSection(name) {
   if (!name || !name.trim()) return;
   const sections = storageGet('sections') || [];
   if (sections.some(s => s.name === name.trim())) { alert('این نام بخش قبلاً وجود دارد!'); return; }
-  sections.push({ id: uid(), name: name.trim() });
+  const maxOrder = sections.length > 0 ? Math.max(...sections.map(s => s.sortOrder !== undefined ? s.sortOrder : 0)) : -1;
+  sections.push({ id: uid(), name: name.trim(), sortOrder: maxOrder + 1 });
   storageSet('sections', sections);
   renderSections();
   renderSectionsList();
@@ -1327,6 +1352,34 @@ function editSection(id) {
   }
 }
 
+function moveSectionUp(id) {
+  const sections = sortSectionsByOrder(storageGet('sections') || []);
+  const idx = sections.findIndex(s => s.id === id);
+  if (idx <= 0) return;
+  const prev = sections[idx - 1];
+  const cur = sections[idx];
+  const tmp = prev.sortOrder !== undefined ? prev.sortOrder : idx - 1;
+  prev.sortOrder = cur.sortOrder !== undefined ? cur.sortOrder : idx;
+  cur.sortOrder = tmp;
+  storageSet('sections', sections);
+  renderSections();
+  renderSectionsList();
+}
+
+function moveSectionDown(id) {
+  const sections = sortSectionsByOrder(storageGet('sections') || []);
+  const idx = sections.findIndex(s => s.id === id);
+  if (idx < 0 || idx >= sections.length - 1) return;
+  const next = sections[idx + 1];
+  const cur = sections[idx];
+  const tmp = next.sortOrder !== undefined ? next.sortOrder : idx + 1;
+  next.sortOrder = cur.sortOrder !== undefined ? cur.sortOrder : idx;
+  cur.sortOrder = tmp;
+  storageSet('sections', sections);
+  renderSections();
+  renderSectionsList();
+}
+
 if (addSectionBtn) addSectionBtn.addEventListener('click', () => { addSection(newSectionName.value); newSectionName.value = ''; });
 if (manageSectionsBtn) manageSectionsBtn.addEventListener('click', () => { sectionsModal.classList.remove('hidden'); renderSectionsList(); });
 if (closeSections) closeSections.addEventListener('click', () => { sectionsModal.classList.add('hidden'); });
@@ -1334,11 +1387,13 @@ if (closeSections) closeSections.addEventListener('click', () => { sectionsModal
 if (sectionsList) {
   sectionsList.addEventListener('click', (e) => {
     const btn = e.target.closest('button');
-    if (!btn) return;
+    if (!btn || btn.disabled) return;
     const action = btn.dataset.action;
     const id = btn.dataset.id;
     if (action === 'edit') editSection(id);
     if (action === 'delete') deleteSection(id);
+    if (action === 'up') moveSectionUp(id);
+    if (action === 'down') moveSectionDown(id);
   });
 }
 
@@ -2099,7 +2154,7 @@ if (exportBtn) {
         pairs: storageGet('pairs') || [],
         entries: storageGet('entries') || [],
         categories: storageGet('categories') || [],
-        sections: storageGet('sections') || [],
+        sections: sortSectionsByOrder(storageGet('sections') || []),
         meta: {
           created: new Date().toISOString(),
           version: '5.0',
@@ -2151,8 +2206,12 @@ if (importFile) {
             storageSet('entries', entriesWithSection);
           } else storageSet('entries', []);
           if (Array.isArray(obj.categories)) storageSet('categories', obj.categories); else storageSet('categories', []);
-          if (Array.isArray(obj.sections) && obj.sections.length > 0) storageSet('sections', obj.sections);
-          else storageSet('sections', [{id:'section1', name:'بخش اول'}, {id:'section2', name:'بخش دوم'}]);
+          if (Array.isArray(obj.sections) && obj.sections.length > 0) {
+            const sectionsWithOrder = obj.sections.map((s, i) => ({ ...s, sortOrder: s.sortOrder !== undefined ? s.sortOrder : i }));
+            storageSet('sections', sectionsWithOrder);
+          } else {
+            storageSet('sections', [{id:'section1', name:'بخش اول', sortOrder: 0}, {id:'section2', name:'بخش دوم', sortOrder: 1}]);
+          }
           activeDisplayEntryId = null;
           renderSections();
           renderPairs();
@@ -2329,7 +2388,7 @@ if ($('show_stats_btn')) {
       const pairs = storageGet('pairs') || [];
       const entries = storageGet('entries') || [];
       const categories = storageGet('categories') || [];
-      const sections = storageGet('sections') || [];
+      const sections = sortSectionsByOrder(storageGet('sections') || []);
       statsContent.innerHTML = `
         <div class="stats-grid">
           <div class="stat-item"><div class="text-lg font-bold">${pairs.length}</div><div class="text-xs muted">جفت‌ارز</div></div>
@@ -2428,6 +2487,7 @@ async function initApp() {
     await loadAllData();
     ensureDefaults();
     upgradePairsWithSortOrder();
+    upgradeSectionsWithSortOrder();
     const entries = storageGet('entries') || [];
     let needsUpdate = false;
     entries.forEach(e => {
