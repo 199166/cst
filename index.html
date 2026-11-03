@@ -33,6 +33,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <!-- اضافه شدن کتابخانه SortableJS برای قابلیت Drag & Drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #735af2 0%, #5a3fd0 100%);
@@ -445,6 +448,17 @@
         .tabs-container.icons-only .tab i {
             font-size: 1.4rem;
             margin: 0;
+        }
+
+        /* استایل کمکی برای درگ تب‌ها */
+        .tab.sortable-chosen {
+            background: rgba(255, 255, 255, 0.35) !important;
+            cursor: grabbing !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0.8;
+        }
+        .tab.sortable-ghost {
+            opacity: 0.3;
         }
 
         /* ========== IFRAME CONTAINER ========== */
@@ -944,35 +958,35 @@
         <div class="tabs-container" id="tabsContainer">
             <div class="tabs-scroll-container" id="tabsScrollContainer">
                 <div class="tabs" id="tabs">
-                    <div class="tab active" onclick="openTab(0)" data-tooltip="Calculator Pro W/D">
+                    <div class="tab active" data-tab-index="0" data-tooltip="Calculator Pro W/D">
                         <i class="fa-solid fa-w"></i>
                         <span class="tab-text">Calculator Pro W/D</span>
                     </div>
-					<div class="tab" onclick="openTab(1)" data-tooltip="Calculator Pro — P2">
+					<div class="tab" data-tab-index="1" data-tooltip="Calculator Pro — P2">
                       <i class="fas fa-equals"></i>
                       <span class="tab-text">Calculator Pro — P2</span>
                    </div>
-                    <div class="tab" onclick="openTab(2)" data-tooltip="Calculator Pro — P3">
+                    <div class="tab" data-tab-index="2" data-tooltip="Calculator Pro — P3">
                       <i class="fa fa-align-justify"></i>
                       <span class="tab-text">Calculator Pro — P3</span>
                    </div>
-                   <div class="tab" onclick="openTab(3)" data-tooltip="Calculator Pro Center">
+                   <div class="tab" data-tab-index="3" data-tooltip="Calculator Pro Center">
                         <i class="fas fa-stream"></i>
                         <span class="tab-text">Calculator Pro Center</span>
                     </div>
-                    <div class="tab" onclick="openTab(4)" data-tooltip="Cst Analyzer">
+                    <div class="tab" data-tab-index="4" data-tooltip="Cst Analyzer">
                         <i class="fa fa-line-chart"></i>
                         <span class="tab-text">Cst Analyzer</span>
                     </div>
-                    <div class="tab" onclick="openTab(5)" data-tooltip="Calculator Pro Formula 4">
+                    <div class="tab" data-tab-index="5" data-tooltip="Calculator Pro Formula 4">
                         <i class="fas fa-4"></i>
                         <span class="tab-text">Calculator Pro Formula 4</span>
                     </div>
-                    <div class="tab" onclick="openTab(6)" data-tooltip="Forex Manager">
+                    <div class="tab" data-tab-index="6" data-tooltip="Forex Manager">
                         <i class="fa fa-exchange-alt"></i>
                         <span class="tab-text">Forex Manager</span>
                     </div>
-                    <div class="tab" onclick="openTab(7)" data-tooltip="Calculator">
+                    <div class="tab" data-tab-index="7" data-tooltip="Calculator">
                         <i class="fa fa-calculator"></i>
                         <span class="tab-text">Calculator</span>
                     </div>
@@ -981,14 +995,14 @@
         </div>
 
         <div class="iframe-container">
-            <iframe src="calculator_pro_w_d/index.html" class="active"></iframe>
-			<iframe src="Calculator_pro_program_2/index.html"></iframe>
-            <iframe src="calculator_pro_w_d_p3/index.html"></iframe>
-            <iframe src="calculator_pro_center_w_d/index.html"></iframe>
-            <iframe src="cst_analyzer/index.html"></iframe>
-            <iframe src="calculator_pro_formula_4/index.html"></iframe>
-            <iframe src="forex_manager/index.html"></iframe>
-            <iframe src="calculator/index.html"></iframe>
+            <iframe src="calculator_pro_w_d/index.html" class="active" data-iframe-index="0"></iframe>
+			<iframe src="Calculator_pro_program_2/index.html" data-iframe-index="1"></iframe>
+            <iframe src="calculator_pro_w_d_p3/index.html" data-iframe-index="2"></iframe>
+            <iframe src="calculator_pro_center_w_d/index.html" data-iframe-index="3"></iframe>
+            <iframe src="cst_analyzer/index.html" data-iframe-index="4"></iframe>
+            <iframe src="calculator_pro_formula_4/index.html" data-iframe-index="5"></iframe>
+            <iframe src="forex_manager/index.html" data-iframe-index="6"></iframe>
+            <iframe src="calculator/index.html" data-iframe-index="7"></iframe>
             <!-- استفاده از مجوزهای کامل برای رفع محدودیت کوکی و اسکریپت فریم -->
 
         </div>
@@ -1429,6 +1443,7 @@
             sessionStorage.setItem('cst_login_time', new Date().getTime());
             
             initMouseWheelScroll();
+            initTabsSortable();
         }
 
         verifyOtpBtn.addEventListener('click', function() {
@@ -1467,7 +1482,10 @@
         if (sessionStorage.getItem('cst_authenticated') === 'true') {
             loginPage.style.display = 'none';
             mainContent.style.display = 'flex';
-            setTimeout(initMouseWheelScroll, 100);
+            setTimeout(() => {
+                initMouseWheelScroll();
+                initTabsSortable();
+            }, 100);
         } else {
             loginPage.style.display = 'block';
             mainContent.style.display = 'none';
@@ -1481,14 +1499,15 @@
             }
         });
 
-        function openTab(n) {
-            document.querySelectorAll('.tab').forEach((t, i) => {
-                t.classList.toggle('active', i === n);
+        // تغییر openTab برای استفاده از ایندکس داینامیک
+        window.openTab = function(index) {
+            document.querySelectorAll('.tab').forEach((t) => {
+                t.classList.toggle('active', parseInt(t.getAttribute('data-tab-index')) === index);
             });
-            document.querySelectorAll('iframe').forEach((f, i) => {
-                f.classList.toggle('active', i === n);
+            document.querySelectorAll('iframe').forEach((f) => {
+                f.classList.toggle('active', parseInt(f.getAttribute('data-iframe-index')) === index);
             });
-        }
+        };
 
         const tooltip = document.getElementById('tabTooltip');
 
@@ -1610,6 +1629,35 @@
             tabsScrollContainer.addEventListener('touchend', function() {
                 touchStartX = null;
             });
+        }
+
+        // ==================== اضافه شدن قابلیت Drag & Drop تب‌ها ====================
+        function initTabsSortable() {
+            const tabsContainer = document.getElementById('tabs');
+            if (!tabsContainer) return;
+
+            // برای جلوگیری از مقداردهی چندباره
+            if (tabsContainer.classList.contains('sortable-initialized')) return;
+
+            new Sortable(tabsContainer, {
+                animation: 200,           // انیمیشن جابجایی
+                ghostClass: 'sortable-ghost', // کلاس برای عنصر پلیس‌هولدر
+                chosenClass: 'sortable-chosen', // کلاس برای عنصری که گرفته شده
+                dragClass: 'sortable-drag', // کلاس برای عنصر در حال درگ
+                onEnd: function (evt) {
+                    // بعد از اتمام جابجایی، با کلیک روی تب جابجا شده (فعلی)، آن را فعال می‌کنیم
+                    // چون کاربر احتمالاً می‌خواسته تب مورد نظر را جابجا و فعال کند
+                    const newIndex = evt.newIndex;
+                    const movedTab = evt.item;
+                    
+                    // پیدا کردن ایندکس داده اصلی تب
+                    const dataIndex = parseInt(movedTab.getAttribute('data-tab-index'));
+                    
+                    // فعال کردن همان تب که جابجا شده (اختیاری - برای اینکه کاربر ببیند کجا رفت)
+                    openTab(dataIndex);
+                }
+            });
+            tabsContainer.classList.add('sortable-initialized');
         }
 
         let deferredPrompt;
