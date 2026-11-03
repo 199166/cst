@@ -450,12 +450,46 @@
             margin: 0;
         }
 
+        /* ========== TAB DRAG HANDLE ========== */
+        .tab-drag-handle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 24px;
+            cursor: grab;
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 0.85rem;
+            margin-right: -4px;
+            margin-left: 2px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .tab-drag-handle:hover {
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .tab-drag-handle:active {
+            cursor: grabbing;
+        }
+
+        body[data-menu-pos="top"] .tab-drag-handle { order: -1; margin-right: 2px; margin-left: -4px; }
+        body[data-menu-pos="bottom"] .tab-drag-handle { order: -1; margin-right: 2px; margin-left: -4px; }
+        body[data-menu-pos="left"] .tab-drag-handle { order: -1; }
+        body[data-menu-pos="right"] .tab-drag-handle { order: -1; }
+
+        .tabs-container.icons-only .tab-drag-handle {
+            display: none !important;
+        }
+
         /* استایل کمکی برای درگ تب‌ها */
         .tab.sortable-chosen {
             background: rgba(255, 255, 255, 0.35) !important;
-            cursor: grabbing !important;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            opacity: 0.8;
+            opacity: 0.9;
         }
         .tab.sortable-ghost {
             opacity: 0.3;
@@ -959,34 +993,42 @@
             <div class="tabs-scroll-container" id="tabsScrollContainer">
                 <div class="tabs" id="tabs">
                     <div class="tab active" data-tab-index="0" data-tooltip="Calculator Pro W/D">
+                        <span class="tab-drag-handle" title="جابجایی"><i class="fas fa-grip-vertical"></i></span>
                         <i class="fa-solid fa-w"></i>
                         <span class="tab-text">Calculator Pro W/D</span>
                     </div>
 					<div class="tab" data-tab-index="1" data-tooltip="Calculator Pro — P2">
+                      <span class="tab-drag-handle" title="جابجایی"><i class="fas fa-grip-vertical"></i></span>
                       <i class="fas fa-equals"></i>
                       <span class="tab-text">Calculator Pro — P2</span>
                    </div>
                     <div class="tab" data-tab-index="2" data-tooltip="Calculator Pro — P3">
+                      <span class="tab-drag-handle" title="جابجایی"><i class="fas fa-grip-vertical"></i></span>
                       <i class="fa fa-align-justify"></i>
                       <span class="tab-text">Calculator Pro — P3</span>
                    </div>
                    <div class="tab" data-tab-index="3" data-tooltip="Calculator Pro Center">
+                        <span class="tab-drag-handle" title="جابجایی"><i class="fas fa-grip-vertical"></i></span>
                         <i class="fas fa-stream"></i>
                         <span class="tab-text">Calculator Pro Center</span>
                     </div>
                     <div class="tab" data-tab-index="4" data-tooltip="Cst Analyzer">
+                        <span class="tab-drag-handle" title="جابجایی"><i class="fas fa-grip-vertical"></i></span>
                         <i class="fa fa-line-chart"></i>
                         <span class="tab-text">Cst Analyzer</span>
                     </div>
                     <div class="tab" data-tab-index="5" data-tooltip="Calculator Pro Formula 4">
+                        <span class="tab-drag-handle" title="جابجایی"><i class="fas fa-grip-vertical"></i></span>
                         <i class="fas fa-4"></i>
                         <span class="tab-text">Calculator Pro Formula 4</span>
                     </div>
                     <div class="tab" data-tab-index="6" data-tooltip="Forex Manager">
+                        <span class="tab-drag-handle" title="جابجایی"><i class="fas fa-grip-vertical"></i></span>
                         <i class="fa fa-exchange-alt"></i>
                         <span class="tab-text">Forex Manager</span>
                     </div>
                     <div class="tab" data-tab-index="7" data-tooltip="Calculator">
+                        <span class="tab-drag-handle" title="جابجایی"><i class="fas fa-grip-vertical"></i></span>
                         <i class="fa fa-calculator"></i>
                         <span class="tab-text">Calculator</span>
                     </div>
@@ -1499,7 +1541,6 @@
             }
         });
 
-        // تغییر openTab برای استفاده از ایندکس داینامیک
         window.openTab = function(index) {
             document.querySelectorAll('.tab').forEach((t) => {
                 t.classList.toggle('active', parseInt(t.getAttribute('data-tab-index')) === index);
@@ -1631,7 +1672,7 @@
             });
         }
 
-        // ==================== قابلیت Drag & Drop تب‌ها با حفظ کلیک ====================
+        // ==================== قابلیت Drag & Drop تب‌ها با Handle ====================
         function initTabsSortable() {
             const tabsContainer = document.getElementById('tabs');
             if (!tabsContainer) return;
@@ -1643,26 +1684,21 @@
                 ghostClass: 'sortable-ghost',
                 chosenClass: 'sortable-chosen',
                 dragClass: 'sortable-drag',
-                // این گزینه باعث می‌شود درگ فقط با کمی حرکت ماوس شروع شود و کلیک عادی خراب نشود
-                delay: 50,
-                delayOnTouchOnly: true,
-                touchStartThreshold: 5,
+                handle: '.tab-drag-handle', // فقط با دستگیره قابل جابجایی است
                 onEnd: function (evt) {
-                    // اگر کاربر فقط کلیک کرد و درگ نکرد، SortableJS به صورت خودکار کلیک را هندل می‌کند
-                    // اما برای اطمینان، تب جابجا شده را فعال می‌کنیم
+                    // اگر کاربر تب را جابجا کرد، همان تب را فعال میکنیم
                     const movedTab = evt.item;
                     const dataIndex = parseInt(movedTab.getAttribute('data-tab-index'));
                     openTab(dataIndex);
                 }
             });
             tabsContainer.classList.add('sortable-initialized');
-            
-            // اضافه کردن شنونده کلیک دستی برای اطمینان بیشتر
-            // چون SortableJS رویدادهای کلیک را در حین درگ متوقف می‌کند
+
+            // اطمینان از اجرای کلیک برای همه تب‌ها
             tabsContainer.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', function(e) {
-                    // جلوگیری از اجرای کلیک اگر در حال درگ هستیم
-                    if (tabsContainer.classList.contains('sortable-drag')) return;
+                    // اگر روی دستگیره درگ کلیک شد، کاری نکن
+                    if (e.target.closest('.tab-drag-handle')) return;
                     const dataIndex = parseInt(this.getAttribute('data-tab-index'));
                     openTab(dataIndex);
                 });
