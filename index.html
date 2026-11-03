@@ -1590,7 +1590,6 @@
         });
 
         window.openTab = function(index) {
-            // اگر در حالت جابجایی هستیم، کلیک روی تب نباید iframe را عوض کند
             if (dragModeActive) return;
             
             document.querySelectorAll('.tab').forEach((t) => {
@@ -1605,17 +1604,14 @@
         function attachTabClickHandlers() {
             const tabs = document.querySelectorAll('.tab');
             tabs.forEach(tab => {
-                // حذف شنونده قبلی برای جلوگیری از تکرار
                 tab.removeEventListener('click', handleTabClick);
                 tab.addEventListener('click', handleTabClick);
             });
         }
 
         function handleTabClick(e) {
-            // اگر در حالت جابجایی هستیم، کلیک را نادیده بگیر
             if (dragModeActive) return;
             
-            // اگر روی آیتم‌های داخل تب کلیک شد (مثل آیکون یا متن)، باز هم کار کند
             const tab = e.currentTarget;
             const index = parseInt(tab.getAttribute('data-tab-index'));
             openTab(index);
@@ -1689,7 +1685,6 @@
             let scrollLeft;
             
             tabsScrollContainer.addEventListener('mousedown', function(e) {
-                // اگر در حالت جابجایی هستیم، اسکرول با ماوس غیرفعال شود
                 if (dragModeActive) return;
                 isDragging = true;
                 startX = e.pageX - this.offsetLeft;
@@ -1758,19 +1753,15 @@
         const dragSeparator = document.getElementById('dragSeparator');
         const resetOrderItem = document.getElementById('resetOrderItem');
 
-        // ذخیره ترتیب اولیه برای بازگردانی
         const initialOrder = Array.from(tabsList.children).map(t => t.getAttribute('data-tab-index'));
 
-        // نمایش منوی راست کلیک
         tabsContainer.addEventListener('contextmenu', function(e) {
             e.preventDefault();
-            // موقعیت منو
             let x = e.clientX;
             let y = e.clientY;
             
             contextMenu.classList.add('show');
             
-            // تنظیم موقعیت پس از نمایش (برای اندازه‌گیری ابعاد)
             const menuRect = contextMenu.getBoundingClientRect();
             if (x + menuRect.width > window.innerWidth) {
                 x = window.innerWidth - menuRect.width - 10;
@@ -1783,20 +1774,17 @@
             contextMenu.style.top = y + 'px';
         });
 
-        // بستن منو با کلیک بیرون
         document.addEventListener('click', function(e) {
             if (!contextMenu.contains(e.target)) {
                 contextMenu.classList.remove('show');
             }
         });
 
-        // بستن منو با اسکرول یا کلید Escape
         window.addEventListener('scroll', () => contextMenu.classList.remove('show'));
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') contextMenu.classList.remove('show');
         });
 
-        // کلیک روی آیتم‌های منو
         contextMenu.addEventListener('click', function(e) {
             const item = e.target.closest('.context-menu-item');
             if (!item) return;
@@ -1833,7 +1821,6 @@
         }
 
         function resetTabOrder() {
-            // بازگرداندن ترتیب اولیه
             const tabElements = Array.from(tabsList.children);
             const sortedTabs = initialOrder.map(idx => {
                 return tabElements.find(t => t.getAttribute('data-tab-index') === idx);
@@ -1842,7 +1829,7 @@
             sortedTabs.forEach(tab => tabsList.appendChild(tab));
         }
 
-        // پیاده‌سازی Drag & Drop بدون کتابخانه، فقط در حالت dragModeActive
+        // ==================== پیاده‌سازی Drag & Drop ====================
         let draggedTab = null;
 
         tabsList.addEventListener('mousedown', function(e) {
@@ -1872,16 +1859,39 @@
             document.addEventListener('touchend', onDragEnd);
         }, { passive: true });
 
-        function getDragAfterElement(container, x, y, isHorizontal) {
+        /**
+         * تشخیص جهت منو (افقی یا عمودی)
+         */
+        function isHorizontalMenu() {
+            const pos = document.body.getAttribute('data-menu-pos') || 'top';
+            return pos === 'top' || pos === 'bottom';
+        }
+
+        /**
+         * پیدا کردن تب بعدی بر اساس موقعیت موس
+         * برای منوی افقی از محور X و برای منوی عمودی از محور Y استفاده می‌کند
+         */
+        function getDragAfterElement(container, x, y) {
+            const horizontal = isHorizontalMenu();
             const draggableElements = [...container.querySelectorAll('.tab:not(.dragging-tab)')];
             
             return draggableElements.reduce((closest, child) => {
                 const box = child.getBoundingClientRect();
-                // برای منوی افقی: محور X، برای عمودی: محور Y
-                const offset = isHorizontal 
-                    ? x - box.left - box.width / 2
-                    : y - box.top - box.height / 2;
                 
+                // محاسبه فاصله مرکز تب از موقعیت فعلی موس
+                let offset;
+                if (horizontal) {
+                    // فاصله موس از مرکز افقی تب
+                    const centerX = box.left + box.width / 2;
+                    offset = x - centerX;
+                } else {
+                    // فاصله موس از مرکز عمودی تب
+                    const centerY = box.top + box.height / 2;
+                    offset = y - centerY;
+                }
+                
+                // می‌خواهیم نزدیک‌ترین تب که موس در سمت "قبل" آن است را پیدا کنیم
+                // در RTL، معنای "قبل" برعکس است، بنابراین منطق را باید بر اساس جهت منو تنظیم کنیم
                 if (offset < 0 && offset > closest.offset) {
                     return { offset: offset, element: child };
                 } else {
@@ -1897,32 +1907,21 @@
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             
-            // تشخیص جهت منو
-            const isHorizontal = !document.body.getAttribute('data-menu-pos') || 
-                                 document.body.getAttribute('data-menu-pos') === 'top' || 
-                                 document.body.getAttribute('data-menu-pos') === 'bottom';
+            const afterElement = getDragAfterElement(tabsList, clientX, clientY);
             
-            const afterElement = getDragAfterElement(tabsList, clientX, clientY, isHorizontal);
-            
-            // بررسی موقعیت فعلی
             const allTabs = [...tabsList.querySelectorAll('.tab')];
-            const currentIndex = allTabs.indexOf(draggedTab);
-            const afterIndex = afterElement ? allTabs.indexOf(afterElement) : allTabs.length;
             
-            if (afterElement == null) {
-                if (currentIndex !== allTabs.length - 1) {
-                    tabsList.appendChild(draggedTab);
-                }
-            } else {
-                if (currentIndex !== afterIndex) {
-                    tabsList.insertBefore(draggedTab, afterElement);
-                }
+            // اضافه کردن کلاس drag-over به تب بعدی
+            allTabs.forEach(t => t.classList.remove('drag-over-tab'));
+            if (afterElement && afterElement !== draggedTab) {
+                afterElement.classList.add('drag-over-tab');
             }
             
-            // اضافه کردن کلاس drag-over
-            allTabs.forEach(t => t.classList.remove('drag-over-tab'));
-            if (afterElement) {
-                afterElement.classList.add('drag-over-tab');
+            // جابجایی در DOM
+            if (afterElement == null) {
+                tabsList.appendChild(draggedTab);
+            } else {
+                tabsList.insertBefore(draggedTab, afterElement);
             }
         }
 
@@ -2003,7 +2002,6 @@
             
             setTimeout(applyVisualFixes, 100);
             
-            // اگر قبلاً لاگین شده بودیم، شنونده‌ها را نصب کن
             if (sessionStorage.getItem('cst_authenticated') === 'true') {
                 setTimeout(attachTabClickHandlers, 150);
             }
