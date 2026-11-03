@@ -33,8 +33,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <!-- کتابخانه SortableJS -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
     <style>
         :root {
@@ -450,15 +448,93 @@
             margin: 0;
         }
 
-        /* استایل کمکی برای درگ تب‌ها */
-        .tab.sortable-chosen {
-            background: rgba(255, 255, 255, 0.35) !important;
-            cursor: grabbing !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            opacity: 0.8;
+        /* ========== DRAG MODE STYLES ========== */
+        .tabs-container.drag-mode-active {
+            outline: 2px dashed #ff4444;
+            outline-offset: 3px;
+            border-radius: 20px;
         }
-        .tab.sortable-ghost {
-            opacity: 0.3;
+
+        .tabs-container.drag-mode-active .tab {
+            cursor: grab;
+            border: 1px dashed rgba(255, 68, 68, 0.5);
+        }
+
+        .tabs-container.drag-mode-active .tab:active {
+            cursor: grabbing;
+        }
+
+        .tab.dragging-tab {
+            opacity: 0.4;
+            background: rgba(255, 68, 68, 0.2) !important;
+        }
+
+        .tab.drag-over-tab {
+            border-color: #ff4444 !important;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+        }
+
+        /* ========== CONTEXT MENU ========== */
+        #contextMenu {
+            position: fixed;
+            background: rgba(30, 30, 40, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 180px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            z-index: 100000;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            direction: rtl;
+        }
+
+        #contextMenu.show {
+            display: flex;
+        }
+
+        .context-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .context-menu-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .context-menu-item.active {
+            background: rgba(255, 68, 68, 0.25);
+            color: #ff9b9b;
+        }
+
+        .context-menu-item i {
+            font-size: 1rem;
+            opacity: 0.9;
+            width: 18px;
+            text-align: center;
+        }
+
+        .context-menu-item.danger:hover {
+            background: rgba(255, 68, 68, 0.3);
+        }
+
+        .context-menu-separator {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.15);
+            margin: 4px 0;
         }
 
         /* ========== IFRAME CONTAINER ========== */
@@ -1080,6 +1156,20 @@
     </div>
 
     <div class="tab-tooltip" id="tabTooltip"></div>
+
+    <!-- Context Menu -->
+    <div id="contextMenu">
+        <div class="context-menu-item" id="toggleDragModeItem" data-action="toggle-drag">
+            <i class="fas fa-lock"></i>
+            <span id="dragModeText">فعال‌سازی حالت جابجایی</span>
+        </div>
+        <div class="context-menu-separator" id="dragSeparator" style="display:none;"></div>
+        <div class="context-menu-item" id="resetOrderItem" data-action="reset-order" style="display:none;">
+            <i class="fas fa-undo"></i>
+            <span>بازگردانی ترتیب اولیه</span>
+        </div>
+    </div>
+
 	<script>
         function isMobileDevice() {
             return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -1443,7 +1533,7 @@
             sessionStorage.setItem('cst_login_time', new Date().getTime());
             
             initMouseWheelScroll();
-            initTabsSortable();
+            attachTabClickHandlers();
         }
 
         verifyOtpBtn.addEventListener('click', function() {
@@ -1484,7 +1574,7 @@
             mainContent.style.display = 'flex';
             setTimeout(() => {
                 initMouseWheelScroll();
-                initTabsSortable();
+                attachTabClickHandlers();
             }, 100);
         } else {
             loginPage.style.display = 'block';
@@ -1499,8 +1589,10 @@
             }
         });
 
-        // تغییر openTab برای استفاده از ایندکس داینامیک
         window.openTab = function(index) {
+            // اگر در حالت جابجایی هستیم، کلیک روی تب نباید iframe را عوض کند
+            if (dragModeActive) return;
+            
             document.querySelectorAll('.tab').forEach((t) => {
                 t.classList.toggle('active', parseInt(t.getAttribute('data-tab-index')) === index);
             });
@@ -1508,6 +1600,26 @@
                 f.classList.toggle('active', parseInt(f.getAttribute('data-iframe-index')) === index);
             });
         };
+
+        // ==================== افزودن شنونده کلیک به تب‌ها ====================
+        function attachTabClickHandlers() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                // حذف شنونده قبلی برای جلوگیری از تکرار
+                tab.removeEventListener('click', handleTabClick);
+                tab.addEventListener('click', handleTabClick);
+            });
+        }
+
+        function handleTabClick(e) {
+            // اگر در حالت جابجایی هستیم، کلیک را نادیده بگیر
+            if (dragModeActive) return;
+            
+            // اگر روی آیتم‌های داخل تب کلیک شد (مثل آیکون یا متن)، باز هم کار کند
+            const tab = e.currentTarget;
+            const index = parseInt(tab.getAttribute('data-tab-index'));
+            openTab(index);
+        }
 
         const tooltip = document.getElementById('tabTooltip');
 
@@ -1577,6 +1689,8 @@
             let scrollLeft;
             
             tabsScrollContainer.addEventListener('mousedown', function(e) {
+                // اگر در حالت جابجایی هستیم، اسکرول با ماوس غیرفعال شود
+                if (dragModeActive) return;
                 isDragging = true;
                 startX = e.pageX - this.offsetLeft;
                 scrollLeft = this.scrollLeft;
@@ -1585,6 +1699,7 @@
             });
 
             tabs.addEventListener('mousedown', function(e) {
+                if (dragModeActive) return;
                 isDragging = true;
                 startX = e.pageX - tabsScrollContainer.offsetLeft;
                 scrollLeft = tabsScrollContainer.scrollLeft;
@@ -1609,17 +1724,19 @@
             let touchStartX;
             let touchScrollLeft;
             tabsScrollContainer.addEventListener('touchstart', function(e) {
+                if (dragModeActive) return;
                 touchStartX = e.touches[0].pageX;
                 touchScrollLeft = this.scrollLeft;
             });
 
             tabs.addEventListener('touchstart', function(e) {
+                if (dragModeActive) return;
                 touchStartX = e.touches[0].pageX;
                 touchScrollLeft = tabsScrollContainer.scrollLeft;
             });
 
             tabsScrollContainer.addEventListener('touchmove', function(e) {
-                if (!touchStartX) return;
+                if (!touchStartX || dragModeActive) return;
                 e.preventDefault();
                 const x = e.touches[0].pageX;
                 const walk = (x - touchStartX) * 2;
@@ -1631,42 +1748,194 @@
             });
         }
 
-        // ==================== قابلیت Drag & Drop تب‌ها با حفظ کلیک ====================
-        function initTabsSortable() {
-            const tabsContainer = document.getElementById('tabs');
-            if (!tabsContainer) return;
+        /* ==================== CONTEXT MENU & DRAG MODE ==================== */
+        let dragModeActive = false;
+        const tabsContainer = document.getElementById('tabsContainer');
+        const tabsList = document.getElementById('tabs');
+        const contextMenu = document.getElementById('contextMenu');
+        const toggleDragModeItem = document.getElementById('toggleDragModeItem');
+        const dragModeText = document.getElementById('dragModeText');
+        const dragSeparator = document.getElementById('dragSeparator');
+        const resetOrderItem = document.getElementById('resetOrderItem');
 
-            if (tabsContainer.classList.contains('sortable-initialized')) return;
+        // ذخیره ترتیب اولیه برای بازگردانی
+        const initialOrder = Array.from(tabsList.children).map(t => t.getAttribute('data-tab-index'));
 
-            new Sortable(tabsContainer, {
-                animation: 200,
-                ghostClass: 'sortable-ghost',
-                chosenClass: 'sortable-chosen',
-                dragClass: 'sortable-drag',
-                // این گزینه باعث می‌شود درگ فقط با کمی حرکت ماوس شروع شود و کلیک عادی خراب نشود
-                delay: 50,
-                delayOnTouchOnly: true,
-                touchStartThreshold: 5,
-                onEnd: function (evt) {
-                    // اگر کاربر فقط کلیک کرد و درگ نکرد، SortableJS به صورت خودکار کلیک را هندل می‌کند
-                    // اما برای اطمینان، تب جابجا شده را فعال می‌کنیم
-                    const movedTab = evt.item;
-                    const dataIndex = parseInt(movedTab.getAttribute('data-tab-index'));
-                    openTab(dataIndex);
-                }
-            });
-            tabsContainer.classList.add('sortable-initialized');
+        // نمایش منوی راست کلیک
+        tabsContainer.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            // موقعیت منو
+            let x = e.clientX;
+            let y = e.clientY;
             
-            // اضافه کردن شنونده کلیک دستی برای اطمینان بیشتر
-            // چون SortableJS رویدادهای کلیک را در حین درگ متوقف می‌کند
-            tabsContainer.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', function(e) {
-                    // جلوگیری از اجرای کلیک اگر در حال درگ هستیم
-                    if (tabsContainer.classList.contains('sortable-drag')) return;
-                    const dataIndex = parseInt(this.getAttribute('data-tab-index'));
-                    openTab(dataIndex);
-                });
-            });
+            contextMenu.classList.add('show');
+            
+            // تنظیم موقعیت پس از نمایش (برای اندازه‌گیری ابعاد)
+            const menuRect = contextMenu.getBoundingClientRect();
+            if (x + menuRect.width > window.innerWidth) {
+                x = window.innerWidth - menuRect.width - 10;
+            }
+            if (y + menuRect.height > window.innerHeight) {
+                y = window.innerHeight - menuRect.height - 10;
+            }
+            
+            contextMenu.style.left = x + 'px';
+            contextMenu.style.top = y + 'px';
+        });
+
+        // بستن منو با کلیک بیرون
+        document.addEventListener('click', function(e) {
+            if (!contextMenu.contains(e.target)) {
+                contextMenu.classList.remove('show');
+            }
+        });
+
+        // بستن منو با اسکرول یا کلید Escape
+        window.addEventListener('scroll', () => contextMenu.classList.remove('show'));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') contextMenu.classList.remove('show');
+        });
+
+        // کلیک روی آیتم‌های منو
+        contextMenu.addEventListener('click', function(e) {
+            const item = e.target.closest('.context-menu-item');
+            if (!item) return;
+            
+            const action = item.getAttribute('data-action');
+            
+            if (action === 'toggle-drag') {
+                toggleDragMode();
+            } else if (action === 'reset-order') {
+                resetTabOrder();
+            }
+            
+            contextMenu.classList.remove('show');
+        });
+
+        function toggleDragMode() {
+            dragModeActive = !dragModeActive;
+            
+            if (dragModeActive) {
+                tabsContainer.classList.add('drag-mode-active');
+                dragModeText.textContent = 'قفل کردن حالت جابجایی';
+                toggleDragModeItem.querySelector('i').className = 'fas fa-lock-open';
+                dragSeparator.style.display = 'block';
+                resetOrderItem.style.display = 'flex';
+                toggleDragModeItem.classList.add('active');
+            } else {
+                tabsContainer.classList.remove('drag-mode-active');
+                dragModeText.textContent = 'فعال‌سازی حالت جابجایی';
+                toggleDragModeItem.querySelector('i').className = 'fas fa-lock';
+                dragSeparator.style.display = 'none';
+                resetOrderItem.style.display = 'none';
+                toggleDragModeItem.classList.remove('active');
+            }
+        }
+
+        function resetTabOrder() {
+            // بازگرداندن ترتیب اولیه
+            const tabElements = Array.from(tabsList.children);
+            const sortedTabs = initialOrder.map(idx => {
+                return tabElements.find(t => t.getAttribute('data-tab-index') === idx);
+            }).filter(Boolean);
+            
+            sortedTabs.forEach(tab => tabsList.appendChild(tab));
+        }
+
+        // پیاده‌سازی Drag & Drop بدون کتابخانه، فقط در حالت dragModeActive
+        let draggedTab = null;
+
+        tabsList.addEventListener('mousedown', function(e) {
+            if (!dragModeActive) return;
+            
+            const tab = e.target.closest('.tab');
+            if (!tab) return;
+            
+            e.preventDefault();
+            draggedTab = tab;
+            draggedTab.classList.add('dragging-tab');
+            
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('mouseup', onDragEnd);
+        });
+
+        tabsList.addEventListener('touchstart', function(e) {
+            if (!dragModeActive) return;
+            
+            const tab = e.target.closest('.tab');
+            if (!tab) return;
+            
+            draggedTab = tab;
+            draggedTab.classList.add('dragging-tab');
+            
+            document.addEventListener('touchmove', onDragMove, { passive: false });
+            document.addEventListener('touchend', onDragEnd);
+        }, { passive: true });
+
+        function getDragAfterElement(container, x, y, isHorizontal) {
+            const draggableElements = [...container.querySelectorAll('.tab:not(.dragging-tab)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                // برای منوی افقی: محور X، برای عمودی: محور Y
+                const offset = isHorizontal 
+                    ? x - box.left - box.width / 2
+                    : y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function onDragMove(e) {
+            if (!draggedTab) return;
+            e.preventDefault();
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            // تشخیص جهت منو
+            const isHorizontal = !document.body.getAttribute('data-menu-pos') || 
+                                 document.body.getAttribute('data-menu-pos') === 'top' || 
+                                 document.body.getAttribute('data-menu-pos') === 'bottom';
+            
+            const afterElement = getDragAfterElement(tabsList, clientX, clientY, isHorizontal);
+            
+            // بررسی موقعیت فعلی
+            const allTabs = [...tabsList.querySelectorAll('.tab')];
+            const currentIndex = allTabs.indexOf(draggedTab);
+            const afterIndex = afterElement ? allTabs.indexOf(afterElement) : allTabs.length;
+            
+            if (afterElement == null) {
+                if (currentIndex !== allTabs.length - 1) {
+                    tabsList.appendChild(draggedTab);
+                }
+            } else {
+                if (currentIndex !== afterIndex) {
+                    tabsList.insertBefore(draggedTab, afterElement);
+                }
+            }
+            
+            // اضافه کردن کلاس drag-over
+            allTabs.forEach(t => t.classList.remove('drag-over-tab'));
+            if (afterElement) {
+                afterElement.classList.add('drag-over-tab');
+            }
+        }
+
+        function onDragEnd() {
+            if (draggedTab) {
+                draggedTab.classList.remove('dragging-tab');
+                draggedTab = null;
+            }
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('drag-over-tab'));
+            document.removeEventListener('mousemove', onDragMove);
+            document.removeEventListener('mouseup', onDragEnd);
+            document.removeEventListener('touchmove', onDragMove);
+            document.removeEventListener('touchend', onDragEnd);
         }
 
         let deferredPrompt;
@@ -1733,6 +2002,11 @@
             handleDesktopResponsiveTabs();
             
             setTimeout(applyVisualFixes, 100);
+            
+            // اگر قبلاً لاگین شده بودیم، شنونده‌ها را نصب کن
+            if (sessionStorage.getItem('cst_authenticated') === 'true') {
+                setTimeout(attachTabClickHandlers, 150);
+            }
         });
 
         window.addEventListener('resize', () => {
