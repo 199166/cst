@@ -33,7 +33,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <!-- اضافه شدن کتابخانه SortableJS برای قابلیت Drag & Drop -->
+    <!-- کتابخانه SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
     <style>
@@ -1631,33 +1631,42 @@
             });
         }
 
-        // ==================== اضافه شدن قابلیت Drag & Drop تب‌ها ====================
+        // ==================== قابلیت Drag & Drop تب‌ها با حفظ کلیک ====================
         function initTabsSortable() {
             const tabsContainer = document.getElementById('tabs');
             if (!tabsContainer) return;
 
-            // برای جلوگیری از مقداردهی چندباره
             if (tabsContainer.classList.contains('sortable-initialized')) return;
 
             new Sortable(tabsContainer, {
-                animation: 200,           // انیمیشن جابجایی
-                ghostClass: 'sortable-ghost', // کلاس برای عنصر پلیس‌هولدر
-                chosenClass: 'sortable-chosen', // کلاس برای عنصری که گرفته شده
-                dragClass: 'sortable-drag', // کلاس برای عنصر در حال درگ
+                animation: 200,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                // این گزینه باعث می‌شود درگ فقط با کمی حرکت ماوس شروع شود و کلیک عادی خراب نشود
+                delay: 50,
+                delayOnTouchOnly: true,
+                touchStartThreshold: 5,
                 onEnd: function (evt) {
-                    // بعد از اتمام جابجایی، با کلیک روی تب جابجا شده (فعلی)، آن را فعال می‌کنیم
-                    // چون کاربر احتمالاً می‌خواسته تب مورد نظر را جابجا و فعال کند
-                    const newIndex = evt.newIndex;
+                    // اگر کاربر فقط کلیک کرد و درگ نکرد، SortableJS به صورت خودکار کلیک را هندل می‌کند
+                    // اما برای اطمینان، تب جابجا شده را فعال می‌کنیم
                     const movedTab = evt.item;
-                    
-                    // پیدا کردن ایندکس داده اصلی تب
                     const dataIndex = parseInt(movedTab.getAttribute('data-tab-index'));
-                    
-                    // فعال کردن همان تب که جابجا شده (اختیاری - برای اینکه کاربر ببیند کجا رفت)
                     openTab(dataIndex);
                 }
             });
             tabsContainer.classList.add('sortable-initialized');
+            
+            // اضافه کردن شنونده کلیک دستی برای اطمینان بیشتر
+            // چون SortableJS رویدادهای کلیک را در حین درگ متوقف می‌کند
+            tabsContainer.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    // جلوگیری از اجرای کلیک اگر در حال درگ هستیم
+                    if (tabsContainer.classList.contains('sortable-drag')) return;
+                    const dataIndex = parseInt(this.getAttribute('data-tab-index'));
+                    openTab(dataIndex);
+                });
+            });
         }
 
         let deferredPrompt;
