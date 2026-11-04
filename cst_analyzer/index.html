@@ -308,6 +308,50 @@
   @media (max-width: 768px) {
     .toast { right: 10px; left: 10px; min-width: auto; top: 10px; }
   }
+
+  /* ==== استایل‌های مخصوص باکس High/Low جدید ==== */
+  #hlCanvasWrap {
+    position: relative;
+    width: 100%;
+    margin-top: 16px;
+    background: #0b1220;
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+  }
+  #hlCanvas {
+    display: block;
+    width: 100%;
+    height: 420px;
+    background: #0f172a;
+    border-radius: 8px;
+  }
+  .hl-legend {
+    display: flex;
+    gap: 22px;
+    justify-content: center;
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    flex-wrap: wrap;
+  }
+  .hl-legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .hl-swatch { display: inline-block; width: 26px; height: 3px; border-radius: 2px; }
+  .hl-tooltip {
+    position: absolute;
+    background: rgba(7, 16, 32, 0.95);
+    border: 1px solid var(--accent-color);
+    color: #e6eef8;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+    z-index: 50;
+    white-space: nowrap;
+    font-family: 'Vazirmatn', sans-serif;
+  }
 </style>
 </head>
 <body>
@@ -528,6 +572,52 @@
         </div>
       </div>
     </div>
+
+    <!-- ====== باکس جدید: نمایش گرافیکی High/Low بین دو تاریخ ====== -->
+    <div class="card collapsible-card" data-section="5">
+      <div class="collapsible-header" onclick="toggleSection('5')">
+        <h3>۵) نمودار High / Low بین دو تاریخ</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <br>
+        <div class="small">
+          یک جفت‌ارز و بازه تاریخ دلخواه انتخاب کن. برای هر روز از داده‌های ذخیره‌شده، خط High با رنگ <strong style="color:#f0c000">زرد</strong> و خط Low با رنگ <strong style="color:#ef4444">قرمز</strong> رسم می‌شود.
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>جفت‌ارز</label>
+            <select id="hlSymbol"></select>
+          </div>
+          <div class="col">
+            <label>تاریخ شروع</label>
+            <input id="hlStartDate" type="date">
+          </div>
+          <div class="col">
+            <label>تاریخ پایان</label>
+            <input id="hlEndDate" type="date">
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button id="hlDrawBtn">رسم نمودار</button>
+          <button id="hlResetBtn" class="btn-small" style="background:#334155; color:#e6eef8;">پاک کردن</button>
+        </div>
+
+        <div id="hlCanvasWrap">
+          <canvas id="hlCanvas"></canvas>
+          <div class="hl-tooltip" id="hlTooltip"></div>
+          <div class="hl-legend">
+            <span><i class="hl-swatch" style="background:#f0c000;"></i> High</span>
+            <span><i class="hl-swatch" style="background:#ef4444;"></i> Low</span>
+          </div>
+        </div>
+
+        <div id="hlInfo" class="small" style="margin-top:8px; text-align:center;"></div>
+      </div>
+    </div>
+
   </div>
 
   <div class="card small" style="background: var(--bg-card); padding: 16px;">
@@ -723,7 +813,7 @@ const STORAGE_KEY = 'cst_data_final_v5';
 const SECTIONS_ORDER_KEY = 'cst_sections_order';
 const SECTION_OPEN_KEY = 'cst_section_open_';
 let store = { symbols: {}, symbolOrder: [] };
-let sectionsOrder = [1, 2, 3, 4];
+let sectionsOrder = [1, 2, 3, 4, 5];
 let lastAlertShownAt = 0;
 const ALERT_THROTTLE_MS = 3000;
 
@@ -789,6 +879,8 @@ function refreshSymbolsList(){
     opt.text = '-- جفت انتخاب نشده --';
     sel.appendChild(opt);
     sel3.appendChild(opt.cloneNode(true));
+    // آپدیت سلکت باکس نمودار High/Low
+    refreshHLSymbolSelect();
     return;
   }
 
@@ -810,6 +902,9 @@ function refreshSymbolsList(){
     sel.value = names[0];
     sel3.value = names[0];
   }
+
+  // آپدیت سلکت باکس نمودار High/Low
+  refreshHLSymbolSelect();
 
   setupFreeDragAndDrop(container);
 }
@@ -931,6 +1026,9 @@ function refreshSymbolDropdown() {
     sel.value = store.symbolOrder[0];
     sel3.value = store.symbolOrder[0];
   }
+
+  // آپدیت سلکت باکس نمودار High/Low
+  refreshHLSymbolSelect();
 }
 
 function ensureSymbol(name){
@@ -1909,6 +2007,7 @@ window.addEventListener('resize', function() {
     window._chart.resize();
   }
   resizeHorizontalLines();
+  if (window._hlRedraw) window._hlRedraw();
 });
 function toggleSection(sectionId) {
   const card = document.querySelector(`[data-section="${sectionId}"]`);
@@ -1934,6 +2033,293 @@ function toggleSection(sectionId) {
       }
     }
   }
+  if (sectionId === '5' && !isOpen) {
+    setTimeout(() => { if (window._hlRedraw) window._hlRedraw(); }, 100);
+  }
+}
+
+// ================== توابع نمودار High/Low ==================
+function refreshHLSymbolSelect() {
+  const sel = document.getElementById('hlSymbol');
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '';
+  if (store.symbolOrder.length === 0) {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.text = '-- جفت‌ارزی موجود نیست --';
+    sel.appendChild(opt);
+    return;
+  }
+  store.symbolOrder.forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.text = name;
+    sel.appendChild(opt);
+  });
+  if (prev && store.symbolOrder.includes(prev)) sel.value = prev;
+}
+
+function drawHLChart() {
+  const symName = document.getElementById('hlSymbol').value;
+  const startVal = document.getElementById('hlStartDate').value;
+  const endVal = document.getElementById('hlEndDate').value;
+  const info = document.getElementById('hlInfo');
+  const canvas = document.getElementById('hlCanvas');
+  const tooltip = document.getElementById('hlTooltip');
+
+  const ctx = canvas.getContext('2d');
+
+  function clearCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, rect.width, rect.height);
+    return rect;
+  }
+
+  if (!symName) { clearCanvas(); info.textContent = ''; return; }
+  if (!startVal || !endVal) {
+    clearCanvas();
+    info.textContent = 'لطفاً تاریخ شروع و پایان را انتخاب کنید.';
+    return;
+  }
+  if (new Date(startVal) > new Date(endVal)) {
+    clearCanvas();
+    info.textContent = 'تاریخ شروع نمی‌تواند بعد از تاریخ پایان باشد.';
+    return;
+  }
+
+  const sym = store.symbols[symName];
+  if (!sym || !sym.history || sym.history.length === 0) {
+    clearCanvas();
+    info.textContent = 'برای این جفت‌ارز داده‌ای ذخیره نشده است.';
+    return;
+  }
+
+  const start = new Date(startVal); start.setHours(0,0,0,0);
+  const end = new Date(endVal); end.setHours(23,59,59,999);
+
+  let records = sym.history.filter(r => {
+    const d = new Date(r.date);
+    return d >= start && d <= end;
+  });
+
+  if (records.length === 0) {
+    clearCanvas();
+    info.textContent = 'در این بازه تاریخی رکوردی وجود ندارد.';
+    return;
+  }
+
+  // مرتب‌سازی صعودی بر اساس تاریخ
+  records = records.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
+
+  const rect = clearCanvas();
+  const W = rect.width, H = rect.height;
+  const padL = 70, padR = 20, padT = 40, padB = 60;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  let minV = Infinity, maxV = -Infinity;
+  records.forEach(r => {
+    if (r.high < minV) minV = r.high;
+    if (r.low < minV) minV = r.low;
+    if (r.high > maxV) maxV = r.high;
+    if (r.low > maxV) maxV = r.low;
+  });
+  if (minV === maxV) { minV -= 1; maxV += 1; }
+  const rangeV = maxV - minV;
+  minV -= rangeV * 0.12;
+  maxV += rangeV * 0.12;
+
+  const toY = v => padT + plotH - ((v - minV) / (maxV - minV)) * plotH;
+  const toX = i => padL + (records.length === 1 ? plotW / 2 : (i / (records.length - 1)) * plotW);
+
+  // شبکه و مقیاس
+  ctx.strokeStyle = 'rgba(148,163,184,0.15)';
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '11px Vazirmatn, Tahoma';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = 1;
+  const gridSteps = 6;
+  for (let i = 0; i <= gridSteps; i++) {
+    const v = minV + ((maxV - minV) * i) / gridSteps;
+    const y = toY(v);
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(W - padR, y);
+    ctx.stroke();
+    const disp = formatNumberSmart(v, symName, null);
+    ctx.fillText(disp, padL - 8, y);
+  }
+
+  // محور عمودی
+  ctx.strokeStyle = 'rgba(148,163,184,0.4)';
+  ctx.beginPath();
+  ctx.moveTo(padL, padT);
+  ctx.lineTo(padL, padT + plotH);
+  ctx.stroke();
+
+  // خطوط افقی High (زرد) و Low (قرمز)
+  // برای هر رکورد، یک خط افقی از ستون قبلی تا ستون فعلی رسم می‌کنیم
+  // (خط پله‌ای، مطابق با درخواست قبلی)
+  const xStart = padL + 10;
+  const xEnd = W - padR - 10;
+
+  // خطوط High (زرد)
+  ctx.lineWidth = 2;
+  records.forEach((r, i) => {
+    const y = toY(r.high);
+    const x1 = (i === 0) ? xStart : toX(i - 0.5) >= padL ? toX(i) - (plotW / Math.max(records.length - 1, 1)) * 0.5 : xStart;
+    // بهتر است برای خوانایی، هر خط را در محدوده کامل بازه بکشیم
+  });
+
+  // روشن‌تر: برای هر روز، High را به صورت خط افقی در محدوده‌ی بین میان‌ستون‌ها رسم می‌کنیم
+  // و خطوط عمودی نازک برای اتصال
+  const stepW = records.length > 1 ? plotW / (records.length - 1) : plotW;
+
+  // ابتدا یک نوار پس‌زمینه ملایم برای هر روز
+  for (let i = 0; i < records.length; i++) {
+    if (i % 2 === 0) {
+      const x0 = (i === 0) ? padL : toX(i) - stepW / 2;
+      const w = (records.length === 1) ? plotW : stepW;
+      ctx.fillStyle = 'rgba(255,255,255,0.015)';
+      ctx.fillRect(Math.max(padL, x0), padT, Math.min(w, plotW), plotH);
+    }
+  }
+
+  // رسم خطوط High (زرد)
+  ctx.strokeStyle = '#f0c000';
+  ctx.lineWidth = 2.5;
+  for (let i = 0; i < records.length; i++) {
+    const r = records[i];
+    const yH = toY(r.high);
+    let x0, x1;
+    if (records.length === 1) {
+      x0 = padL + 10; x1 = W - padR - 10;
+    } else {
+      x0 = (i === 0) ? padL + 2 : toX(i) - stepW / 2;
+      x1 = (i === records.length - 1) ? W - padR - 2 : toX(i) + stepW / 2;
+      // محدود کردن به ناحیه ترسیم
+      x0 = Math.max(padL + 2, x0);
+      x1 = Math.min(W - padR - 2, x1);
+    }
+    ctx.beginPath();
+    ctx.moveTo(x0, yH);
+    ctx.lineTo(x1, yH);
+    ctx.stroke();
+  }
+
+  // رسم خطوط Low (قرمز)
+  ctx.strokeStyle = '#ef4444';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < records.length; i++) {
+    const r = records[i];
+    const yL = toY(r.low);
+    let x0, x1;
+    if (records.length === 1) {
+      x0 = padL + 10; x1 = W - padR - 10;
+    } else {
+      x0 = (i === 0) ? padL + 2 : toX(i) - stepW / 2;
+      x1 = (i === records.length - 1) ? W - padR - 2 : toX(i) + stepW / 2;
+      x0 = Math.max(padL + 2, x0);
+      x1 = Math.min(W - padR - 2, x1);
+    }
+    // Low را کمی خط‌چین برای تمایز بیشتر
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(x0, yL);
+    ctx.lineTo(x1, yL);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // خطوط عمودی راهنما (نازک) در محل هر رکورد
+  ctx.strokeStyle = 'rgba(148,163,184,0.08)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < records.length; i++) {
+    const x = toX(i);
+    ctx.beginPath();
+    ctx.moveTo(x, padT);
+    ctx.lineTo(x, padT + plotH);
+    ctx.stroke();
+  }
+
+  // برچسب تاریخ‌ها
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '11px Vazirmatn, Tahoma';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  const maxLabels = Math.max(1, Math.floor(plotW / 70));
+  const stepLabel = Math.max(1, Math.ceil(records.length / maxLabels));
+  for (let i = 0; i < records.length; i += stepLabel) {
+    const x = toX(i);
+    ctx.fillText(records[i].date.slice(5), x, padT + plotH + 8);
+  }
+
+  // عنوان
+  ctx.fillStyle = '#e6eef8';
+  ctx.font = 'bold 13px Vazirmatn, Tahoma';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText(`${symName}  —  High (زرد) / Low (قرمز)`, W / 2, 12);
+
+  // ذخیره اطلاعات برای tooltip
+  window._hlData = { records, toX, toY, padL, padR, padT, padB, W, H, stepW, symName };
+
+  // اطلاعات خلاصه
+  const highs = records.map(r => r.high);
+  const lows = records.map(r => r.low);
+  info.innerHTML = `تعداد روزهای رسم‌شده: <strong>${records.length}</strong> — بیشترین High: <strong>${formatNumberSmart(Math.max(...highs), symName, null)}</strong> — کمترین Low: <strong>${formatNumberSmart(Math.min(...lows), symName, null)}</strong>`;
+}
+
+function setupHLInteractions() {
+  const canvas = document.getElementById('hlCanvas');
+  const tooltip = document.getElementById('hlTooltip');
+  if (!canvas) return;
+
+  function handleMove(e) {
+    const data = window._hlData;
+    if (!data) { tooltip.style.opacity = 0; return; }
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    if (x < data.padL || x > data.W - data.padR || y < data.padT || y > data.padT + (data.H - data.padT - data.padB)) {
+      tooltip.style.opacity = 0;
+      return;
+    }
+    // پیدا کردن نزدیک‌ترین ایندکس
+    let closest = 0, minDist = Infinity;
+    for (let i = 0; i < data.records.length; i++) {
+      const d = Math.abs(data.toX(i) - x);
+      if (d < minDist) { minDist = d; closest = i; }
+    }
+    const r = data.records[closest];
+    if (!r) { tooltip.style.opacity = 0; return; }
+    const dispH = formatNumberSmart(r.high, data.symName, r.originalHigh);
+    const dispL = formatNumberSmart(r.low, data.symName, r.originalLow);
+    tooltip.innerHTML = `<div style="color:#f0c000;font-weight:600;">High: ${dispH}</div><div style="color:#ef4444;font-weight:600;">Low: ${dispL}</div><div style="color:#94a3b8;font-size:0.72rem;margin-top:2px;">${r.date}</div>`;
+    tooltip.style.opacity = 1;
+    const wrapRect = canvas.parentElement.getBoundingClientRect();
+    let tx = x + 14;
+    let ty = y - 50;
+    if (tx + 130 > wrapRect.width) tx = x - 140;
+    if (ty < 0) ty = 6;
+    tooltip.style.left = tx + 'px';
+    tooltip.style.top = ty + 'px';
+  }
+  function handleLeave() { tooltip.style.opacity = 0; }
+
+  canvas.addEventListener('mousemove', handleMove);
+  canvas.addEventListener('mouseleave', handleLeave);
+  canvas.addEventListener('touchmove', handleMove, { passive: true });
+  canvas.addEventListener('touchstart', handleMove, { passive: true });
+  canvas.addEventListener('touchend', handleLeave);
 }
 
 // ---------- init ----------
@@ -1999,6 +2385,34 @@ function initApp() {
         card.querySelector('.collapsible-content').style.display = 'none';
       }
     });
+
+    // ====== مقداردهی اولیه باکس High/Low ======
+    refreshHLSymbolSelect();
+    const hlToday = new Date();
+    const hlWeekAgo = new Date();
+    hlWeekAgo.setDate(hlWeekAgo.getDate() - 7);
+    const hlEndInput = document.getElementById('hlEndDate');
+    const hlStartInput = document.getElementById('hlStartDate');
+    if (hlEndInput && !hlEndInput.value) hlEndInput.value = hlToday.toISOString().slice(0, 10);
+    if (hlStartInput && !hlStartInput.value) hlStartInput.value = hlWeekAgo.toISOString().slice(0, 10);
+
+    document.getElementById('hlSymbol').addEventListener('change', () => { /* نیاز به رسم دستی */ });
+    document.getElementById('hlDrawBtn').addEventListener('click', drawHLChart);
+    document.getElementById('hlResetBtn').addEventListener('click', () => {
+      const ctx = document.getElementById('hlCanvas').getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = document.getElementById('hlCanvas').getBoundingClientRect();
+      document.getElementById('hlCanvas').width = Math.max(1, Math.floor(rect.width * dpr));
+      document.getElementById('hlCanvas').height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, rect.width, rect.height);
+      document.getElementById('hlInfo').textContent = '';
+      window._hlData = null;
+    });
+
+    setupHLInteractions();
+    window._hlRedraw = drawHLChart;
   }).catch(err => {
     console.error('Error initializing app:', err);
     alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
