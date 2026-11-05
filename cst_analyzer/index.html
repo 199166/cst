@@ -582,7 +582,7 @@
       <div class="collapsible-content">
         <br>
         <div class="small">
-          یک جفت‌ارز و بازه تاریخ دلخواه انتخاب کن. برای هر روز از داده‌های ذخیره‌شده، خط High با رنگ <strong style="color:#f0c000">زرد</strong> و خط Low با رنگ <strong style="color:#ef4444">قرمز</strong> رسم می‌شود.
+          یک جفت‌ارز و بازه تاریخ دلخواه انتخاب کن. برای هر روز از داده‌های ذخیره‌شده، خط High با رنگ <strong style="color:#f0c000">زرد</strong> و خط Low با رنگ <strong style="color:#ef4444">قرمز</strong> رسم می‌شود. با تغییر جفت‌ارز یا تاریخ‌ها، نمودار به صورت خودکار به‌روزرسانی می‌شود.
         </div>
 
         <div class="row">
@@ -598,11 +598,6 @@
             <label>تاریخ پایان</label>
             <input id="hlEndDate" type="date">
           </div>
-        </div>
-
-        <div class="btn-group">
-          <button id="hlDrawBtn">رسم نمودار</button>
-          <button id="hlResetBtn" class="btn-small" style="background:#334155; color:#e6eef8;">پاک کردن</button>
         </div>
 
         <div id="hlCanvasWrap">
@@ -2058,6 +2053,11 @@ function refreshHLSymbolSelect() {
     sel.appendChild(opt);
   });
   if (prev && store.symbolOrder.includes(prev)) sel.value = prev;
+
+  // رسم خودکار پس از پر شدن سلکت
+  if (sel.value) {
+    setTimeout(() => drawHLChart(), 30);
+  }
 }
 
 function drawHLChart() {
@@ -2066,7 +2066,6 @@ function drawHLChart() {
   const endVal = document.getElementById('hlEndDate').value;
   const info = document.getElementById('hlInfo');
   const canvas = document.getElementById('hlCanvas');
-  const tooltip = document.getElementById('hlTooltip');
 
   const ctx = canvas.getContext('2d');
 
@@ -2082,15 +2081,17 @@ function drawHLChart() {
     return rect;
   }
 
-  if (!symName) { clearCanvas(); info.textContent = ''; return; }
+  if (!symName) { clearCanvas(); info.textContent = ''; window._hlData = null; return; }
   if (!startVal || !endVal) {
     clearCanvas();
     info.textContent = 'لطفاً تاریخ شروع و پایان را انتخاب کنید.';
+    window._hlData = null;
     return;
   }
   if (new Date(startVal) > new Date(endVal)) {
     clearCanvas();
     info.textContent = 'تاریخ شروع نمی‌تواند بعد از تاریخ پایان باشد.';
+    window._hlData = null;
     return;
   }
 
@@ -2098,6 +2099,7 @@ function drawHLChart() {
   if (!sym || !sym.history || sym.history.length === 0) {
     clearCanvas();
     info.textContent = 'برای این جفت‌ارز داده‌ای ذخیره نشده است.';
+    window._hlData = null;
     return;
   }
 
@@ -2112,6 +2114,7 @@ function drawHLChart() {
   if (records.length === 0) {
     clearCanvas();
     info.textContent = 'در این بازه تاریخی رکوردی وجود ندارد.';
+    window._hlData = null;
     return;
   }
 
@@ -2165,25 +2168,9 @@ function drawHLChart() {
   ctx.lineTo(padL, padT + plotH);
   ctx.stroke();
 
-  // خطوط افقی High (زرد) و Low (قرمز)
-  // برای هر رکورد، یک خط افقی از ستون قبلی تا ستون فعلی رسم می‌کنیم
-  // (خط پله‌ای، مطابق با درخواست قبلی)
-  const xStart = padL + 10;
-  const xEnd = W - padR - 10;
-
-  // خطوط High (زرد)
-  ctx.lineWidth = 2;
-  records.forEach((r, i) => {
-    const y = toY(r.high);
-    const x1 = (i === 0) ? xStart : toX(i - 0.5) >= padL ? toX(i) - (plotW / Math.max(records.length - 1, 1)) * 0.5 : xStart;
-    // بهتر است برای خوانایی، هر خط را در محدوده کامل بازه بکشیم
-  });
-
-  // روشن‌تر: برای هر روز، High را به صورت خط افقی در محدوده‌ی بین میان‌ستون‌ها رسم می‌کنیم
-  // و خطوط عمودی نازک برای اتصال
   const stepW = records.length > 1 ? plotW / (records.length - 1) : plotW;
 
-  // ابتدا یک نوار پس‌زمینه ملایم برای هر روز
+  // نوار پس‌زمینه ملایم برای هر روز
   for (let i = 0; i < records.length; i++) {
     if (i % 2 === 0) {
       const x0 = (i === 0) ? padL : toX(i) - stepW / 2;
@@ -2205,7 +2192,6 @@ function drawHLChart() {
     } else {
       x0 = (i === 0) ? padL + 2 : toX(i) - stepW / 2;
       x1 = (i === records.length - 1) ? W - padR - 2 : toX(i) + stepW / 2;
-      // محدود کردن به ناحیه ترسیم
       x0 = Math.max(padL + 2, x0);
       x1 = Math.min(W - padR - 2, x1);
     }
@@ -2230,7 +2216,6 @@ function drawHLChart() {
       x0 = Math.max(padL + 2, x0);
       x1 = Math.min(W - padR - 2, x1);
     }
-    // Low را کمی خط‌چین برای تمایز بیشتر
     ctx.setLineDash([6, 4]);
     ctx.beginPath();
     ctx.moveTo(x0, yL);
@@ -2239,7 +2224,7 @@ function drawHLChart() {
     ctx.setLineDash([]);
   }
 
-  // خطوط عمودی راهنما (نازک) در محل هر رکورد
+  // خطوط عمودی راهنما
   ctx.strokeStyle = 'rgba(148,163,184,0.08)';
   ctx.lineWidth = 1;
   for (let i = 0; i < records.length; i++) {
@@ -2269,10 +2254,8 @@ function drawHLChart() {
   ctx.textBaseline = 'top';
   ctx.fillText(`${symName}  —  High (زرد) / Low (قرمز)`, W / 2, 12);
 
-  // ذخیره اطلاعات برای tooltip
   window._hlData = { records, toX, toY, padL, padR, padT, padB, W, H, stepW, symName };
 
-  // اطلاعات خلاصه
   const highs = records.map(r => r.high);
   const lows = records.map(r => r.low);
   info.innerHTML = `تعداد روزهای رسم‌شده: <strong>${records.length}</strong> — بیشترین High: <strong>${formatNumberSmart(Math.max(...highs), symName, null)}</strong> — کمترین Low: <strong>${formatNumberSmart(Math.min(...lows), symName, null)}</strong>`;
@@ -2293,7 +2276,6 @@ function setupHLInteractions() {
       tooltip.style.opacity = 0;
       return;
     }
-    // پیدا کردن نزدیک‌ترین ایندکس
     let closest = 0, minDist = Infinity;
     for (let i = 0; i < data.records.length; i++) {
       const d = Math.abs(data.toX(i) - x);
@@ -2387,7 +2369,6 @@ function initApp() {
     });
 
     // ====== مقداردهی اولیه باکس High/Low ======
-    refreshHLSymbolSelect();
     const hlToday = new Date();
     const hlWeekAgo = new Date();
     hlWeekAgo.setDate(hlWeekAgo.getDate() - 7);
@@ -2396,23 +2377,18 @@ function initApp() {
     if (hlEndInput && !hlEndInput.value) hlEndInput.value = hlToday.toISOString().slice(0, 10);
     if (hlStartInput && !hlStartInput.value) hlStartInput.value = hlWeekAgo.toISOString().slice(0, 10);
 
-    document.getElementById('hlSymbol').addEventListener('change', () => { /* نیاز به رسم دستی */ });
-    document.getElementById('hlDrawBtn').addEventListener('click', drawHLChart);
-    document.getElementById('hlResetBtn').addEventListener('click', () => {
-      const ctx = document.getElementById('hlCanvas').getContext('2d');
-      const dpr = window.devicePixelRatio || 1;
-      const rect = document.getElementById('hlCanvas').getBoundingClientRect();
-      document.getElementById('hlCanvas').width = Math.max(1, Math.floor(rect.width * dpr));
-      document.getElementById('hlCanvas').height = Math.max(1, Math.floor(rect.height * dpr));
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, rect.width, rect.height);
-      document.getElementById('hlInfo').textContent = '';
-      window._hlData = null;
-    });
+    // رسم خودکار با تغییر هر فیلد (جفت‌ارز یا تاریخ‌ها)
+    document.getElementById('hlSymbol').addEventListener('change', drawHLChart);
+    document.getElementById('hlStartDate').addEventListener('change', drawHLChart);
+    document.getElementById('hlEndDate').addEventListener('change', drawHLChart);
+    document.getElementById('hlStartDate').addEventListener('input', drawHLChart);
+    document.getElementById('hlEndDate').addEventListener('input', drawHLChart);
 
     setupHLInteractions();
     window._hlRedraw = drawHLChart;
+
+    // رسم اولیه نمودار (اگر جفت‌ارز و تاریخ‌ها موجود باشند)
+    setTimeout(() => drawHLChart(), 100);
   }).catch(err => {
     console.error('Error initializing app:', err);
     alert('خطا در راه‌اندازی برنامه. لطفاً صفحه را مجدداً بارگذاری کنید.');
